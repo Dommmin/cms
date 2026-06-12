@@ -12,6 +12,7 @@ use App\Models\Page;
 use App\Queries\Admin\PageIndexQuery;
 use App\Services\CloneSiteService;
 use App\Services\LegalDocumentVersionService;
+use App\Services\MetafieldVisibilityService;
 use App\Services\PagePublicationWebhookService;
 use App\Services\PageSlugService;
 use App\Services\PageVersionService;
@@ -28,6 +29,7 @@ class PageController extends Controller
         private readonly PageVersionService $versionService,
         private readonly PagePublicationWebhookService $publicationWebhookService,
         private readonly LegalDocumentVersionService $legalDocumentVersionService,
+        private readonly MetafieldVisibilityService $metafieldVisibilityService,
     ) {}
 
     public function index(Request $request): Response
@@ -53,12 +55,16 @@ class PageController extends Controller
             'modules' => config('cms.modules'),
             'systemPages' => config('cms.system_pages'),
             'pages' => $pages,
+            'metafield_definitions' => $this->metafieldVisibilityService->serializeDefinitions(Page::class),
+            'metafields' => [],
         ]);
     }
 
     public function store(StorePageRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $metafields = $data['metafields'] ?? [];
+        unset($data['metafields']);
 
         if (($data['page_type'] ?? null) === 'blocks') {
             $data['module_name'] = null;
@@ -68,6 +74,7 @@ class PageController extends Controller
         $data['is_published'] = false;
 
         $page = Page::query()->create($data);
+        $page->syncMetafields($metafields);
 
         return to_route('admin.cms.pages.edit', $page)->with('success', 'Page created');
     }
@@ -89,12 +96,16 @@ class PageController extends Controller
             'modules' => config('cms.modules'),
             'systemPages' => config('cms.system_pages'),
             'pages' => $pages,
+            'metafield_definitions' => $this->metafieldVisibilityService->serializeDefinitions(Page::class),
+            'metafields' => $this->metafieldVisibilityService->serializeMetafieldsForOwner($page),
         ]);
     }
 
     public function update(UpdatePageRequest $request, Page $page): RedirectResponse
     {
         $data = $request->validated();
+        $metafields = $data['metafields'] ?? [];
+        unset($data['metafields']);
 
         if (($data['page_type'] ?? null) === 'blocks') {
             $data['module_name'] = null;
@@ -102,6 +113,7 @@ class PageController extends Controller
         }
 
         $page->update($data);
+        $page->syncMetafields($metafields);
 
         return back()->with('success', 'Page updated');
     }

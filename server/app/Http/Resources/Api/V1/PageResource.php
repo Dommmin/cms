@@ -12,6 +12,7 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Services\Hooks\Cms\PageRenderFilter;
 use App\Services\Hooks\Facades\Hook;
+use App\Services\MetafieldVisibilityService;
 use App\Services\StorefrontPathService;
 use BackedEnum;
 use Illuminate\Http\Request;
@@ -71,6 +72,12 @@ class PageResource extends JsonResource
                 ]) : [],
             ]) : [],
         ];
+
+        if ($page->relationLoaded('metafields')) {
+            $data['metafields'] = MetafieldResource::collection(
+                resolve(MetafieldVisibilityService::class)->publicMetafieldsForOwner($page)
+            )->resolve($request);
+        }
 
         $filter = Hook::filter(new PageRenderFilter($data, $page));
 

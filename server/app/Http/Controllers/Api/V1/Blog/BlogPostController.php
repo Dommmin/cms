@@ -61,7 +61,7 @@ class BlogPostController extends ApiController
                 $q->whereNull('available_locales')
                     ->orWhereJsonContains('available_locales', $locale);
             })
-            ->with(['author:id,name', 'category:id,name,slug', 'votes', 'tags'])
+            ->with(['author:id,name', 'category:id,name,slug', 'votes', 'tags', 'metafields'])
             ->firstOrFail();
 
         return $this->ok(new BlogPostResource($post));

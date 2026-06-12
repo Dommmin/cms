@@ -6,6 +6,7 @@ namespace App\Http\Requests\Admin\Cms;
 
 use App\Enums\PageLayoutEnum;
 use App\Enums\PageTypeEnum;
+use App\Http\Requests\Admin\Concerns\InteractsWithMetafields;
 use App\Models\Locale;
 use App\Models\Page;
 use Illuminate\Foundation\Http\FormRequest;
@@ -13,6 +14,8 @@ use Illuminate\Validation\Rule;
 
 class StorePageRequest extends FormRequest
 {
+    use InteractsWithMetafields;
+
     public function authorize(): bool
     {
         return true;
@@ -56,6 +59,7 @@ class StorePageRequest extends FormRequest
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:500'],
             'seo_canonical' => ['nullable', 'string', 'max:255'],
+            ...$this->metafieldRules(),
         ];
     }
 
@@ -77,7 +81,7 @@ class StorePageRequest extends FormRequest
                 }
 
                 $exists = Page::query()
-                    ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(slug, '$.\"' || ? || '\"')) = ?", [$localeCode, $slugValue])
+                    ->where('slug->'.$localeCode, $slugValue)
                     ->where('parent_id', $parentId)
                     ->where('locale', $locale)
                     ->exists();
@@ -100,5 +104,17 @@ class StorePageRequest extends FormRequest
                 $validator->errors()->add('system_page_key', 'This system page role is already assigned for the selected locale.');
             }
         });
+    }
+
+    public function after(): array
+    {
+        return [
+            ...$this->validateMetafields(Page::class),
+        ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->normalizeMetafields();
     }
 }

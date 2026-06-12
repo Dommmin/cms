@@ -20,6 +20,7 @@ use App\Models\ProductFlag;
 use App\Models\ProductType;
 use App\Queries\Admin\ProductIndexQuery;
 use App\Services\Admin\Ecommerce\ProductService;
+use App\Services\MetafieldVisibilityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,6 +33,7 @@ class ProductController extends Controller
 {
     public function __construct(
         private readonly ProductService $productService,
+        private readonly MetafieldVisibilityService $metafieldVisibilityService,
     ) {}
 
     public function index(Request $request): Response
@@ -52,12 +54,19 @@ class ProductController extends Controller
             'types' => ProductType::all(),
             'brands' => Brand::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'flags' => ProductFlag::query()->active()->ordered()->get(),
+            'metafield_definitions' => $this->metafieldVisibilityService->serializeDefinitions(Product::class),
+            'metafields' => [],
         ]);
     }
 
     public function store(StoreProductRequest $request): RedirectResponse
     {
-        $this->productService->createProduct($request->validated());
+        $data = $request->validated();
+        $metafields = $data['metafields'] ?? [];
+        unset($data['metafields']);
+
+        $product = $this->productService->createProduct($data);
+        $product->syncMetafields($metafields);
 
         return to_route('admin.ecommerce.products.index')
             ->with('success', 'Product created successfully.');
@@ -85,18 +94,29 @@ class ProductController extends Controller
             ->all() ?? [];
 
         return inertia('admin/ecommerce/products/edit', [
-            'product' => AdminProductData::fromModel($product),
+            'product' => array_merge(
+                AdminProductData::fromModel($product)->toArray(),
+                [
+                    'metafields' => $this->metafieldVisibilityService->serializeMetafieldsForOwner($product),
+                ],
+            ),
             'categories' => $this->categoryFormOptions(),
             'types' => ProductType::all(),
             'brands' => Brand::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'flags' => ProductFlag::query()->active()->ordered()->get(),
             'price_history' => $priceHistory,
+            'metafield_definitions' => $this->metafieldVisibilityService->serializeDefinitions(Product::class),
         ]);
     }
 
     public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
-        $this->productService->updateProduct($product, $request->validated());
+        $data = $request->validated();
+        $metafields = $data['metafields'] ?? [];
+        unset($data['metafields']);
+
+        $updatedProduct = $this->productService->updateProduct($product, $data);
+        $updatedProduct->syncMetafields($metafields);
 
         return back()->with('success', 'Product updated successfully.');
     }

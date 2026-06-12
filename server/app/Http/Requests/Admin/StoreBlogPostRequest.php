@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Admin\Concerns\InteractsWithMetafields;
+use App\Models\BlogPost;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBlogPostRequest extends FormRequest
 {
+    use InteractsWithMetafields;
+
     public function authorize(): bool
     {
         return true;
@@ -51,6 +55,14 @@ class StoreBlogPostRequest extends FormRequest
             'meta_robots' => ['nullable', 'string', 'max:100'],
             'og_image' => ['nullable', 'string', 'max:255'],
             'sitemap_exclude' => ['sometimes', 'boolean'],
+            ...$this->metafieldRules(),
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            ...$this->validateMetafields(BlogPost::class),
         ];
     }
 
@@ -68,5 +80,10 @@ class StoreBlogPostRequest extends FormRequest
         }
 
         return $messages;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->normalizeMetafields();
     }
 }

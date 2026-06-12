@@ -38,6 +38,7 @@ class MetafieldDefinitionController extends Controller
             })
             ->when($request->input('owner_type'), fn ($q, string $type) => $q->where('owner_type', $type))
             ->orderBy('owner_type')
+            ->orderByDesc('pinned')
             ->orderBy('position')
             ->orderBy('name');
 

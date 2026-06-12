@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources\Api\V1;
 
 use App\Models\BlogPost;
+use App\Services\MetafieldVisibilityService;
 use App\Services\StorefrontPathService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -67,6 +68,11 @@ class BlogPostResource extends JsonResource
                 'name' => $this->category->name,
                 'slug' => $this->category->slug,
             ] : null),
+            'metafields' => $this->relationLoaded('metafields')
+                ? MetafieldResource::collection(
+                    resolve(MetafieldVisibilityService::class)->publicMetafieldsForOwner($this->resource)
+                )->resolve($request)
+                : null,
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

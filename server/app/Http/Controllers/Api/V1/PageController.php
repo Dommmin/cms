@@ -21,6 +21,7 @@ class PageController extends ApiController
         abort_unless($page instanceof Page, 404);
 
         $page->load([
+            'metafields',
             'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks.relations',
@@ -41,6 +42,7 @@ class PageController extends ApiController
             if ($previewToken instanceof PagePreviewToken) {
                 $page = Page::query()->findOrFail($previewToken->page_id);
                 $page->load([
+                    'metafields',
                     'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
                     'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
                     'sections.blocks.relations',
@@ -55,6 +57,7 @@ class PageController extends ApiController
         abort_unless($page instanceof Page, 404);
 
         $page->load([
+            'metafields',
             'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks.relations',

@@ -10,6 +10,7 @@ use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Page;
 use App\Models\Product;
+use App\Services\MetafieldVisibilityService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,10 @@ class MetafieldController extends ApiController
         'category' => Category::class,
     ];
 
+    public function __construct(
+        private readonly MetafieldVisibilityService $metafieldVisibilityService,
+    ) {}
+
     public function forResource(Request $request, string $type, int $id): JsonResponse
     {
         throw_unless(isset($this->allowedTypes[$type]), NotFoundHttpException::class, 'Unknown resource type: '.$type);
@@ -36,7 +41,9 @@ class MetafieldController extends ApiController
         $model = $modelClass::query()->findOrFail($id);
 
         return $this->ok(
-            MetafieldResource::collection($model->metafields()->get())
+            MetafieldResource::collection(
+                $this->metafieldVisibilityService->publicMetafieldsForOwner($model)
+            )
         );
     }
 }

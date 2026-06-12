@@ -45,6 +45,8 @@ abstract class WebhookRequest extends FormRequest
             'customer.updated',
             'page.published',
             'page.unpublished',
+            'page.updated',
+            'category.updated',
             'product.created',
             'product.updated',
             'product.deleted',

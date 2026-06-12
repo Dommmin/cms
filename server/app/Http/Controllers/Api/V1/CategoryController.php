@@ -76,7 +76,7 @@ class CategoryController extends ApiController
         $category = Category::query()
             ->where('slug->'.$locale, $slug)
             ->where('is_active', true)
-            ->with(['parent', 'children'])
+            ->with(['parent', 'children', 'metafields'])
             ->firstOrFail();
 
         $breadcrumb = $category->breadcrumb();

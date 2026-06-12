@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Ecommerce;
 
+use App\Http\Requests\Admin\Concerns\InteractsWithMetafields;
 use App\Http\Requests\Admin\Ecommerce\Concerns\InteractsWithProductAttributeValues;
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
 class StoreProductRequest extends FormRequest
 {
+    use InteractsWithMetafields;
     use InteractsWithProductAttributeValues;
 
     public function authorize(): bool
@@ -58,6 +61,7 @@ class StoreProductRequest extends FormRequest
             'images.*.media_id' => ['required', 'exists:media,id'],
             'images.*.is_thumbnail' => ['boolean'],
             'images.*.position' => ['integer'],
+            ...$this->metafieldRules(),
             ...$this->productAttributeValueRules(),
         ];
     }
@@ -65,7 +69,10 @@ class StoreProductRequest extends FormRequest
     public function after(): array
     {
         return [
-            $this->validateProductAttributeValues(...),
+            ...$this->validateMetafields(Product::class),
+            function ($validator): void {
+                $this->validateProductAttributeValues($validator);
+            },
         ];
     }
 
@@ -81,6 +88,7 @@ class StoreProductRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->normalizeProductAttributeValues();
+        $this->normalizeMetafields();
 
         $name = $this->input('name');
         $slugInput = $this->input('slug', []);

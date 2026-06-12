@@ -112,6 +112,7 @@ class ProductController extends ApiController
                 'brand',
                 'thumbnail.media',
                 'images.media',
+                'metafields',
                 'attributeValues.attribute.values',
                 'attributeValues.selectedOption',
                 'activeVariants.attributeValues.attribute',

@@ -10,6 +10,7 @@ use App\Http\Requests\Admin\Ecommerce\UpdateCategoryRequest;
 use App\Models\Attribute;
 use App\Models\Category;
 use App\Queries\Admin\CategoryIndexQuery;
+use App\Services\MetafieldVisibilityService;
 use App\Services\SmartCollectionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,10 @@ use Inertia\Response;
 
 class CategoryController extends Controller
 {
-    public function __construct(private readonly SmartCollectionService $smartCollectionService) {}
+    public function __construct(
+        private readonly SmartCollectionService $smartCollectionService,
+        private readonly MetafieldVisibilityService $metafieldVisibilityService,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -39,6 +43,8 @@ class CategoryController extends Controller
         return inertia('admin/ecommerce/categories/create', [
             'categories' => $categories,
             'available_attributes' => $this->availableAttributes(),
+            'metafield_definitions' => $this->metafieldVisibilityService->serializeDefinitions(Category::class),
+            'metafields' => [],
         ]);
     }
 
@@ -47,14 +53,18 @@ class CategoryController extends Controller
         $data = $request->validated();
         $data['is_active'] ??= true;
         $schema = $data['attribute_schema'] ?? null;
+        $metafields = $data['metafields'] ?? [];
         unset($data['attribute_schema']);
+        unset($data['metafields']);
 
-        DB::transaction(function () use ($data, $schema): void {
+        DB::transaction(function () use ($data, $schema, $metafields): void {
             $category = Category::query()->create($data);
 
             if (is_array($schema)) {
                 $this->syncAttributeSchema($category, $schema);
             }
+
+            $category->syncMetafields($metafields);
         });
 
         return to_route('admin.ecommerce.categories.index')->with('success', 'Category created');
@@ -113,6 +123,8 @@ class CategoryController extends Controller
                 ])
                 ->values()
                 ->all(),
+            'metafield_definitions' => $this->metafieldVisibilityService->serializeDefinitions(Category::class),
+            'metafields' => $this->metafieldVisibilityService->serializeMetafieldsForOwner($category),
         ]);
     }
 
@@ -121,19 +133,23 @@ class CategoryController extends Controller
         $data = $request->validated();
         $data['is_active'] ??= true;
         $schema = $data['attribute_schema'] ?? null;
+        $metafields = $data['metafields'] ?? [];
         unset($data['attribute_schema']);
+        unset($data['metafields']);
 
         // Clear rules when switching back to manual
         if (($data['collection_type'] ?? 'manual') === 'manual') {
             $data['rules'] = null;
         }
 
-        DB::transaction(function () use ($category, $data, $schema): void {
+        DB::transaction(function () use ($category, $data, $schema, $metafields): void {
             $category->update($data);
 
             if (is_array($schema)) {
                 $this->syncAttributeSchema($category, $schema);
             }
+
+            $category->syncMetafields($metafields);
         });
 
         return to_route('admin.ecommerce.categories.index')->with('success', 'Category updated');

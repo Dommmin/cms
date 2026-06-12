@@ -12,6 +12,7 @@ use App\Models\BlogPost;
 use App\Models\Tag;
 use App\Queries\Admin\BlogCategoryIndexQuery;
 use App\Queries\Admin\BlogPostIndexQuery;
+use App\Services\MetafieldVisibilityService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -19,6 +20,10 @@ use Inertia\Response;
 
 class BlogPostController extends Controller
 {
+    public function __construct(
+        private readonly MetafieldVisibilityService $metafieldVisibilityService,
+    ) {}
+
     public function index(Request $request): Response
     {
         $postQuery = new BlogPostIndexQuery;
@@ -43,6 +48,8 @@ class BlogPostController extends Controller
         return inertia('admin/blog/posts/create', [
             'categories' => $categoryQuery->categoriesForSelect(),
             'available_tags' => Tag::query()->orderBy('name')->get(['id', 'name', 'slug']),
+            'metafield_definitions' => $this->metafieldVisibilityService->serializeDefinitions(BlogPost::class),
+            'metafields' => [],
         ]);
     }
 
@@ -50,7 +57,9 @@ class BlogPostController extends Controller
     {
         $data = $request->validated();
         $tags = $data['tags'] ?? [];
+        $metafields = $data['metafields'] ?? [];
         unset($data['tags']);
+        unset($data['metafields']);
 
         $data['user_id'] = auth()->id();
         $titleForSlug = is_array($data['title'])
@@ -76,6 +85,7 @@ class BlogPostController extends Controller
 
         $post = BlogPost::query()->create($data);
         $post->tags()->sync($this->resolveTagIds($tags));
+        $post->syncMetafields($metafields);
 
         $message = $status === 'published' ? 'misc.blog_post_published' : 'misc.blog_post_saved';
 
@@ -99,6 +109,8 @@ class BlogPostController extends Controller
             ]),
             'categories' => $categoryQuery->categoriesForSelect(),
             'available_tags' => Tag::query()->orderBy('name')->get(['id', 'name', 'slug']),
+            'metafield_definitions' => $this->metafieldVisibilityService->serializeDefinitions(BlogPost::class),
+            'metafields' => $this->metafieldVisibilityService->serializeMetafieldsForOwner($post),
         ]);
     }
 
@@ -106,7 +118,9 @@ class BlogPostController extends Controller
     {
         $data = $request->validated();
         $tags = $data['tags'] ?? [];
+        $metafields = $data['metafields'] ?? [];
         unset($data['tags']);
+        unset($data['metafields']);
 
         $titleForSlug = is_array($data['title'])
             ? ($data['title'][config('app.locale')] ?? array_values($data['title'])[0] ?? '')
@@ -131,6 +145,7 @@ class BlogPostController extends Controller
 
         $post->update($data);
         $post->tags()->sync($this->resolveTagIds($tags));
+        $post->syncMetafields($metafields);
 
         $message = $status === 'published' ? 'misc.blog_post_updated' : 'misc.blog_post_saved';
 

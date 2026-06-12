@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Ecommerce;
 
+use App\Http\Requests\Admin\Concerns\InteractsWithMetafields;
 use App\Models\Category;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
 
 class StoreCategoryRequest extends FormRequest
 {
+    use InteractsWithMetafields;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -48,12 +51,14 @@ class StoreCategoryRequest extends FormRequest
             'attribute_schema.*.attribute_id' => ['required', 'integer', 'exists:attributes,id'],
             'attribute_schema.*.is_required' => ['sometimes', 'boolean'],
             'attribute_schema.*.position' => ['sometimes', 'integer', 'min:0', 'max:255'],
+            ...$this->metafieldRules(),
         ];
     }
 
     public function after(): array
     {
         return [
+            ...$this->validateMetafields(Category::class),
             function (Validator $validator): void {
                 foreach ($this->input('slug', []) as $locale => $slug) {
                     if (Category::query()->where('slug->'.$locale, $slug)->exists()) {
@@ -76,6 +81,8 @@ class StoreCategoryRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $this->normalizeMetafields();
+
         $defaultLocale = config('app.locale');
         $name = $this->input('name');
         $nameForSlug = is_array($name)

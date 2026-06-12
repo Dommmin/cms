@@ -6,6 +6,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Data\ProductData;
 use App\Models\Product;
+use App\Services\MetafieldVisibilityService;
 use App\Services\ProductAttributePresenter;
 use App\Services\StorefrontPathService;
 use Illuminate\Http\Request;
@@ -90,6 +91,12 @@ class ProductResource extends JsonResource
             $attributePresenter = resolve(ProductAttributePresenter::class);
             $data['attribute_summary'] = $attributePresenter->buildAttributeSummary($product);
             $data['attribute_map'] = $attributePresenter->buildAttributeMap($product);
+
+            if ($product->relationLoaded('metafields')) {
+                $data['metafields'] = MetafieldResource::collection(
+                    resolve(MetafieldVisibilityService::class)->publicMetafieldsForOwner($product)
+                )->resolve($request);
+            }
 
             // Active promotions (only when loaded)
             if ($product->relationLoaded('promotions')) {
