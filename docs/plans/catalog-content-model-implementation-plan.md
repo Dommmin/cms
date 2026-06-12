@@ -593,11 +593,89 @@ Powód:
 - Zaplanować bezpieczne przepięcie listing filters na product-level attributes.
 - Przygotować review Release 3 i dopiero potem zakres Release 4 / cleanup legacy.
 
-### Release 4
+## Release 4 implementation summary
 
-- Phase 6
-- contract cleanup
-- selective legacy removal
+### Co zostało wdrożone
+
+- Storefront detail renderuje specyfikację produktu z `attribute_values`.
+- Product detail API rozdziela teraz:
+  - `attribute_values`,
+  - `attribute_summary`,
+  - `variant_options`,
+  - `variants`.
+- Listingi storefrontu zaczęły korzystać z product-level summaries bez usuwania legacy `attribute_map`.
+- API listing filters przyjmuje i wystawia product-level filterable attributes jako główne źródło, ale dalej wspiera legacy variant filters jako fallback.
+- Revalidation dla zmian produktowych obejmuje detail, listingi, category/brand paths, search i compare przez `product.updated`.
+
+### Jak storefront używa product-level attributes
+
+- Sekcja specyfikacji na detail page renderuje tylko niepuste `attribute_values`.
+- Specyfikacja nie miesza się z wyborem wariantu:
+  - atrybuty pokrywające się z `variant_options` nie są renderowane jako core specs,
+  - selector wariantu nadal działa na `variant.attributes`,
+  - `variant_options` są addytywną warstwą kontraktu dla storefrontu.
+- Listingi wykorzystują `attribute_summary` jako preferowane źródło krótkich specyfikacji, z fallbackiem do legacy `attribute_map`.
+- Compare dalej działa na `attribute_map`, ale mapa jest już budowana hybrydowo z product-level attributes i legacy variant attributes.
+
+### Jakie pliki zmieniono
+
+- `server/app/Services/ProductAttributePresenter.php`
+- `server/app/Http/Controllers/Api/V1/ProductController.php`
+- `server/app/Http/Controllers/Api/V1/BrandController.php`
+- `server/app/Http/Resources/Api/V1/ProductResource.php`
+- `server/app/Observers/ProductObserver.php`
+- `server/app/Services/Admin/Ecommerce/ProductService.php`
+- `server/app/Http/Requests/Admin/Ecommerce/Concerns/InteractsWithProductAttributeValues.php`
+- `server/tests/Feature/ProductAttributeValueTest.php`
+- `server/tests/Feature/Api/ProductAttributeFilterTest.php`
+- `server/tests/Feature/Admin/Cms/OnPublishWebhookTest.php`
+- `client/types/api.ts`
+- `client/lib/product-attributes.ts`
+- `client/app/products/[slug]/ProductDetailClient.tsx`
+- `client/app/products/[slug]/product-detail-components.tsx`
+- `client/app/products/[slug]/product-detail-components.types.ts`
+- `client/components/product-list-item.tsx`
+- `client/tests/unit/product-attributes.test.tsx`
+- `client/app/stores/stores-metadata.ts`
+- `client/app/stores/page.tsx`
+- `client/app/[locale]/stores/page.tsx`
+- `client/lib/security-headers.ts`
+
+### Co nadal działa jako fallback
+
+- Legacy variant filters nie zostały usunięte.
+- `variant.attributes` nie zostało usunięte ani zmienione breaking-change’owo.
+- Add-to-cart, cena i stock nadal zależą od wybranego wariantu.
+- Compare i listing nadal akceptują stary payload tam, gdzie jeszcze był używany.
+
+### Jakie testy dodano
+
+- `tests/Feature/ProductAttributeValueTest.php`
+  - contract `variant_options` w detail API,
+  - compare compatibility bez nowych attributes.
+- `tests/Feature/Api/ProductAttributeFilterTest.php`
+  - product-level filters w `available_filters`,
+  - fallback legacy variant filters.
+- `tests/Feature/Admin/Cms/OnPublishWebhookTest.php`
+  - `product.updated` przy zmianie samych `attribute_values`.
+- `client/tests/unit/product-attributes.test.tsx`
+  - render specyfikacji z `attribute_values`,
+  - brak pustych wartości,
+  - fallback `attribute_summary`/`attribute_map`.
+
+### Co zostało celowo odłożone
+
+- usuwanie legacy variant filters,
+- usuwanie `variant.attributes`,
+- end-to-end Metafields,
+- pełny cleanup starego kontraktu compare/listing,
+- selective legacy removal w modelu wariantów i `ProductTypeAttribute`.
+
+### Następne kroki
+
+- Dodać stricte frontendowe testy interakcyjne dla variant selector + add-to-cart na detail page.
+- Ocenić, które typy product-level attributes mogą być bezpiecznie oznaczane jako `is_listable` / `is_comparable` po dodaniu jawnych flag w modelu.
+- Przygotować osobny release na redukcję legacy `attribute_map` i `variant_attribute_values` dopiero po stabilizacji danych produkcyjnych.
 
 ## What Not to Over-Engineer
 

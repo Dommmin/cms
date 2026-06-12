@@ -370,7 +370,10 @@ export default function Edit({
     );
 
     const handleCategoryChange = (categoryId: string | null) => {
-        const nextSchema = getCategoryAttributeSchema(categoriesList, categoryId);
+        const nextSchema = getCategoryAttributeSchema(
+            categoriesList,
+            categoryId,
+        );
 
         setFormData((prev) => ({
             ...prev,
@@ -1221,7 +1224,9 @@ export default function Edit({
                                         >
                                             <CoreAttributesSection
                                                 schema={selectedSchema}
-                                                values={formData.attribute_values}
+                                                values={
+                                                    formData.attribute_values
+                                                }
                                                 errors={errors as FormErrors}
                                                 onChange={(attributeValues) =>
                                                     handleFormChange(

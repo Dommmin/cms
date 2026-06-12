@@ -65,7 +65,7 @@ class StoreProductRequest extends FormRequest
     public function after(): array
     {
         return [
-            fn ($validator) => $this->validateProductAttributeValues($validator),
+            $this->validateProductAttributeValues(...),
         ];
     }
 

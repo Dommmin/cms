@@ -11,6 +11,7 @@ use App\Filters\MinPriceFilter;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\ProductCollection;
 use App\Http\Resources\Api\V1\ProductResource;
+use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
@@ -19,6 +20,7 @@ use App\Models\Product;
 use App\Models\ProductAttributeValue;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantStockSubscription;
+use App\Services\ProductAttributePresenter;
 use App\Services\SmartCollectionService;
 use App\Services\StorefrontPathService;
 use App\Sorts\RatingSort;
@@ -28,6 +30,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
@@ -35,6 +38,10 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductController extends ApiController
 {
+    public function __construct(
+        private readonly ProductAttributePresenter $productAttributePresenter,
+    ) {}
+
     public function index(Request $request): JsonResponse
     {
         $locale = app()->getLocale();
@@ -76,6 +83,8 @@ class ProductController extends ApiController
                 'thumbnail.media',
                 'category',
                 'brand',
+                'attributeValues.attribute.values',
+                'attributeValues.selectedOption',
                 'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed',
                 'activeVariants.priceHistory',
                 'activeVariants.attributeValues.attribute',
@@ -160,14 +169,15 @@ class ProductController extends ApiController
                 'public_url' => $pathService->brandPath($product->brand, $locale),
             ] : null,
             'attributes' => [],
-            'attribute_values' => $this->serializeProductAttributeValues($product),
-            'attribute_summary' => $this->buildProductAttributeSummary($product),
+            'attribute_values' => $this->productAttributePresenter->serializeAttributeValues($product),
+            'attribute_summary' => $this->productAttributePresenter->buildAttributeSummary($product),
             'created_at' => $product->created_at?->toIso8601String(),
             'seo_title' => $product->seo_title,
             'seo_description' => $product->seo_description,
             'meta_robots' => $product->meta_robots ?? 'index, follow',
             'og_image' => $product->og_image,
             'sitemap_exclude' => (bool) $product->sitemap_exclude,
+            'variant_options' => $this->productAttributePresenter->buildVariantOptions($product),
             'variants' => $product->activeVariants->map(fn ($variant): array => [
                 'id' => $variant->id,
                 'sku' => $variant->sku,
@@ -205,6 +215,8 @@ class ProductController extends ApiController
                 'thumbnail.media',
                 'category',
                 'brand',
+                'attributeValues.attribute.values',
+                'attributeValues.selectedOption',
                 'activeVariants.attributeValues.attribute',
                 'activeVariants.attributeValues.attributeValue',
             ])
@@ -212,26 +224,9 @@ class ProductController extends ApiController
 
         abort_if($products->count() < 2, 404, 'No products found.');
 
-        // Build per-product attribute map: { "RAM" => ["16 GB", "32 GB"], "Storage" => ["512 GB"] }
-        // Values are aggregated (unique) across all active variants of each product.
-        $productAttributeMaps = $products->map(function (Product $product): array {
-            $map = [];
-            foreach ($product->activeVariants as $variant) {
-                foreach ($variant->attributeValues as $av) {
-                    $key = $av->attribute->name;
-                    $val = $av->attributeValue->value;
-                    if (! isset($map[$key])) {
-                        $map[$key] = [];
-                    }
-
-                    if (! in_array($val, $map[$key], true)) {
-                        $map[$key][] = $val;
-                    }
-                }
-            }
-
-            return $map;
-        });
+        $productAttributeMaps = $products->map(
+            fn (Product $product): array => $this->productAttributePresenter->buildAttributeMap($product)
+        );
 
         // Union of all attribute keys across all products — preserves insertion order
         $allAttributeKeys = $productAttributeMaps
@@ -304,7 +299,16 @@ class ProductController extends ApiController
                     $q->orWhere('brand_id', $product->brand_id);
                 }
             })
-            ->with(['thumbnail.media', 'brand', 'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed'])
+            ->with([
+                'category',
+                'thumbnail.media',
+                'brand',
+                'attributeValues.attribute.values',
+                'attributeValues.selectedOption',
+                'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed',
+                'activeVariants.attributeValues.attribute',
+                'activeVariants.attributeValues.attributeValue',
+            ])
             ->inRandomOrder()
             ->limit(8)
             ->get();
@@ -346,7 +350,15 @@ class ProductController extends ApiController
         ])['per_page'] ?? 24);
 
         $products = $products
-            ->with(['thumbnail.media', 'brand'])
+            ->with([
+                'category',
+                'thumbnail.media',
+                'brand',
+                'attributeValues.attribute.values',
+                'attributeValues.selectedOption',
+                'activeVariants.attributeValues.attribute',
+                'activeVariants.attributeValues.attributeValue',
+            ])
             ->paginate($perPage)
             ->withQueryString();
 
@@ -428,10 +440,21 @@ class ProductController extends ApiController
                 continue;
             }
 
-            $query->whereHas('activeVariants.attributeValues', function (Builder $builder) use ($attributeSlug, $values): void {
-                $builder
-                    ->whereHas('attribute', fn (Builder $attributeQuery): Builder => $attributeQuery->where('slug', $attributeSlug))
-                    ->whereHas('attributeValue', fn (Builder $valueQuery): Builder => $valueQuery->whereIn('slug', $values));
+            $attribute = Attribute::query()
+                ->with('values:id,attribute_id,slug')
+                ->where('slug', $attributeSlug)
+                ->first();
+
+            $query->where(function (Builder $compoundQuery) use ($attribute, $attributeSlug, $values): void {
+                if ($attribute instanceof Attribute && $attribute->is_filterable) {
+                    $this->applyProductLevelAttributeFilter($compoundQuery, $attribute, $values);
+                }
+
+                $compoundQuery->orWhereHas('activeVariants.attributeValues', function (Builder $builder) use ($attributeSlug, $values): void {
+                    $builder
+                        ->whereHas('attribute', fn (Builder $attributeQuery): Builder => $attributeQuery->where('slug', $attributeSlug))
+                        ->whereHas('attributeValue', fn (Builder $valueQuery): Builder => $valueQuery->whereIn('slug', $values));
+                });
             });
         }
     }
@@ -442,6 +465,8 @@ class ProductController extends ApiController
         $products = $query
             ->with([
                 'brand:id,name,slug',
+                'attributeValues.attribute.values',
+                'attributeValues.selectedOption',
                 'activeVariants.attributeValues.attribute:id,name,slug,is_filterable,position',
                 'activeVariants.attributeValues.attributeValue:id,attribute_id,value,slug,position',
             ])
@@ -469,6 +494,44 @@ class ProductController extends ApiController
                 if (! in_array($product->id, $brandBuckets[$brandId]['product_ids'], true)) {
                     $brandBuckets[$brandId]['product_ids'][] = $product->id;
                     $brandBuckets[$brandId]['count']++;
+                }
+            }
+
+            foreach ($product->attributeValues as $attributeValue) {
+                if (! $attributeValue->relationLoaded('attribute')) {
+                    continue;
+                }
+
+                if (! $attributeValue->attribute->is_filterable) {
+                    continue;
+                }
+
+                foreach ($this->extractProductLevelFilterEntries($attributeValue) as $filterValue) {
+                    $attributeSlug = $attributeValue->attribute->slug;
+
+                    if (! isset($attributeBuckets[$attributeSlug])) {
+                        $attributeBuckets[$attributeSlug] = [
+                            'slug' => $attributeSlug,
+                            'label' => $attributeValue->attribute->name,
+                            'position' => $attributeValue->attribute->position,
+                            'values' => [],
+                        ];
+                    }
+
+                    if (! isset($attributeBuckets[$attributeSlug]['values'][$filterValue['slug']])) {
+                        $attributeBuckets[$attributeSlug]['values'][$filterValue['slug']] = [
+                            'slug' => $filterValue['slug'],
+                            'label' => $filterValue['label'],
+                            'position' => $filterValue['position'],
+                            'count' => 0,
+                            'product_ids' => [],
+                        ];
+                    }
+
+                    if (! in_array($product->id, $attributeBuckets[$attributeSlug]['values'][$filterValue['slug']]['product_ids'], true)) {
+                        $attributeBuckets[$attributeSlug]['values'][$filterValue['slug']]['product_ids'][] = $product->id;
+                        $attributeBuckets[$attributeSlug]['values'][$filterValue['slug']]['count']++;
+                    }
                 }
             }
 
@@ -549,118 +612,110 @@ class ProductController extends ApiController
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @param  list<string>  $values
      */
-    private function serializeProductAttributeValues(Product $product): array
+    private function applyProductLevelAttributeFilter(Builder $query, Attribute $attribute, array $values): void
     {
-        $schemaByAttributeId = $product->category
-            ->resolvedAttributeSchemas()
-            ->keyBy('attribute_id');
-
-        return $product->attributeValues
-            ->sortBy(fn (ProductAttributeValue $attributeValue): int => (int) ($schemaByAttributeId->get($attributeValue->attribute_id)?->position ?? 999))
-            ->map(function (ProductAttributeValue $attributeValue) use ($schemaByAttributeId): array {
-                $attribute = $attributeValue->attribute;
-                $valuePayload = $this->resolveSerializedAttributeValue($attributeValue);
-                $schema = $schemaByAttributeId->get($attribute->id);
-
-                return [
-                    'attribute_id' => $attribute->id,
-                    'slug' => $attribute->slug,
-                    'label' => $attribute->name,
-                    'type' => $attribute->type->value,
-                    'unit' => $attribute->unit,
-                    'is_required' => (bool) ($schema?->is_required ?? false),
-                    'value' => $valuePayload['value'],
-                    'display_value' => $valuePayload['display_value'],
-                ];
-            })
-            ->values()
-            ->all();
-    }
-
-    /**
-     * @return array<string, array{label: string, value: string}>
-     */
-    private function buildProductAttributeSummary(Product $product): array
-    {
-        return collect($this->serializeProductAttributeValues($product))
-            ->mapWithKeys(function (array $attributeValue): array {
-                return [
-                    $attributeValue['slug'] => [
-                        'label' => $attributeValue['label'],
-                        'value' => $this->stringifyAttributeSummaryValue($attributeValue['display_value']),
-                    ],
-                ];
-            })
-            ->all();
-    }
-
-    /**
-     * @return array{value:mixed, display_value:mixed}
-     */
-    private function resolveSerializedAttributeValue(ProductAttributeValue $attributeValue): array
-    {
-        return match ($attributeValue->attribute->type->value) {
-            'numeric' => [
-                'value' => $attributeValue->value_numeric !== null ? (float) $attributeValue->value_numeric : null,
-                'display_value' => $attributeValue->value_numeric !== null ? (float) $attributeValue->value_numeric : null,
-            ],
-            'boolean' => [
-                'value' => $attributeValue->value_boolean,
-                'display_value' => $attributeValue->value_boolean,
-            ],
-            'date' => [
-                'value' => $attributeValue->value_date?->toDateString(),
-                'display_value' => $attributeValue->value_date?->toDateString(),
-            ],
-            'select' => [
-                'value' => $attributeValue->selectedOption?->slug,
-                'display_value' => $attributeValue->selectedOption?->value,
-            ],
-            'multiselect' => $this->resolveSerializedMultiselectValue($attributeValue),
-            default => [
-                'value' => $attributeValue->value_text,
-                'display_value' => $attributeValue->value_text,
-            ],
+        match ($attribute->type->value) {
+            'select' => $this->applyProductLevelSelectFilter($query, $attribute, $values),
+            'multiselect' => $this->applyProductLevelMultiselectFilter($query, $attribute, $values),
+            'text', 'color' => $query->whereHas('attributeValues', fn (Builder $builder): Builder => $builder
+                ->where('attribute_id', $attribute->id)
+                ->whereIn('value_text', $values)),
+            'numeric' => $query->whereHas('attributeValues', fn (Builder $builder): Builder => $builder
+                ->where('attribute_id', $attribute->id)
+                ->whereIn('value_numeric', $values)),
+            default => null,
         };
     }
 
     /**
-     * @return array{value:array<int, string>, display_value:array<int, string>}
+     * @param  list<string>  $values
      */
-    private function resolveSerializedMultiselectValue(ProductAttributeValue $attributeValue): array
+    private function applyProductLevelSelectFilter(Builder $query, Attribute $attribute, array $values): void
     {
-        $selectedIds = collect($attributeValue->value_json ?? [])
-            ->filter(fn (mixed $optionId): bool => is_numeric($optionId))
-            ->map(fn (mixed $optionId): int => (int) $optionId)
-            ->values();
+        $optionIds = $attribute->values
+            ->whereIn('slug', $values)
+            ->pluck('id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
 
-        $selectedOptions = $attributeValue->attribute->values
-            ->filter(fn (AttributeValue $option): bool => $selectedIds->contains($option->id))
-            ->sortBy(fn (AttributeValue $option): int => (int) ($selectedIds->search($option->id) ?? 0))
-            ->values();
+        if ($optionIds === []) {
+            return;
+        }
 
-        return [
-            'value' => $selectedOptions->pluck('slug')->all(),
-            'display_value' => $selectedOptions->pluck('value')->all(),
-        ];
+        $query->whereHas('attributeValues', fn (Builder $builder): Builder => $builder
+            ->where('attribute_id', $attribute->id)
+            ->whereIn('attribute_value_id', $optionIds));
     }
 
-    private function stringifyAttributeSummaryValue(mixed $displayValue): string
+    /**
+     * @param  list<string>  $values
+     */
+    private function applyProductLevelMultiselectFilter(Builder $query, Attribute $attribute, array $values): void
     {
-        if (is_array($displayValue)) {
-            return implode(', ', $displayValue);
+        $optionIds = $attribute->values
+            ->whereIn('slug', $values)
+            ->pluck('id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
+
+        if ($optionIds === []) {
+            return;
         }
 
-        if (is_bool($displayValue)) {
-            return $displayValue ? 'true' : 'false';
-        }
+        $query->whereHas('attributeValues', function (Builder $builder) use ($attribute, $optionIds): void {
+            $builder
+                ->where('attribute_id', $attribute->id)
+                ->where(function (Builder $valueQuery) use ($optionIds): void {
+                    foreach ($optionIds as $optionId) {
+                        $valueQuery->orWhereJsonContains('value_json', $optionId);
+                    }
+                });
+        });
+    }
 
-        if ($displayValue === null) {
-            return '';
-        }
+    /**
+     * @return array<int, array{slug: string, label: string, position: int}>
+     */
+    private function extractProductLevelFilterEntries(ProductAttributeValue $attributeValue): array
+    {
+        $attribute = $attributeValue->attribute;
 
-        return (string) $displayValue;
+        return match ($attribute->type->value) {
+            'select' => $attributeValue->selectedOption instanceof AttributeValue
+                ? [[
+                    'slug' => $attributeValue->selectedOption->slug,
+                    'label' => $attributeValue->selectedOption->value,
+                    'position' => $attributeValue->selectedOption->position,
+                ]]
+                : [],
+            'multiselect' => collect($attributeValue->value_json ?? [])
+                ->filter()
+                ->map(fn (mixed $optionId): ?AttributeValue => $attribute->values->firstWhere('id', (int) $optionId))
+                ->filter()
+                ->map(fn (AttributeValue $option): array => [
+                    'slug' => $option->slug,
+                    'label' => $option->value,
+                    'position' => $option->position,
+                ])
+                ->values()
+                ->all(),
+            'text', 'color' => $attributeValue->value_text !== null && $attributeValue->value_text !== ''
+                ? [[
+                    'slug' => $attributeValue->value_text,
+                    'label' => $attributeValue->value_text,
+                    'position' => 0,
+                ]]
+                : [],
+            'numeric' => $attributeValue->value_numeric !== null
+                ? [[
+                    'slug' => (string) $attributeValue->value_numeric,
+                    'label' => Str::of((string) $attributeValue->value_numeric)->toString(),
+                    'position' => 0,
+                ]]
+                : [],
+            default => [],
+        };
     }
 }

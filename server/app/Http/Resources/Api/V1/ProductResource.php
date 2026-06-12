@@ -6,6 +6,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Data\ProductData;
 use App\Models\Product;
+use App\Services\ProductAttributePresenter;
 use App\Services\StorefrontPathService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -86,38 +87,9 @@ class ProductResource extends JsonResource
                 $data['omnibus_price_min'] = null;
             }
 
-            // Build attribute_map: { "RAM" => ["16 GB","32 GB"], "Color" => ["Black"] }
-            // Only populated when attributeValues are eager-loaded.
-            $attributeMap = [];
-            if ($product->relationLoaded('activeVariants')) {
-                foreach ($product->activeVariants as $variant) {
-                    if (! $variant->relationLoaded('attributeValues')) {
-                        continue;
-                    }
-
-                    foreach ($variant->attributeValues as $av) {
-                        if (! $av->relationLoaded('attribute')) {
-                            continue;
-                        }
-
-                        if (! $av->relationLoaded('attributeValue')) {
-                            continue;
-                        }
-
-                        $key = $av->attribute->name;
-                        $val = $av->attributeValue->value;
-                        if (! isset($attributeMap[$key])) {
-                            $attributeMap[$key] = [];
-                        }
-
-                        if (! in_array($val, $attributeMap[$key], true)) {
-                            $attributeMap[$key][] = $val;
-                        }
-                    }
-                }
-            }
-
-            $data['attribute_map'] = $attributeMap;
+            $attributePresenter = resolve(ProductAttributePresenter::class);
+            $data['attribute_summary'] = $attributePresenter->buildAttributeSummary($product);
+            $data['attribute_map'] = $attributePresenter->buildAttributeMap($product);
 
             // Active promotions (only when loaded)
             if ($product->relationLoaded('promotions')) {

@@ -71,6 +71,8 @@ class BrandController extends ApiController
                 'thumbnail.media',
                 'category',
                 'brand',
+                'attributeValues.attribute.values',
+                'attributeValues.selectedOption',
                 'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed',
                 'activeVariants.priceHistory',
                 'activeVariants.attributeValues.attribute',

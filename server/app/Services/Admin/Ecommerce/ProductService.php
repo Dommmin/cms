@@ -97,6 +97,10 @@ class ProductService
 
             if (array_key_exists('attribute_values', $data) || $originalCategoryId !== (int) $product->category_id) {
                 $this->syncProductAttributeValues($product, $data['attribute_values'] ?? []);
+
+                if (! $product->wasChanged()) {
+                    $product->touch();
+                }
             }
 
             return $product->fresh(['category', 'categories', 'images', 'defaultVariant', 'attributeValues']);
@@ -219,7 +223,7 @@ class ProductService
         $resolvedSchema = $category->resolvedAttributeSchemas()->keyBy('attribute_id');
         $allowedAttributeIds = $resolvedSchema->keys()->all();
         $submittedValues = collect($attributeValues)
-            ->filter(fn (mixed $item): bool => is_array($item) && is_numeric($item['attribute_id'] ?? null))
+            ->filter(fn (array $item): bool => is_numeric($item['attribute_id'] ?? null))
             ->keyBy(fn (array $item): int => (int) $item['attribute_id']);
 
         $product->attributeValues()
@@ -259,7 +263,7 @@ class ProductService
             AttributeTypeEnum::NUMERIC,
             AttributeTypeEnum::COLOR,
             AttributeTypeEnum::DATE,
-            AttributeTypeEnum::BOOLEAN => ($entry['value'] ?? null) !== null && ($entry['value'] ?? null) !== '',
+            AttributeTypeEnum::BOOLEAN => isset($entry['value']) && $entry['value'] !== '',
             AttributeTypeEnum::SELECT => is_numeric($entry['option_id'] ?? null),
             AttributeTypeEnum::MULTISELECT => collect($entry['option_ids'] ?? [])->isNotEmpty(),
         };

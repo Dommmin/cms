@@ -8,14 +8,19 @@ use App\Enums\AttributeTypeEnum;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductAttributeValue;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
+use Throwable;
 
 trait InteractsWithProductAttributeValues
 {
     protected function normalizeProductAttributeValues(): void
     {
-        $attributeValues = $this->input('attribute_values', []);
+        if (! $this->exists('attribute_values')) {
+            return;
+        }
+
+        $attributeValues = $this->input('attribute_values');
 
         if (! is_array($attributeValues)) {
             $this->merge(['attribute_values' => []]);
@@ -106,7 +111,7 @@ trait InteractsWithProductAttributeValues
 
             if ($schemaItem === null) {
                 $validator->errors()->add(
-                    "attribute_values.{$index}.attribute_id",
+                    sprintf('attribute_values.%d.attribute_id', $index),
                     'The selected core attribute does not belong to the category schema.'
                 );
 
@@ -127,6 +132,7 @@ trait InteractsWithProductAttributeValues
                 AttributeTypeEnum::DATE => $this->validateDateAttributeValue($validator, $index, $value),
                 AttributeTypeEnum::SELECT => $this->validateSelectAttributeValue($validator, $index, $optionId, $allowedOptionIds),
                 AttributeTypeEnum::MULTISELECT => $this->validateMultiselectAttributeValue($validator, $index, $optionIds, $allowedOptionIds),
+                default => null,
             };
         });
 
@@ -147,7 +153,7 @@ trait InteractsWithProductAttributeValues
 
             $validator->errors()->add(
                 'attribute_values',
-                "The {$schemaItem->attribute->name} attribute is required for the selected category."
+                sprintf('The %s attribute is required for the selected category.', $schemaItem->attribute->name)
             );
         });
     }
@@ -182,14 +188,14 @@ trait InteractsWithProductAttributeValues
     private function validateTextAttributeValue($validator, int $index, mixed $value): void
     {
         if ($value !== null && ! is_string($value)) {
-            $validator->errors()->add("attribute_values.{$index}.value", 'The value must be a string.');
+            $validator->errors()->add(sprintf('attribute_values.%d.value', $index), 'The value must be a string.');
         }
     }
 
     private function validateNumericAttributeValue($validator, int $index, mixed $value): void
     {
         if ($value !== null && $value !== '' && ! is_numeric($value)) {
-            $validator->errors()->add("attribute_values.{$index}.value", 'The value must be numeric.');
+            $validator->errors()->add(sprintf('attribute_values.%d.value', $index), 'The value must be numeric.');
         }
     }
 
@@ -200,14 +206,14 @@ trait InteractsWithProductAttributeValues
         }
 
         if (! in_array($value, ['0', '1', 'true', 'false'], true)) {
-            $validator->errors()->add("attribute_values.{$index}.value", 'The value must be true or false.');
+            $validator->errors()->add(sprintf('attribute_values.%d.value', $index), 'The value must be true or false.');
         }
     }
 
     private function validateColorAttributeValue($validator, int $index, mixed $value): void
     {
         if ($value !== null && $value !== '' && (! is_string($value) || ! preg_match('/^#[0-9a-f]{6}$/i', $value))) {
-            $validator->errors()->add("attribute_values.{$index}.value", 'The value must be a valid hex color.');
+            $validator->errors()->add(sprintf('attribute_values.%d.value', $index), 'The value must be a valid hex color.');
         }
     }
 
@@ -218,9 +224,9 @@ trait InteractsWithProductAttributeValues
         }
 
         try {
-            Carbon::parse((string) $value);
-        } catch (\Throwable) {
-            $validator->errors()->add("attribute_values.{$index}.value", 'The value must be a valid date.');
+            Date::parse((string) $value);
+        } catch (Throwable) {
+            $validator->errors()->add(sprintf('attribute_values.%d.value', $index), 'The value must be a valid date.');
         }
     }
 
@@ -230,19 +236,19 @@ trait InteractsWithProductAttributeValues
             return;
         }
 
-        if (! $allowedOptionIds->contains((int) $optionId)) {
-            $validator->errors()->add("attribute_values.{$index}.option_id", 'The selected option does not belong to the attribute.');
+        if ($allowedOptionIds->doesntContain((int) $optionId)) {
+            $validator->errors()->add(sprintf('attribute_values.%d.option_id', $index), 'The selected option does not belong to the attribute.');
         }
     }
 
     private function validateMultiselectAttributeValue($validator, int $index, Collection $optionIds, Collection $allowedOptionIds): void
     {
         if ($optionIds->duplicates()->isNotEmpty()) {
-            $validator->errors()->add("attribute_values.{$index}.option_ids", 'Selected options must be unique.');
+            $validator->errors()->add(sprintf('attribute_values.%d.option_ids', $index), 'Selected options must be unique.');
         }
 
         if ($optionIds->diff($allowedOptionIds)->isNotEmpty()) {
-            $validator->errors()->add("attribute_values.{$index}.option_ids", 'One or more selected options do not belong to the attribute.');
+            $validator->errors()->add(sprintf('attribute_values.%d.option_ids', $index), 'One or more selected options do not belong to the attribute.');
         }
     }
 }

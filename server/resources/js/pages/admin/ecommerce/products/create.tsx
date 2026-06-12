@@ -279,7 +279,10 @@ export default function Create({
     );
 
     const handleCategoryChange = (categoryId: string | null) => {
-        const nextSchema = getCategoryAttributeSchema(categoriesList, categoryId);
+        const nextSchema = getCategoryAttributeSchema(
+            categoriesList,
+            categoryId,
+        );
 
         setFormData((prev) => ({
             ...prev,
@@ -937,7 +940,9 @@ export default function Create({
                                         >
                                             <CoreAttributesSection
                                                 schema={selectedSchema}
-                                                values={formData.attribute_values}
+                                                values={
+                                                    formData.attribute_values
+                                                }
                                                 errors={errors as FormErrors}
                                                 onChange={(attributeValues) =>
                                                     handleFormChange(

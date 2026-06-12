@@ -180,22 +180,26 @@ export function CoreAttributesSection({
                                 <div className="flex items-center gap-3">
                                     <Input
                                         type="color"
-                                        value={
-                                            currentValue.value || '#000000'
-                                        }
+                                        value={currentValue.value || '#000000'}
                                         onChange={(event) =>
-                                            updateValue(attribute.attribute_id, {
-                                                value: event.target.value,
-                                            })
+                                            updateValue(
+                                                attribute.attribute_id,
+                                                {
+                                                    value: event.target.value,
+                                                },
+                                            )
                                         }
                                         className="h-10 w-16 p-1"
                                     />
                                     <Input
                                         value={currentValue.value}
                                         onChange={(event) =>
-                                            updateValue(attribute.attribute_id, {
-                                                value: event.target.value,
-                                            })
+                                            updateValue(
+                                                attribute.attribute_id,
+                                                {
+                                                    value: event.target.value,
+                                                },
+                                            )
                                         }
                                         placeholder="#000000"
                                     />

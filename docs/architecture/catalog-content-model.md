@@ -675,6 +675,79 @@ Zmiany w tych warstwach powinny invalidować:
 - Zaplanować kontrolowaną migrację listing filters z modelu wariantów na product-level attributes.
 - Dopiero po stabilizacji kontraktu detail/listing ocenić zakres redukcji legacy `ProductTypeAttribute` i `variant_attribute_values`.
 
+## Release 4 implementation summary
+
+### Co zostało wdrożone
+
+- Storefront detail renderuje specyfikację produktu z `attribute_values`.
+- Publiczny kontrakt detail został rozszerzony o `variant_options`, bez usuwania `variant.attributes`.
+- `attribute_summary` stało się preferowanym źródłem krótkich specyfikacji na listingach storefrontu.
+- `attribute_map` pozostało kompatybilnym payloadem dla compare/listingu, ale jest budowane hybrydowo z product-level attributes i legacy variant attributes.
+- Product-level filterable attributes trafiają do `available_filters`, a legacy variant filters nadal pozostają aktywne jako fallback.
+- Revalidation produktu obejmuje detail, listing rooty, category/brand pages, search i compare przez event `product.updated`.
+
+### Jak storefront używa product-level attributes
+
+- Detail page pokazuje tylko niepuste specyfikacje z `attribute_values`.
+- Atrybuty pokrywające się z `variant_options` nie są renderowane jako core specs, żeby nie mieszać specyfikacji z wyborem wariantu.
+- Wybór wariantu nadal zależy od `variant.attributes`, a `variant_options` jest addytywną warstwą kontraktu.
+- Listing cards preferują `attribute_summary`, z fallbackiem do legacy `attribute_map`.
+
+### Jakie pliki zmieniono
+
+- `server/app/Services/ProductAttributePresenter.php`
+- `server/app/Http/Controllers/Api/V1/ProductController.php`
+- `server/app/Http/Controllers/Api/V1/BrandController.php`
+- `server/app/Http/Resources/Api/V1/ProductResource.php`
+- `server/app/Observers/ProductObserver.php`
+- `server/app/Services/Admin/Ecommerce/ProductService.php`
+- `server/app/Http/Requests/Admin/Ecommerce/Concerns/InteractsWithProductAttributeValues.php`
+- `server/tests/Feature/ProductAttributeValueTest.php`
+- `server/tests/Feature/Api/ProductAttributeFilterTest.php`
+- `server/tests/Feature/Admin/Cms/OnPublishWebhookTest.php`
+- `client/types/api.ts`
+- `client/lib/product-attributes.ts`
+- `client/app/products/[slug]/ProductDetailClient.tsx`
+- `client/app/products/[slug]/product-detail-components.tsx`
+- `client/app/products/[slug]/product-detail-components.types.ts`
+- `client/components/product-list-item.tsx`
+- `client/tests/unit/product-attributes.test.tsx`
+- `client/app/stores/stores-metadata.ts`
+- `client/app/stores/page.tsx`
+- `client/app/[locale]/stores/page.tsx`
+- `client/lib/security-headers.ts`
+
+### Co nadal działa jako fallback
+
+- legacy variant filters,
+- `variant.attributes`,
+- add-to-cart / stock / pricing flow oparty o wariant,
+- compare/listing payloady oczekujące `attribute_map`,
+- brak publicznego end-to-end exposure dla Metafields.
+
+### Jakie testy dodano
+
+- detail API contract dla `variant_options`,
+- compare compatibility bez nowych attributes,
+- product-level filters w `available_filters`,
+- fallback legacy variant filters,
+- `product.updated` przy zmianie samych `attribute_values`,
+- unit testy storefrontu dla renderingu specyfikacji i fallbacków `attribute_summary` / `attribute_map`.
+
+### Co zostało celowo odłożone
+
+- usuwanie legacy variant filters,
+- usuwanie `variant.attributes`,
+- end-to-end Metafields,
+- pełny cleanup compare/listing payloadów,
+- selective legacy removal w modelu wariantów i `ProductTypeAttribute`.
+
+### Następne kroki
+
+- Dodać interakcyjne testy storefrontu dla variant selector i add-to-cart na detail page.
+- Rozszerzyć model definicji atrybutów o jawne flagi `is_listable` / `is_comparable`, zamiast wnioskować z obecnego stanu przejściowego.
+- Dopiero po stabilizacji danych produkcyjnych zaplanować redukcję `variant_attribute_values` i legacy `attribute_map`.
+
 ### Variants
 
 1. Zachować obecny model wariantów
