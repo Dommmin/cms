@@ -42,7 +42,7 @@ class SecurityHeaders
 
         // Content Security Policy for HTML responses
         $contentType = $response->headers->get('Content-Type');
-        if ($contentType && str_contains((string) $contentType, 'text/html')) {
+        if ($contentType && str_contains((string) $contentType, 'text/html') && ! $request->is('horizon*', 'telescope*')) {
             $isDev = app()->environment('local', 'testing');
             $frameAncestors = $isDev
                 ? "frame-ancestors 'self' http://localhost:*"
