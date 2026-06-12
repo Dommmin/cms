@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Data;
 
 use App\Models\Product;
+use App\Models\ProductAttributeValue;
 use Spatie\LaravelData\Data;
 
 class AdminProductData extends Data
@@ -37,6 +38,8 @@ class AdminProductData extends Data
         public array $categories = [],
         /** @var array<int, int> */
         public array $flag_ids = [],
+        /** @var array<int, array<string, mixed>> */
+        public array $attribute_values = [],
     ) {}
 
     public static function fromModel(Product $product): self
@@ -51,6 +54,25 @@ class AdminProductData extends Data
             is_thumbnail: $img->is_thumbnail,
             position: $img->position,
         ))->all();
+
+        $attributeValues = $product->attributeValues
+            ->map(function (ProductAttributeValue $attributeValue): array {
+                $attribute = $attributeValue->attribute;
+
+                return [
+                    'attribute_id' => $attribute->id,
+                    'value' => match ($attribute->type->value) {
+                        'numeric' => $attributeValue->value_numeric !== null ? (string) $attributeValue->value_numeric : '',
+                        'boolean' => $attributeValue->value_boolean === null ? '' : ($attributeValue->value_boolean ? '1' : '0'),
+                        'date' => $attributeValue->value_date?->toDateString() ?? '',
+                        default => $attributeValue->value_text ?? '',
+                    },
+                    'option_id' => $attributeValue->attribute_value_id,
+                    'option_ids' => $attributeValue->value_json ?? [],
+                ];
+            })
+            ->values()
+            ->all();
 
         return new self(
             id: $product->id,
@@ -87,6 +109,7 @@ class AdminProductData extends Data
             images: $images,
             categories: $product->categories->map(fn ($cat): CategoryData => CategoryData::from($cat))->all(),
             flag_ids: $product->flags->pluck('id')->values()->all(),
+            attribute_values: $attributeValues,
         );
     }
 }

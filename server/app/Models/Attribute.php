@@ -33,6 +33,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $category_schemas_count
  * @property-read Collection<int, AttributeValue> $values
  * @property-read int|null $values_count
+ * @property-read Collection<int, ProductAttributeValue> $productValues
+ * @property-read int|null $product_values_count
  *
  * @method static AttributeFactory factory($count = null, $state = [])
  * @method static Builder<static>|Attribute newModelQuery()
@@ -72,6 +74,11 @@ class Attribute extends Model
     public function categorySchemas(): HasMany
     {
         return $this->hasMany(CategoryAttributeSchema::class)->orderBy('position');
+    }
+
+    public function productValues(): HasMany
+    {
+        return $this->hasMany(ProductAttributeValue::class);
     }
 
     protected function casts(): array

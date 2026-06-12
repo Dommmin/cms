@@ -10,7 +10,9 @@ enum AttributeTypeEnum: string
     case SELECT = 'select';
     case MULTISELECT = 'multiselect';
     case NUMERIC = 'numeric';
+    case BOOLEAN = 'boolean';
     case COLOR = 'color';
+    case DATE = 'date';
 
     public function getLabel(): string
     {
@@ -19,7 +21,9 @@ enum AttributeTypeEnum: string
             self::SELECT => 'Select',
             self::MULTISELECT => 'Multiselect',
             self::NUMERIC => 'Numeric',
+            self::BOOLEAN => 'Boolean',
             self::COLOR => 'Color',
+            self::DATE => 'Date',
         };
     }
 }

@@ -1,5 +1,11 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { ArrowLeftIcon, ImageIcon, Search, Settings } from 'lucide-react';
+import {
+    ArrowLeftIcon,
+    ImageIcon,
+    Search,
+    Settings,
+    SlidersHorizontal,
+} from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
@@ -31,6 +37,11 @@ import { resolveLocalizedText } from '@/lib/localized-text';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
+import { CoreAttributesSection } from './core-attributes-section';
+import {
+    alignAttributeValuesToSchema,
+    getCategoryAttributeSchema,
+} from './core-attributes.utils';
 import type {
     Brand,
     Category,
@@ -64,6 +75,7 @@ const defaultFormData = (defaultLocale: string): FormData => ({
     seo_title: '',
     seo_description: '',
     flags: [],
+    attribute_values: [],
     variant: {
         sku: '',
         name: '',
@@ -94,6 +106,7 @@ const tabFieldMap: Record<TabKey, string[]> = {
         'is_search_promoted',
         'is_featured',
     ],
+    core_attributes: ['attribute_values'],
     pricing: [
         'variant',
         'variant.sku',
@@ -112,7 +125,13 @@ const tabFieldMap: Record<TabKey, string[]> = {
 function tabForErrors(errors: FormErrors): TabKey {
     const entries = Object.keys(errors);
 
-    for (const tab of ['general', 'pricing', 'media', 'metadata'] as TabKey[]) {
+    for (const tab of [
+        'general',
+        'core_attributes',
+        'pricing',
+        'media',
+        'metadata',
+    ] as TabKey[]) {
         if (
             entries.some((field) =>
                 tabFieldMap[tab].some(
@@ -254,6 +273,24 @@ export default function Create({
         }));
     };
 
+    const selectedSchema = getCategoryAttributeSchema(
+        categoriesList,
+        formData.category_id,
+    );
+
+    const handleCategoryChange = (categoryId: string | null) => {
+        const nextSchema = getCategoryAttributeSchema(categoriesList, categoryId);
+
+        setFormData((prev) => ({
+            ...prev,
+            category_id: categoryId,
+            attribute_values: alignAttributeValuesToSchema(
+                nextSchema,
+                prev.attribute_values,
+            ),
+        }));
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
@@ -300,6 +337,10 @@ export default function Create({
                                     errors as FormErrors,
                                     'pricing',
                                 );
+                                const coreAttributeErrors = errorCountForTab(
+                                    errors as FormErrors,
+                                    'core_attributes',
+                                );
                                 const mediaErrors = errorCountForTab(
                                     errors as FormErrors,
                                     'media',
@@ -324,6 +365,18 @@ export default function Create({
                                                 {generalErrors > 0 && (
                                                     <span className="ml-2 rounded bg-destructive px-1.5 text-xs text-destructive-foreground">
                                                         {generalErrors}
+                                                    </span>
+                                                )}
+                                            </TabsTrigger>
+                                            <TabsTrigger
+                                                value="core_attributes"
+                                                className="min-w-[10rem] flex-none"
+                                            >
+                                                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                                                Core Attributes
+                                                {coreAttributeErrors > 0 && (
+                                                    <span className="ml-2 rounded bg-destructive px-1.5 text-xs text-destructive-foreground">
+                                                        {coreAttributeErrors}
                                                     </span>
                                                 )}
                                             </TabsTrigger>
@@ -533,8 +586,7 @@ export default function Create({
                                                                     label: string;
                                                                 } | null,
                                                             ) =>
-                                                                handleFormChange(
-                                                                    'category_id',
+                                                                handleCategoryChange(
                                                                     item?.value.toString() ??
                                                                         null,
                                                                 )
@@ -876,6 +928,24 @@ export default function Create({
                                                     </div>
                                                 </div>
                                             </div>
+                                        </TabsContent>
+
+                                        <TabsContent
+                                            value="core_attributes"
+                                            forceRender
+                                            className="mt-6 space-y-6"
+                                        >
+                                            <CoreAttributesSection
+                                                schema={selectedSchema}
+                                                values={formData.attribute_values}
+                                                errors={errors as FormErrors}
+                                                onChange={(attributeValues) =>
+                                                    handleFormChange(
+                                                        'attribute_values',
+                                                        attributeValues,
+                                                    )
+                                                }
+                                            />
                                         </TabsContent>
 
                                         <TabsContent

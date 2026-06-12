@@ -515,6 +515,84 @@ Powód:
 - admin UX + storefront integration for Phase 4
 - Phase 5
 
+## Release 3 implementation summary
+
+### Co zostało wdrożone
+
+- Dodano `ProductAttributeValue` jako product-level storage dla core attributes.
+- Produkt waliduje i zapisuje `attribute_values` względem resolved schema kategorii.
+- Admin formularz produktu ma osobną sekcję `Core Attributes`.
+- Product detail API zwraca `attribute_values` i `attribute_summary`.
+- Typy `boolean` i `date` zostały dopuszczone w definicjach atrybutów obok typów już istniejących po Release 1.
+
+### Jak działają product-level attributes
+
+- Kategoria definiuje dostępne definicje przez `CategoryAttributeSchema`.
+- Produkt zapisuje wyłącznie własne wartości; schema nie dziedziczy wartości.
+- `select` korzysta z pojedynczego `attribute_value_id`.
+- `multiselect` przechowuje listę dozwolonych option ids.
+- `variant.attributes` pozostaje bez zmian i nadal obsługuje legacy/storefront variant flow.
+
+### Jakie pliki zmieniono
+
+- `server/app/Models/ProductAttributeValue.php`
+- `server/database/migrations/2026_06_12_170000_add_boolean_and_date_types_to_attributes_table.php`
+- `server/database/migrations/2026_06_12_171000_create_product_attribute_values_table.php`
+- `server/database/factories/ProductAttributeValueFactory.php`
+- `server/app/Models/Product.php`
+- `server/app/Models/Attribute.php`
+- `server/app/Enums/AttributeTypeEnum.php`
+- `server/app/Http/Requests/Admin/Ecommerce/Concerns/InteractsWithProductAttributeValues.php`
+- `server/app/Http/Requests/Admin/Ecommerce/StoreProductRequest.php`
+- `server/app/Http/Requests/Admin/Ecommerce/UpdateProductRequest.php`
+- `server/app/Services/Admin/Ecommerce/ProductService.php`
+- `server/app/Http/Controllers/Admin/Ecommerce/ProductController.php`
+- `server/app/Http/Controllers/Api/V1/ProductController.php`
+- `server/app/Data/AdminProductData.php`
+- `server/resources/js/pages/admin/ecommerce/products/create.tsx`
+- `server/resources/js/pages/admin/ecommerce/products/edit.tsx`
+- `server/resources/js/pages/admin/ecommerce/products/core-attributes-section.tsx`
+- `server/resources/js/pages/admin/ecommerce/products/core-attributes.types.ts`
+- `server/resources/js/pages/admin/ecommerce/products/core-attributes.utils.ts`
+- `server/resources/js/pages/admin/ecommerce/products/create.types.ts`
+- `server/resources/js/pages/admin/ecommerce/products/edit.types.ts`
+- `server/resources/js/pages/admin/ecommerce/attributes/create.tsx`
+- `server/resources/js/pages/admin/ecommerce/attributes/edit.tsx`
+- `server/resources/js/pages/admin/ecommerce/attributes/create.types.ts`
+- `server/resources/js/pages/admin/ecommerce/attributes/edit.types.ts`
+- `client/types/api.ts`
+- `server/tests/Feature/ProductAttributeValueTest.php`
+
+### Jakie testy dodano
+
+- `tests/Feature/ProductAttributeValueTest.php`
+  - save product-level attribute values,
+  - required schema validation,
+  - type validation,
+  - select/multiselect option validation,
+  - no value inheritance,
+  - product detail API contract,
+  - cart/default variant compatibility.
+
+### Jakie testy uruchomiono
+
+- `docker compose exec php php artisan test --compact tests/Feature/ProductAttributeValueTest.php tests/Feature/CategoryAttributeSchemaTest.php tests/Feature/Api/ProductAttributeFilterTest.php`
+
+### Co zostało celowo odłożone
+
+- pełna storefront integration sekcji specyfikacji
+- przebudowa storefront filters
+- migracja compare/listing na product-level attributes
+- usuwanie legacy `variant_attribute_values`
+- usuwanie legacy `ProductTypeAttribute`
+- Metafields end-to-end
+
+### Następne kroki
+
+- Dodać storefront rendering dla `attribute_values`.
+- Zaplanować bezpieczne przepięcie listing filters na product-level attributes.
+- Przygotować review Release 3 i dopiero potem zakres Release 4 / cleanup legacy.
+
 ### Release 4
 
 - Phase 6

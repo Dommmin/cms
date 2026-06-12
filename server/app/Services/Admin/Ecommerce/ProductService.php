@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Admin\Ecommerce;
 
+use App\Enums\AttributeTypeEnum;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +49,8 @@ class ProductService
                 $this->attachImages($product, $data['images']);
             }
 
+            $this->syncProductAttributeValues($product, $data['attribute_values'] ?? []);
+
             return $product;
         });
     }
@@ -54,6 +58,8 @@ class ProductService
     public function updateProduct(Product $product, array $data): Product
     {
         return DB::transaction(function () use ($product, $data) {
+            $originalCategoryId = (int) $product->category_id;
+
             $product->update([
                 'name' => $data['name'],
                 'slug' => $data['slug'],
@@ -89,7 +95,11 @@ class ProductService
                 $this->syncImages($product, $data['images']);
             }
 
-            return $product->fresh(['category', 'categories', 'images', 'defaultVariant']);
+            if (array_key_exists('attribute_values', $data) || $originalCategoryId !== (int) $product->category_id) {
+                $this->syncProductAttributeValues($product, $data['attribute_values'] ?? []);
+            }
+
+            return $product->fresh(['category', 'categories', 'images', 'defaultVariant', 'attributeValues']);
         });
     }
 
@@ -192,5 +202,110 @@ class ProductService
         }
 
         return $normalizedImages;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $attributeValues
+     */
+    private function syncProductAttributeValues(Product $product, array $attributeValues): void
+    {
+        $category = Category::query()->find($product->category_id);
+        if (! $category instanceof Category) {
+            $product->attributeValues()->delete();
+
+            return;
+        }
+
+        $resolvedSchema = $category->resolvedAttributeSchemas()->keyBy('attribute_id');
+        $allowedAttributeIds = $resolvedSchema->keys()->all();
+        $submittedValues = collect($attributeValues)
+            ->filter(fn (mixed $item): bool => is_array($item) && is_numeric($item['attribute_id'] ?? null))
+            ->keyBy(fn (array $item): int => (int) $item['attribute_id']);
+
+        $product->attributeValues()
+            ->whereNotIn('attribute_id', $allowedAttributeIds === [] ? [0] : $allowedAttributeIds)
+            ->delete();
+
+        if ($allowedAttributeIds === []) {
+            $product->attributeValues()->delete();
+
+            return;
+        }
+
+        foreach ($resolvedSchema as $attributeId => $schemaItem) {
+            $entry = $submittedValues->get($attributeId);
+            if (! is_array($entry) || ! $this->hasMeaningfulSubmittedAttributeValue($schemaItem->attribute->type, $entry)) {
+                $product->attributeValues()->where('attribute_id', $attributeId)->delete();
+
+                continue;
+            }
+
+            $payload = $this->buildAttributeValuePayload($schemaItem->attribute->type, $entry);
+
+            $product->attributeValues()->updateOrCreate(
+                ['attribute_id' => $attributeId],
+                $payload
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $entry
+     */
+    private function hasMeaningfulSubmittedAttributeValue(AttributeTypeEnum $type, array $entry): bool
+    {
+        return match ($type) {
+            AttributeTypeEnum::TEXT,
+            AttributeTypeEnum::NUMERIC,
+            AttributeTypeEnum::COLOR,
+            AttributeTypeEnum::DATE,
+            AttributeTypeEnum::BOOLEAN => ($entry['value'] ?? null) !== null && ($entry['value'] ?? null) !== '',
+            AttributeTypeEnum::SELECT => is_numeric($entry['option_id'] ?? null),
+            AttributeTypeEnum::MULTISELECT => collect($entry['option_ids'] ?? [])->isNotEmpty(),
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $entry
+     * @return array<string, mixed>
+     */
+    private function buildAttributeValuePayload(AttributeTypeEnum $type, array $entry): array
+    {
+        $payload = [
+            'attribute_value_id' => null,
+            'value_text' => null,
+            'value_numeric' => null,
+            'value_boolean' => null,
+            'value_date' => null,
+            'value_json' => null,
+        ];
+
+        return match ($type) {
+            AttributeTypeEnum::TEXT => array_merge($payload, [
+                'value_text' => (string) $entry['value'],
+            ]),
+            AttributeTypeEnum::NUMERIC => array_merge($payload, [
+                'value_numeric' => round((float) $entry['value'], 4),
+            ]),
+            AttributeTypeEnum::BOOLEAN => array_merge($payload, [
+                'value_boolean' => in_array($entry['value'], ['1', 'true', true], true),
+            ]),
+            AttributeTypeEnum::COLOR => array_merge($payload, [
+                'value_text' => mb_strtolower((string) $entry['value']),
+            ]),
+            AttributeTypeEnum::DATE => array_merge($payload, [
+                'value_date' => (string) $entry['value'],
+            ]),
+            AttributeTypeEnum::SELECT => array_merge($payload, [
+                'attribute_value_id' => (int) $entry['option_id'],
+            ]),
+            AttributeTypeEnum::MULTISELECT => array_merge($payload, [
+                'value_json' => collect($entry['option_ids'] ?? [])
+                    ->filter(fn (mixed $optionId): bool => is_numeric($optionId))
+                    ->map(fn (mixed $optionId): int => (int) $optionId)
+                    ->values()
+                    ->all(),
+            ]),
+        };
     }
 }

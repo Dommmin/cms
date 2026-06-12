@@ -1,4 +1,14 @@
-export type Category = { id: number; name: string; slug: string };
+import type {
+    CoreAttributeSchemaItem,
+    ProductAttributeFormValue,
+} from './core-attributes.types';
+
+export type Category = {
+    id: number;
+    name: string;
+    slug: string;
+    attribute_schema?: CoreAttributeSchemaItem[];
+};
 export type ProductType = { id: number; name: string };
 export type Brand = { id: number; name: string };
 export type ProductFlag = {
@@ -8,7 +18,12 @@ export type ProductFlag = {
     description?: string | null;
 };
 export type FormErrors = Record<string, string>;
-export type TabKey = 'general' | 'pricing' | 'media' | 'metadata';
+export type TabKey =
+    | 'general'
+    | 'core_attributes'
+    | 'pricing'
+    | 'media'
+    | 'metadata';
 export type FormData = {
     name: Record<string, string>;
     slug: Record<string, string>;
@@ -25,6 +40,7 @@ export type FormData = {
     seo_title: string;
     seo_description: string;
     flags: number[];
+    attribute_values: ProductAttributeFormValue[];
     variant: {
         sku: string;
         name: string;

@@ -1,7 +1,13 @@
+import type {
+    CoreAttributeSchemaItem,
+    ProductAttributeFormValue,
+} from './core-attributes.types';
+
 export type Category = {
     id: number;
     name: string | Record<string, string>;
     slug: string;
+    attribute_schema?: CoreAttributeSchemaItem[];
 };
 export type ProductType = { id: number; name: string };
 export type Brand = { id: number; name: string };
@@ -14,6 +20,7 @@ export type ProductFlag = {
 export type FormErrors = Record<string, string>;
 export type TabKey =
     | 'general'
+    | 'core_attributes'
     | 'pricing'
     | 'media'
     | 'metadata'
@@ -64,6 +71,7 @@ export type FormData = {
     og_image: string | null;
     sitemap_exclude: boolean;
     flags: number[];
+    attribute_values: ProductAttributeFormValue[];
     variant: ProductVariant;
     categories: number[];
 };

@@ -17,9 +17,11 @@ beforeEach(function (): void {
 dataset('supported-attribute-types', [
     'text' => ['text'],
     'numeric' => ['numeric'],
+    'boolean' => ['boolean'],
     'select' => ['select'],
     'multiselect' => ['multiselect'],
     'color' => ['color'],
+    'date' => ['date'],
 ]);
 
 it('creates attributes with every supported canonical type', function (string $type): void {
@@ -68,11 +70,26 @@ it('normalizes legacy number type to numeric', function (): void {
 it('rejects unsupported attribute types', function (): void {
     $this->actingAs($this->admin)
         ->post(route('admin.ecommerce.attributes.store'), [
-            'name' => 'Launch date',
-            'slug' => 'launch-date',
-            'type' => 'date',
+            'name' => 'Unsupported',
+            'slug' => 'unsupported',
+            'type' => 'json',
         ])
         ->assertSessionHasErrors(['type']);
+});
+
+it('rejects non-discrete attributes as storefront filters or variant selectors', function (): void {
+    $this->actingAs($this->admin)
+        ->post(route('admin.ecommerce.attributes.store'), [
+            'name' => 'Launch Date',
+            'slug' => 'launch-date',
+            'type' => 'date',
+            'is_filterable' => true,
+            'is_variant_selection' => true,
+        ])
+        ->assertSessionHasErrors([
+            'is_filterable',
+            'is_variant_selection',
+        ]);
 });
 
 it('stores attribute values using slug and color_hex columns', function (): void {

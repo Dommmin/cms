@@ -10,7 +10,14 @@ export type AttributeData = {
     id: number;
     name: string;
     slug: string;
-    type: 'text' | 'numeric' | 'select' | 'multiselect' | 'color';
+    type:
+        | 'text'
+        | 'numeric'
+        | 'boolean'
+        | 'select'
+        | 'multiselect'
+        | 'color'
+        | 'date';
     unit: string | null;
     is_filterable: boolean;
     is_variant_selection: boolean;

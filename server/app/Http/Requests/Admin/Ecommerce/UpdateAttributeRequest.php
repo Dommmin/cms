@@ -48,6 +48,21 @@ class UpdateAttributeRequest extends FormRequest
     {
         return [
             function ($validator): void {
+                $type = $this->input('type');
+                $supportsLegacyOptions = in_array($type, [
+                    AttributeTypeEnum::SELECT->value,
+                    AttributeTypeEnum::MULTISELECT->value,
+                    AttributeTypeEnum::COLOR->value,
+                ], true);
+
+                if (! $supportsLegacyOptions && $this->boolean('is_filterable')) {
+                    $validator->errors()->add('is_filterable', 'Only select, multiselect, and color attributes can be used in storefront filters.');
+                }
+
+                if (! $supportsLegacyOptions && $this->boolean('is_variant_selection')) {
+                    $validator->errors()->add('is_variant_selection', 'Only select, multiselect, and color attributes can be used for product variants.');
+                }
+
                 $slugs = collect($this->input('values', []))
                     ->pluck('slug')
                     ->filter(fn (mixed $slug): bool => is_string($slug) && $slug !== '');

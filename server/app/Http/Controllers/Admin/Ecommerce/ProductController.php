@@ -14,6 +14,7 @@ use App\Imports\ProductsImport;
 use App\Imports\ProductsImportPreview;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\CategoryAttributeSchema;
 use App\Models\Product;
 use App\Models\ProductFlag;
 use App\Models\ProductType;
@@ -47,7 +48,7 @@ class ProductController extends Controller
     public function create(): Response
     {
         return inertia('admin/ecommerce/products/create', [
-            'categories' => Category::all(),
+            'categories' => $this->categoryFormOptions(),
             'types' => ProductType::all(),
             'brands' => Brand::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'flags' => ProductFlag::query()->active()->ordered()->get(),
@@ -64,7 +65,16 @@ class ProductController extends Controller
 
     public function edit(Product $product): Response
     {
-        $product->load(['category', 'categories', 'images.media', 'defaultVariant.priceHistory', 'brand', 'flags']);
+        $product->load([
+            'category',
+            'categories',
+            'images.media',
+            'defaultVariant.priceHistory',
+            'brand',
+            'flags',
+            'attributeValues.attribute.values',
+            'attributeValues.selectedOption',
+        ]);
 
         $priceHistory = $product->defaultVariant?->priceHistory
             ->map(fn ($ph): array => [
@@ -76,7 +86,7 @@ class ProductController extends Controller
 
         return inertia('admin/ecommerce/products/edit', [
             'product' => AdminProductData::fromModel($product),
-            'categories' => Category::all(),
+            'categories' => $this->categoryFormOptions(),
             'types' => ProductType::all(),
             'brands' => Brand::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'flags' => ProductFlag::query()->active()->ordered()->get(),
@@ -172,5 +182,58 @@ class ProductController extends Controller
         $this->productService->deleteProduct($product);
 
         return back()->with('success', 'Product deleted successfully.');
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function categoryFormOptions(): array
+    {
+        return Category::query()
+            ->with([
+                'parent',
+                'attributeSchemas.attribute.values',
+                'parent.attributeSchemas.attribute.values',
+            ])
+            ->orderBy('position')
+            ->get()
+            ->map(fn (Category $category): array => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'attribute_schema' => $this->serializeAttributeSchema($category),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeAttributeSchema(Category $category): array
+    {
+        return $category->resolvedAttributeSchemas()
+            ->map(function (CategoryAttributeSchema $schema): array {
+                $attribute = $schema->attribute;
+
+                return [
+                    'attribute_id' => $attribute->id,
+                    'name' => $attribute->name,
+                    'slug' => $attribute->slug,
+                    'type' => $attribute->type->value,
+                    'unit' => $attribute->unit,
+                    'is_required' => (bool) $schema->is_required,
+                    'position' => $schema->position,
+                    'is_inherited' => (bool) $schema->getAttribute('is_inherited'),
+                    'options' => $attribute->values->map(fn ($value): array => [
+                        'id' => $value->id,
+                        'value' => $value->value,
+                        'slug' => $value->slug,
+                        'color_hex' => $value->color_hex,
+                    ])->values()->all(),
+                ];
+            })
+            ->values()
+            ->all();
     }
 }

@@ -76,6 +76,8 @@ use Spatie\Translatable\HasTranslations;
  * @property-read Collection<int, Metafield> $metafields
  * @property-read int|null $metafields_count
  * @property-read ProductType $productType
+ * @property-read Collection<int, ProductAttributeValue> $attributeValues
+ * @property-read int|null $attribute_values_count
  * @property-read Collection<int, Promotion> $promotions
  * @property-read int|null $promotions_count
  * @property-read Collection<int, ProductReview> $reviews
@@ -165,6 +167,11 @@ class Product extends Model implements HasMedia
     public function productType(): BelongsTo
     {
         return $this->belongsTo(ProductType::class);
+    }
+
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(ProductAttributeValue::class);
     }
 
     public function category(): BelongsTo

@@ -584,6 +584,97 @@ Zmiany w tych warstwach powinny invalidować:
 - Dodać walidację produktu względem required category schema przy create/update produktu.
 - Dopiero po tym etapowo przepinać admin UX produktu i storefront filters na nowy model danych.
 
+## Release 3 implementation summary
+
+### Co zostało wdrożone
+
+- Dodano model i tabelę `ProductAttributeValue` jako warstwę product-level core attributes.
+- `Product` ma teraz relację `attributeValues`, a `Attribute` ma relację `productValues`.
+- Create/update produktu waliduje payload `attribute_values` względem resolved `CategoryAttributeSchema`, w tym:
+  - required attributes,
+  - zgodność typu wartości,
+  - select/multiselect tylko dla dozwolonych option values.
+- `ProductService` synchronizuje `product_attribute_values` równolegle do istniejącego flow wariantu i nie dotyka legacy `variant_attribute_values`.
+- Admin formularz produktu dostał osobną sekcję `Core Attributes`, ładowaną z resolved schema wybranej kategorii.
+- Product detail API wystawia nowe pola:
+  - `attribute_values`
+  - `attribute_summary`
+- Zachowano kompatybilność:
+  - `attributes: []` nadal istnieje w detail API,
+  - `variant.attributes` nie zmieniło shape,
+  - filtry storefrontu nadal działają na atrybutach wariantów.
+
+### Jak działają product-level attributes
+
+- Wartości są przypisane do produktu, nie do wariantu.
+- Kategoria pozostaje ownerem schema, a produkt zapisuje tylko wartości dla atrybutów dopuszczonych przez schema.
+- Brak dziedziczenia wartości z kategorii: sama definicja schema nie tworzy żadnego `ProductAttributeValue`.
+- Typy wspierane w Release 3:
+  - `text`
+  - `numeric`
+  - `boolean`
+  - `select`
+  - `multiselect`
+  - `color`
+  - `date`
+- `select` zapisuje pojedynczy `attribute_value_id`, a `multiselect` zapisuje listę dozwolonych option ids w `value_json`.
+
+### Jakie pliki zmieniono
+
+- `server/app/Models/ProductAttributeValue.php`
+- `server/database/migrations/2026_06_12_170000_add_boolean_and_date_types_to_attributes_table.php`
+- `server/database/migrations/2026_06_12_171000_create_product_attribute_values_table.php`
+- `server/database/factories/ProductAttributeValueFactory.php`
+- `server/app/Models/Product.php`
+- `server/app/Models/Attribute.php`
+- `server/app/Enums/AttributeTypeEnum.php`
+- `server/app/Http/Requests/Admin/Ecommerce/Concerns/InteractsWithProductAttributeValues.php`
+- `server/app/Http/Requests/Admin/Ecommerce/StoreProductRequest.php`
+- `server/app/Http/Requests/Admin/Ecommerce/UpdateProductRequest.php`
+- `server/app/Services/Admin/Ecommerce/ProductService.php`
+- `server/app/Http/Controllers/Admin/Ecommerce/ProductController.php`
+- `server/app/Data/AdminProductData.php`
+- `server/app/Http/Controllers/Api/V1/ProductController.php`
+- `server/resources/js/pages/admin/ecommerce/products/core-attributes-section.tsx`
+- `server/resources/js/pages/admin/ecommerce/products/core-attributes.types.ts`
+- `server/resources/js/pages/admin/ecommerce/products/core-attributes.utils.ts`
+- `server/resources/js/pages/admin/ecommerce/products/create.tsx`
+- `server/resources/js/pages/admin/ecommerce/products/edit.tsx`
+- `server/resources/js/pages/admin/ecommerce/products/create.types.ts`
+- `server/resources/js/pages/admin/ecommerce/products/edit.types.ts`
+- `server/resources/js/pages/admin/ecommerce/attributes/create.tsx`
+- `server/resources/js/pages/admin/ecommerce/attributes/edit.tsx`
+- `server/resources/js/pages/admin/ecommerce/attributes/create.types.ts`
+- `server/resources/js/pages/admin/ecommerce/attributes/edit.types.ts`
+- `client/types/api.ts`
+- `server/tests/Feature/ProductAttributeValueTest.php`
+
+### Jakie testy dodano
+
+- zapis product-level attribute values w admin flow,
+- walidacja required category attributes,
+- walidacja typu wartości,
+- walidacja dozwolonych option values dla `select` i `multiselect`,
+- brak dziedziczenia wartości z category schema,
+- `attribute_values` w product detail API,
+- kompatybilność z legacy `variant.attributes`,
+- kompatybilność default variant i cart flow.
+
+### Co zostało celowo odłożone
+
+- migracja storefront filters z `variant_attribute_values`
+- pełna storefront integration sekcji specyfikacji
+- przebudowa compare/listing na nowy model product attributes
+- usuwanie legacy `ProductTypeAttribute`
+- usuwanie legacy `variant_attribute_values`
+- Metafields end-to-end
+
+### Następne kroki
+
+- Przepiąć storefront detail na bezpieczne renderowanie `attribute_values`.
+- Zaplanować kontrolowaną migrację listing filters z modelu wariantów na product-level attributes.
+- Dopiero po stabilizacji kontraktu detail/listing ocenić zakres redukcji legacy `ProductTypeAttribute` i `variant_attribute_values`.
+
 ### Variants
 
 1. Zachować obecny model wariantów

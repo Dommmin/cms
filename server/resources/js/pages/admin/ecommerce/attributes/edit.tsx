@@ -18,9 +18,11 @@ import type { AttributeData, EditAttributeProps } from './edit.types';
 const ATTRIBUTE_TYPES = [
     { value: 'text', label: 'Text' },
     { value: 'numeric', label: 'Numeric' },
+    { value: 'boolean', label: 'Boolean' },
     { value: 'select', label: 'Select' },
     { value: 'multiselect', label: 'Multi-Select' },
     { value: 'color', label: 'Color' },
+    { value: 'date', label: 'Date' },
 ] as const;
 
 function emptyValue(position: number) {
@@ -48,6 +50,7 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
     const supportsValues = ['select', 'multiselect', 'color'].includes(
         data.type,
     );
+    const supportsLegacyOptions = supportsValues;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -178,6 +181,20 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                                         ].includes(event.target.value)
                                             ? prev.values
                                             : [],
+                                        is_filterable: [
+                                            'select',
+                                            'multiselect',
+                                            'color',
+                                        ].includes(event.target.value)
+                                            ? prev.is_filterable
+                                            : false,
+                                        is_variant_selection: [
+                                            'select',
+                                            'multiselect',
+                                            'color',
+                                        ].includes(event.target.value)
+                                            ? prev.is_variant_selection
+                                            : false,
                                     }))
                                 }
                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -232,6 +249,7 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                                 type="checkbox"
                                 id="is_filterable"
                                 checked={data.is_filterable}
+                                disabled={!supportsLegacyOptions}
                                 onChange={(event) =>
                                     setData((prev) => ({
                                         ...prev,
@@ -250,12 +268,19 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                                 )}
                             </Label>
                         </div>
+                        {!supportsLegacyOptions ? (
+                            <p className="text-xs text-muted-foreground">
+                                Legacy storefront filters currently support only
+                                select, multiselect, and color attributes.
+                            </p>
+                        ) : null}
 
                         <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"
                                 id="is_variant_selection"
                                 checked={data.is_variant_selection}
+                                disabled={!supportsLegacyOptions}
                                 onChange={(event) =>
                                     setData((prev) => ({
                                         ...prev,
@@ -275,6 +300,12 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                                 )}
                             </Label>
                         </div>
+                        {!supportsLegacyOptions ? (
+                            <p className="text-xs text-muted-foreground">
+                                Legacy variant options currently support only
+                                select, multiselect, and color attributes.
+                            </p>
+                        ) : null}
                     </div>
 
                     {supportsValues ? (

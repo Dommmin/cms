@@ -11,10 +11,12 @@ use App\Filters\MinPriceFilter;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\ProductCollection;
 use App\Http\Resources\Api\V1\ProductResource;
+use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\FlashSale;
 use App\Models\Product;
+use App\Models\ProductAttributeValue;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantStockSubscription;
 use App\Services\SmartCollectionService;
@@ -101,6 +103,8 @@ class ProductController extends ApiController
                 'brand',
                 'thumbnail.media',
                 'images.media',
+                'attributeValues.attribute.values',
+                'attributeValues.selectedOption',
                 'activeVariants.attributeValues.attribute',
                 'activeVariants.attributeValues.attributeValue',
                 'activeVariants.priceHistory',
@@ -156,6 +160,8 @@ class ProductController extends ApiController
                 'public_url' => $pathService->brandPath($product->brand, $locale),
             ] : null,
             'attributes' => [],
+            'attribute_values' => $this->serializeProductAttributeValues($product),
+            'attribute_summary' => $this->buildProductAttributeSummary($product),
             'created_at' => $product->created_at?->toIso8601String(),
             'seo_title' => $product->seo_title,
             'seo_description' => $product->seo_description,
@@ -540,5 +546,121 @@ class ProductController extends ApiController
             'brands' => $brands,
             'attributes' => $attributes,
         ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeProductAttributeValues(Product $product): array
+    {
+        $schemaByAttributeId = $product->category
+            ->resolvedAttributeSchemas()
+            ->keyBy('attribute_id');
+
+        return $product->attributeValues
+            ->sortBy(fn (ProductAttributeValue $attributeValue): int => (int) ($schemaByAttributeId->get($attributeValue->attribute_id)?->position ?? 999))
+            ->map(function (ProductAttributeValue $attributeValue) use ($schemaByAttributeId): array {
+                $attribute = $attributeValue->attribute;
+                $valuePayload = $this->resolveSerializedAttributeValue($attributeValue);
+                $schema = $schemaByAttributeId->get($attribute->id);
+
+                return [
+                    'attribute_id' => $attribute->id,
+                    'slug' => $attribute->slug,
+                    'label' => $attribute->name,
+                    'type' => $attribute->type->value,
+                    'unit' => $attribute->unit,
+                    'is_required' => (bool) ($schema?->is_required ?? false),
+                    'value' => $valuePayload['value'],
+                    'display_value' => $valuePayload['display_value'],
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<string, array{label: string, value: string}>
+     */
+    private function buildProductAttributeSummary(Product $product): array
+    {
+        return collect($this->serializeProductAttributeValues($product))
+            ->mapWithKeys(function (array $attributeValue): array {
+                return [
+                    $attributeValue['slug'] => [
+                        'label' => $attributeValue['label'],
+                        'value' => $this->stringifyAttributeSummaryValue($attributeValue['display_value']),
+                    ],
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * @return array{value:mixed, display_value:mixed}
+     */
+    private function resolveSerializedAttributeValue(ProductAttributeValue $attributeValue): array
+    {
+        return match ($attributeValue->attribute->type->value) {
+            'numeric' => [
+                'value' => $attributeValue->value_numeric !== null ? (float) $attributeValue->value_numeric : null,
+                'display_value' => $attributeValue->value_numeric !== null ? (float) $attributeValue->value_numeric : null,
+            ],
+            'boolean' => [
+                'value' => $attributeValue->value_boolean,
+                'display_value' => $attributeValue->value_boolean,
+            ],
+            'date' => [
+                'value' => $attributeValue->value_date?->toDateString(),
+                'display_value' => $attributeValue->value_date?->toDateString(),
+            ],
+            'select' => [
+                'value' => $attributeValue->selectedOption?->slug,
+                'display_value' => $attributeValue->selectedOption?->value,
+            ],
+            'multiselect' => $this->resolveSerializedMultiselectValue($attributeValue),
+            default => [
+                'value' => $attributeValue->value_text,
+                'display_value' => $attributeValue->value_text,
+            ],
+        };
+    }
+
+    /**
+     * @return array{value:array<int, string>, display_value:array<int, string>}
+     */
+    private function resolveSerializedMultiselectValue(ProductAttributeValue $attributeValue): array
+    {
+        $selectedIds = collect($attributeValue->value_json ?? [])
+            ->filter(fn (mixed $optionId): bool => is_numeric($optionId))
+            ->map(fn (mixed $optionId): int => (int) $optionId)
+            ->values();
+
+        $selectedOptions = $attributeValue->attribute->values
+            ->filter(fn (AttributeValue $option): bool => $selectedIds->contains($option->id))
+            ->sortBy(fn (AttributeValue $option): int => (int) ($selectedIds->search($option->id) ?? 0))
+            ->values();
+
+        return [
+            'value' => $selectedOptions->pluck('slug')->all(),
+            'display_value' => $selectedOptions->pluck('value')->all(),
+        ];
+    }
+
+    private function stringifyAttributeSummaryValue(mixed $displayValue): string
+    {
+        if (is_array($displayValue)) {
+            return implode(', ', $displayValue);
+        }
+
+        if (is_bool($displayValue)) {
+            return $displayValue ? 'true' : 'false';
+        }
+
+        if ($displayValue === null) {
+            return '';
+        }
+
+        return (string) $displayValue;
     }
 }

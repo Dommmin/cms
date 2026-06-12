@@ -9,7 +9,14 @@ export type AttributeValueFormData = {
 export type AttributeFormData = {
     name: string;
     slug: string;
-    type: 'text' | 'numeric' | 'select' | 'multiselect' | 'color';
+    type:
+        | 'text'
+        | 'numeric'
+        | 'boolean'
+        | 'select'
+        | 'multiselect'
+        | 'color'
+        | 'date';
     unit: string;
     is_filterable: boolean;
     is_variant_selection: boolean;

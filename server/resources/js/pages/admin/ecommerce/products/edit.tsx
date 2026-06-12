@@ -7,6 +7,7 @@ import {
     ImageIcon,
     Search,
     Settings,
+    SlidersHorizontal,
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -48,6 +49,11 @@ import { slugify } from '@/lib/slug';
 import { formatDateTime } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
+import { CoreAttributesSection } from './core-attributes-section';
+import {
+    alignAttributeValuesToSchema,
+    getCategoryAttributeSchema,
+} from './core-attributes.utils';
 import type {
     Brand,
     Category,
@@ -91,6 +97,7 @@ const tabFieldMap: Record<TabKey, string[]> = {
         'is_search_promoted',
         'is_featured',
     ],
+    core_attributes: ['attribute_values'],
     pricing: [
         'variant',
         'variant.sku',
@@ -116,7 +123,13 @@ const tabFieldMap: Record<TabKey, string[]> = {
 function tabForErrors(errors: FormErrors): TabKey {
     const entries = Object.keys(errors);
 
-    for (const tab of ['general', 'pricing', 'media', 'metadata'] as TabKey[]) {
+    for (const tab of [
+        'general',
+        'core_attributes',
+        'pricing',
+        'media',
+        'metadata',
+    ] as TabKey[]) {
         if (
             entries.some((field) =>
                 tabFieldMap[tab].some(
@@ -185,6 +198,7 @@ export default function Edit({
         images?: ProductImage[];
         categories?: Category[];
         flag_ids?: number[];
+        attribute_values?: FormData['attribute_values'];
     };
 }) {
     const { frontendUrl, locales } = usePage().props as {
@@ -222,6 +236,10 @@ export default function Edit({
         og_image: product.og_image ?? null,
         sitemap_exclude: product.sitemap_exclude ?? false,
         flags: product.flag_ids ?? [],
+        attribute_values: alignAttributeValuesToSchema(
+            getCategoryAttributeSchema(categoriesList, product.category_id),
+            product.attribute_values ?? [],
+        ),
         variant: product.variant
             ? {
                   id: product.variant.id,
@@ -343,6 +361,24 @@ export default function Edit({
             flags: checked
                 ? [...prev.flags, flagId]
                 : prev.flags.filter((id) => id !== flagId),
+        }));
+    };
+
+    const selectedSchema = getCategoryAttributeSchema(
+        categoriesList,
+        formData.category_id,
+    );
+
+    const handleCategoryChange = (categoryId: string | null) => {
+        const nextSchema = getCategoryAttributeSchema(categoriesList, categoryId);
+
+        setFormData((prev) => ({
+            ...prev,
+            category_id: categoryId,
+            attribute_values: alignAttributeValuesToSchema(
+                nextSchema,
+                prev.attribute_values,
+            ),
         }));
     };
 
@@ -509,6 +545,10 @@ export default function Edit({
                                     errors as FormErrors,
                                     'pricing',
                                 );
+                                const coreAttributeErrors = errorCountForTab(
+                                    errors as FormErrors,
+                                    'core_attributes',
+                                );
                                 const mediaErrors = errorCountForTab(
                                     errors as FormErrors,
                                     'media',
@@ -523,7 +563,7 @@ export default function Edit({
                                         value={activeTab}
                                         onValueChange={setActiveTab}
                                     >
-                                        <TabsList className="flex h-auto w-full snap-x scrollbar-none justify-start overflow-x-auto bg-muted p-1 sm:grid sm:grid-cols-5">
+                                        <TabsList className="flex h-auto w-full snap-x scrollbar-none justify-start overflow-x-auto bg-muted p-1 sm:grid sm:grid-cols-6">
                                             <TabsTrigger
                                                 value="general"
                                                 className="snap-align-start shrink-0"
@@ -533,6 +573,18 @@ export default function Edit({
                                                 {generalErrors > 0 && (
                                                     <span className="ml-2 rounded bg-destructive px-1.5 text-xs text-destructive-foreground">
                                                         {generalErrors}
+                                                    </span>
+                                                )}
+                                            </TabsTrigger>
+                                            <TabsTrigger
+                                                value="core_attributes"
+                                                className="snap-align-start shrink-0"
+                                            >
+                                                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                                                Core Attributes
+                                                {coreAttributeErrors > 0 && (
+                                                    <span className="ml-2 rounded bg-destructive px-1.5 text-xs text-destructive-foreground">
+                                                        {coreAttributeErrors}
                                                     </span>
                                                 )}
                                             </TabsTrigger>
@@ -777,8 +829,7 @@ export default function Edit({
                                                                         label: string;
                                                                     } | null,
                                                                 ) =>
-                                                                    handleFormChange(
-                                                                        'category_id',
+                                                                    handleCategoryChange(
                                                                         item?.value.toString() ??
                                                                             null,
                                                                     )
@@ -1161,6 +1212,24 @@ export default function Edit({
                                                     />
                                                 </div>
                                             </div>
+                                        </TabsContent>
+
+                                        <TabsContent
+                                            value="core_attributes"
+                                            forceRender
+                                            className="mt-6"
+                                        >
+                                            <CoreAttributesSection
+                                                schema={selectedSchema}
+                                                values={formData.attribute_values}
+                                                errors={errors as FormErrors}
+                                                onChange={(attributeValues) =>
+                                                    handleFormChange(
+                                                        'attribute_values',
+                                                        attributeValues,
+                                                    )
+                                                }
+                                            />
                                         </TabsContent>
 
                                         {/* Pricing & Stock Tab */}
