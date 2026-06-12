@@ -334,6 +334,9 @@ it('returns product attribute_values in product detail api and keeps legacy vari
         ->assertJsonPath('attribute_values.2.slug', 'wireless')
         ->assertJsonPath('attribute_values.2.display_value', false)
         ->assertJsonPath('attribute_summary.wireless.value', 'false')
+        ->assertJsonPath('variant_options.0.slug', 'color')
+        ->assertJsonPath('variant_options.0.label', 'Color')
+        ->assertJsonPath('variant_options.0.values.0', 'Red')
         ->assertJsonPath('variants.0.attributes.Color', 'Red');
 });
 
@@ -371,4 +374,53 @@ it('keeps products with core attributes compatible with cart and default variant
         'quantity' => 1,
     ])->assertOk()
         ->assertJsonPath('items_count', 1);
+});
+
+it('keeps compare endpoint compatible when products do not have product-level attributes', function (): void {
+    $color = Attribute::factory()->create([
+        'name' => 'Color',
+        'slug' => 'color',
+    ]);
+    $red = AttributeValue::factory()->for($color)->create([
+        'value' => 'Red',
+        'slug' => 'red',
+    ]);
+    $blue = AttributeValue::factory()->for($color)->create([
+        'value' => 'Blue',
+        'slug' => 'blue',
+    ]);
+
+    $firstProduct = Product::factory()->create([
+        'slug' => ['en' => 'compare-first'],
+        'is_active' => true,
+        'is_saleable' => true,
+    ]);
+    $firstVariant = ProductVariant::factory()->for($firstProduct)->default()->active()->create();
+    VariantAttributeValue::factory()
+        ->for($firstVariant, 'variant')
+        ->for($color, 'attribute')
+        ->for($red, 'attributeValue')
+        ->create();
+
+    $secondProduct = Product::factory()->create([
+        'slug' => ['en' => 'compare-second'],
+        'is_active' => true,
+        'is_saleable' => true,
+    ]);
+    $secondVariant = ProductVariant::factory()->for($secondProduct)->default()->active()->create();
+    VariantAttributeValue::factory()
+        ->for($secondVariant, 'variant')
+        ->for($color, 'attribute')
+        ->for($blue, 'attributeValue')
+        ->create();
+
+    $this->getJson(sprintf(
+        '/api/v1/products/compare?ids[0]=%d&ids[1]=%d',
+        $firstProduct->id,
+        $secondProduct->id,
+    ))
+        ->assertOk()
+        ->assertJsonPath('meta.attribute_keys.0', 'Color')
+        ->assertJsonPath('data.0.attribute_map.Color.0', 'Red')
+        ->assertJsonPath('data.1.attribute_map.Color.0', 'Blue');
 });

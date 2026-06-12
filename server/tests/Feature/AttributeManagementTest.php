@@ -30,8 +30,8 @@ it('creates attributes with every supported canonical type', function (string $t
         'slug' => 'attribute-'.$type,
         'type' => $type,
         'unit' => $type === 'numeric' ? 'cm' : null,
-        'is_filterable' => true,
-        'is_variant_selection' => $type !== 'text',
+        'is_filterable' => in_array($type, ['select', 'multiselect', 'color'], true),
+        'is_variant_selection' => in_array($type, ['select', 'multiselect', 'color'], true),
         'position' => 2,
         'values' => in_array($type, ['select', 'multiselect', 'color'], true) ? [[
             'value' => 'Primary',

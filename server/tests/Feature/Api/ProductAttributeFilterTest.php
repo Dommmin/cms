@@ -7,6 +7,7 @@ use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\CategoryAttributeSchema;
 use App\Models\Product;
+use App\Models\ProductAttributeValue;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
 
@@ -115,4 +116,98 @@ it('keeps variant filters working when category schema exists in parallel', func
         ->assertOk()
         ->assertJsonFragment(['slug' => $product->slug])
         ->assertJsonPath('meta.available_filters.attributes.0.slug', 'style');
+});
+
+it('supports listing filters from product-level attributes while keeping legacy variant filters as fallback', function (): void {
+    $category = Category::factory()->create();
+
+    $material = Attribute::factory()->create([
+        'name' => 'Material',
+        'slug' => 'material',
+        'type' => 'select',
+        'is_filterable' => true,
+    ]);
+    $steel = AttributeValue::factory()->for($material)->create([
+        'value' => 'Steel',
+        'slug' => 'steel',
+    ]);
+    $wood = AttributeValue::factory()->for($material)->create([
+        'value' => 'Wood',
+        'slug' => 'wood',
+    ]);
+
+    CategoryAttributeSchema::factory()->for($category)->create([
+        'attribute_id' => $material->id,
+        'is_required' => false,
+        'position' => 0,
+    ]);
+
+    $size = Attribute::factory()->create([
+        'name' => 'Size',
+        'slug' => 'size',
+        'is_filterable' => true,
+    ]);
+    $large = AttributeValue::factory()->for($size)->create([
+        'value' => 'Large',
+        'slug' => 'large',
+    ]);
+
+    $productFromCoreAttributes = Product::factory()->create([
+        'category_id' => $category->id,
+        'name' => 'Steel desk',
+        'slug' => ['en' => 'steel-desk'],
+        'is_active' => true,
+        'is_saleable' => true,
+    ]);
+    ProductVariant::factory()->for($productFromCoreAttributes)->default()->active()->create([
+        'stock_quantity' => 8,
+    ]);
+    ProductAttributeValue::query()->create([
+        'product_id' => $productFromCoreAttributes->id,
+        'attribute_id' => $material->id,
+        'attribute_value_id' => $steel->id,
+    ]);
+
+    $productFromLegacyVariants = Product::factory()->create([
+        'category_id' => $category->id,
+        'name' => 'Large chair',
+        'slug' => ['en' => 'large-chair'],
+        'is_active' => true,
+        'is_saleable' => true,
+    ]);
+    $legacyVariant = ProductVariant::factory()->for($productFromLegacyVariants)->default()->active()->create([
+        'stock_quantity' => 6,
+    ]);
+    VariantAttributeValue::factory()
+        ->for($legacyVariant, 'variant')
+        ->for($size, 'attribute')
+        ->for($large, 'attributeValue')
+        ->create();
+
+    $otherProduct = Product::factory()->create([
+        'category_id' => $category->id,
+        'name' => 'Wood desk',
+        'slug' => ['en' => 'wood-desk'],
+        'is_active' => true,
+        'is_saleable' => true,
+    ]);
+    ProductVariant::factory()->for($otherProduct)->default()->active()->create([
+        'stock_quantity' => 4,
+    ]);
+    ProductAttributeValue::query()->create([
+        'product_id' => $otherProduct->id,
+        'attribute_id' => $material->id,
+        'attribute_value_id' => $wood->id,
+    ]);
+
+    $this->getJson('/api/v1/products?filter[attributes][material]=steel')
+        ->assertOk()
+        ->assertJsonFragment(['slug' => $productFromCoreAttributes->slug])
+        ->assertJsonMissing(['slug' => $otherProduct->slug])
+        ->assertJsonPath('meta.available_filters.attributes.0.slug', 'material')
+        ->assertJsonPath('meta.available_filters.attributes.0.values.0.slug', 'steel');
+
+    $this->getJson('/api/v1/products?filter[attributes][size]=large')
+        ->assertOk()
+        ->assertJsonFragment(['slug' => $productFromLegacyVariants->slug]);
 });
