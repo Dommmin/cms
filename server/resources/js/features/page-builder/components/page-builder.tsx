@@ -19,6 +19,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from '@/hooks/use-translation';
 import { useBuilderState } from '../hooks/use-builder-state';
 import { analyzePageHealth } from '../page-health';
@@ -33,7 +34,6 @@ import { ResponsivePreviewPanel } from './responsive-preview-panel';
 import { SectionTemplatesDialog } from './section-templates-dialog';
 import type { SectionTemplate } from './section-templates-dialog.types';
 import { SortableSection } from './sortable-section';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function PageBuilder({
     data,

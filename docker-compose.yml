@@ -107,7 +107,7 @@ services:
       - cms-network
 
   playwright:
-    image: mcr.microsoft.com/playwright:v1.52.0-noble
+    image: mcr.microsoft.com/playwright:v1.58.2-noble
     container_name: ${COMPOSE_PROJECT_NAME}_playwright
     working_dir: /var/www/client
     volumes:

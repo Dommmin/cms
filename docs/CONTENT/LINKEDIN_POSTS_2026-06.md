@@ -68,23 +68,51 @@ Więcej o tym, jak to działa end-to-end - artykuł na blogu, link w komentarzu.
 
 Używam AI codziennie w dev.
 
-Ale mam dla niego twardą granicę.
+Ale nie traktuję go jak „magicznego seniora”.
 
-**AI robi u mnie:**
-→ boilerplate - migracje, szkielety testów, fabryki
-→ eksplorację wariantów architektury przed decyzją
-→ pierwsze pytania przy nowym zapytaniu do bazy
+Traktuję go jak bardzo szybkiego wykonawcę, który potrzebuje dobrego kontekstu, zasad i review.
 
-**AI nie robi:**
-→ nie decyduje o granicach domenowych
-→ nie projektuje integracji płatności
-→ nie zastępuje testów
+AI robi u mnie:
+→ generuje boilerplate: migracje, fabryki, szkielety testów
+→ pomaga eksplorować warianty architektury przed decyzją
+→ analizuje zapytania SQL i podpowiada miejsca do optymalizacji
+→ przygotowuje pierwszą wersję implementacji
+→ pomaga pisać testy, edge case’y i checklisty review
+→ może nawet wdrażać integracje, np. płatności, webhooki czy logikę checkoutu
 
-Różnica jest prosta: AI nie odpowiada za produkt. Ja tak.
+Ale jest jeden warunek:
 
-Reguły projektu (środowisko, konwencje kodu, co jest zakazane) mam zapisane - AI bez nich generuje kod, który wygląda dobrze i psuje architekturę za 3 tygodnie.
+nic krytycznego nie przechodzi bez testów, review i mojej akceptacji.
 
-Jak wygląda Wasz podział - co oddajecie AI, co zostaje ręcznie?
+AI może napisać integrację płatności.
+
+Ale to ja odpowiadam za to, czy:
+→ obsłużone są retry i duplikaty webhooków
+→ statusy zamówień są poprawne
+→ płatność jest idempotentna
+→ edge case’y są pokryte testami
+→ architektura nie rozwali się za 3 miesiące
+
+Dlatego największą różnicę robią nie same prompty, tylko reguły projektu.
+
+Mam zapisane:
+→ konwencje kodu
+→ strukturę katalogów
+→ zasady testowania
+→ czego AI ma nie robić
+→ kiedy ma najpierw przygotować plan
+→ kiedy ma zatrzymać się przed zmianą architektury
+
+Bez tego AI często generuje kod, który wygląda dobrze w diffie, ale po czasie psuje spójność systemu.
+
+Dla mnie podział jest prosty:
+
+AI może implementować.
+Człowiek musi rozumieć, akceptować i brać odpowiedzialność.
+
+Jak wygląda to u Was?
+
+Co oddajecie AI, a co nadal zostaje po Waszej stronie?
 
 #AI #Laravel #DeveloperExperience #SoftwareArchitecture #BuildInPublic
 
