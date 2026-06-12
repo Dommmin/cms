@@ -38,5 +38,7 @@
         <env name="SCOUT_DRIVER" value="collection"/>
         <env name="GOTENBERG_URL" value="http://gotenberg:3000"/>
         <env name="LARAVEL_PDF_DRIVER" value="dompdf"/>
+        <env name="FILESYSTEM_DISK" value="local"/>
+        <env name="MEDIA_DISK" value="public"/>
     </php>
 </phpunit>
