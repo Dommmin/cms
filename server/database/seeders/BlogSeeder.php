@@ -239,6 +239,8 @@ class BlogSeeder extends Seeder
                     'published_at' => now()->subDays($daysAgo),
                     'reading_time' => $readingTime,
                     'available_locales' => $hasPl ? ['en', 'pl'] : null,
+                    'seo_title' => ['en' => $postData['title'].' | Blog'],
+                    'seo_description' => ['en' => $postData['excerpt']],
                 ]));
             }
 
@@ -249,6 +251,8 @@ class BlogSeeder extends Seeder
                 $post->setTranslation('slug', 'pl', $slug);
                 $post->setTranslation('excerpt', 'pl', $pl['excerpt']);
                 $post->setTranslation('content', 'pl', $pl['content']);
+                $post->setTranslation('seo_title', 'pl', $pl['title'].' | Blog');
+                $post->setTranslation('seo_description', 'pl', $pl['excerpt']);
                 $post->save();
             }
         }

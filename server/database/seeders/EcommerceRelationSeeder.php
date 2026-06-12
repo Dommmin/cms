@@ -15,10 +15,10 @@ use App\Models\Metafield;
 use App\Models\MetafieldDefinition;
 use App\Models\Product;
 use App\Models\ProductFlag;
+use App\Models\ProductReview;
 use App\Models\ProductType;
 use App\Models\ProductTypeAttribute;
 use App\Models\ProductVariant;
-use App\Models\ProductReview;
 use App\Models\Promotion;
 use App\Models\VariantAttributeValue;
 use Illuminate\Database\Seeder;
@@ -232,7 +232,7 @@ class EcommerceRelationSeeder extends Seeder
                 $type = ProductType::query()->create([
                     'slug' => $typeSlug,
                     'name' => $typeInfo['name'],
-                    'has_variants' => count($typeInfo['attributes']) > 0,
+                    'has_variants' => $typeInfo['attributes'] !== [],
                     'variant_selection_attributes' => $typeInfo['attributes'],
                     'is_shippable' => true,
                 ]);
@@ -338,9 +338,7 @@ class EcommerceRelationSeeder extends Seeder
                 $promotion->categories()->syncWithoutDetaching($categories->random(min(2, $categories->count()))->pluck('id')->all());
             } else {
                 $promotion->products()->syncWithoutDetaching(
-                    $products->random(min(5, $products->count()))->mapWithKeys(function ($product) {
-                        return [$product->id => ['discount_value' => random_int(10, 30), 'discount_type' => 'percentage']];
-                    })->all()
+                    $products->random(min(5, $products->count()))->mapWithKeys(fn ($product): array => [$product->id => ['discount_value' => random_int(10, 30), 'discount_type' => 'percentage']])->all()
                 );
             }
         }
@@ -349,6 +347,7 @@ class EcommerceRelationSeeder extends Seeder
             if ($categories->isNotEmpty()) {
                 $discount->categories()->syncWithoutDetaching($categories->random(min(2, $categories->count()))->pluck('id')->all());
             }
+
             $discount->products()->syncWithoutDetaching($products->random(min(5, $products->count()))->pluck('id')->all());
         }
     }

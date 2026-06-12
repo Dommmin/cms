@@ -507,6 +507,8 @@ class ElectronicsSeeder extends Seeder
             $category->fill([
                 'name' => ['pl' => $name, 'en' => $name],
                 'description' => ['pl' => 'Kategoria '.$name, 'en' => $name.' category'],
+                'seo_title' => ['pl' => $name.' - Kupuj online | Sklep', 'en' => $name.' - Shop online | Store'],
+                'seo_description' => ['pl' => 'Kupuj produkty z kategorii '.$name.' w najlepszych cenach. Szeroki wybór i szybka wysyłka.', 'en' => 'Shop '.$name.' products at the best prices. Wide selection and fast shipping.'],
                 'is_active' => true,
                 'parent_id' => $parentId,
                 'position' => $position++,
@@ -1630,6 +1632,8 @@ class ElectronicsSeeder extends Seeder
             'slug' => ['pl' => $slug, 'en' => $slug],
             'description' => ['pl' => $this->generateDescription($config['name']), 'en' => $this->generateDescription($config['name'])],
             'short_description' => ['pl' => 'Wysokiej jakosci produkt '.$config['name'], 'en' => 'High quality product '.$config['name']],
+            'seo_title' => ['pl' => $config['name'].' - Kup online w naszym sklepie', 'en' => $config['name'].' - Buy online in our store'],
+            'seo_description' => ['pl' => 'Kup '.$config['name'].' w świetnej cenie! Szybka dostawa, gwarancja i profesjonalna obsługa klienta w naszym sklepie.', 'en' => 'Get '.$config['name'].' at a great price! Fast shipping, warranty, and professional customer service in our store.'],
             'is_active' => true,
             'is_saleable' => true,
         ]);
