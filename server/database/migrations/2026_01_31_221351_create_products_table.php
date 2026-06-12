@@ -31,7 +31,7 @@ return new class extends Migration
             $table->timestamp('available_from')->nullable();
             $table->timestamp('available_until')->nullable();
             $table->string('seo_title')->nullable();
-            $table->string('seo_description', 255)->nullable();
+            $table->text('seo_description')->nullable();
             $table->timestamps();
 
             $table->index('slug');

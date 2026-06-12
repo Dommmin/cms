@@ -26,7 +26,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->unsignedTinyInteger('position')->default(0);
             $table->string('seo_title')->nullable();
-            $table->string('seo_description', 255)->nullable();
+            $table->text('seo_description')->nullable();
             $table->timestamps();
 
             $table->index('slug');
