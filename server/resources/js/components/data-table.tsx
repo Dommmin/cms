@@ -38,6 +38,8 @@ export default function DataTable<T>({
     mobilePrimaryColumns = 3,
     mobileCardTitle,
     mobileEmptyLabel,
+    mobileLayout = 'table',
+    tableMinWidthClassName,
 }: DataTableProps<T>) {
     'use no memo';
 
@@ -169,96 +171,108 @@ export default function DataTable<T>({
                 </div>
             )}
 
-            <div className="space-y-3 md:hidden">
-                {data.length === 0 ? (
-                    <Card>
-                        <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                            {mobileEmptyLabel ??
-                                __('empty.no_results', 'No results.')}
-                        </CardContent>
-                    </Card>
-                ) : (
-                    data.map((row, rowIndex) => (
-                        <Card key={rowIndex}>
-                            <CardContent className="space-y-4 p-4">
-                                <div className="space-y-3">
-                                    {mobileCardTitle ? (
-                                        <div className="min-w-0">
-                                            {mobileCardTitle(row, rowIndex)}
-                                        </div>
-                                    ) : (
-                                        <div className="min-w-0">
-                                            {renderCell(
-                                                row,
-                                                rowIndex,
-                                                mobileSummaryColumns[0],
-                                            )}
-                                        </div>
-                                    )}
-
-                                    <dl className="space-y-3">
-                                        {mobileSummaryColumns
-                                            .slice(mobileCardTitle ? 1 : 1)
-                                            .map((column, columnIndex) => {
-                                                const value = getCellValue(
-                                                    row,
-                                                    column,
-                                                    rowIndex,
-                                                );
-
-                                                if (isEmptyValue(value)) {
-                                                    return null;
-                                                }
-
-                                                return (
-                                                    <div
-                                                        key={getColumnId(
-                                                            column,
-                                                            columnIndex,
-                                                        )}
-                                                        className="space-y-1"
-                                                    >
-                                                        <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                                            {renderHeader(
-                                                                column,
-                                                            )}
-                                                        </dt>
-                                                        <dd className="text-sm">
-                                                            {renderCell(
-                                                                row,
-                                                                rowIndex,
-                                                                column,
-                                                            )}
-                                                        </dd>
-                                                    </div>
-                                                );
-                                            })}
-                                    </dl>
-                                </div>
-
-                                {mobileDetailColumns.length > 0 && (
-                                    <Button
-                                        variant="outline"
-                                        className="w-full justify-between"
-                                        onClick={() =>
-                                            setDetailsRowIndex(rowIndex)
-                                        }
-                                    >
-                                        {__(
-                                            'action.view_details',
-                                            'View details',
-                                        )}
-                                        <ChevronRightIcon className="h-4 w-4" />
-                                    </Button>
-                                )}
+            {mobileLayout === 'cards' ? (
+                <div className="space-y-3 md:hidden">
+                    {data.length === 0 ? (
+                        <Card>
+                            <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                                {mobileEmptyLabel ??
+                                    __('empty.no_results', 'No results.')}
                             </CardContent>
                         </Card>
-                    ))
-                )}
-            </div>
+                    ) : (
+                        data.map((row, rowIndex) => (
+                            <Card key={rowIndex}>
+                                <CardContent className="space-y-3 p-3.5">
+                                    <div className="space-y-2.5">
+                                        {mobileCardTitle ? (
+                                            <div className="min-w-0 text-sm font-medium">
+                                                {mobileCardTitle(row, rowIndex)}
+                                            </div>
+                                        ) : (
+                                            <div className="min-w-0">
+                                                {renderCell(
+                                                    row,
+                                                    rowIndex,
+                                                    mobileSummaryColumns[0],
+                                                )}
+                                            </div>
+                                        )}
 
-            <div className="hidden overflow-x-auto rounded-md border md:block">
-                <table className="w-full min-w-max text-sm">
+                                        <dl className="grid gap-x-3 gap-y-2 sm:grid-cols-2">
+                                            {mobileSummaryColumns
+                                                .slice(1)
+                                                .map((column, columnIndex) => {
+                                                    const value = getCellValue(
+                                                        row,
+                                                        column,
+                                                        rowIndex,
+                                                    );
+
+                                                    if (isEmptyValue(value)) {
+                                                        return null;
+                                                    }
+
+                                                    return (
+                                                        <div
+                                                            key={getColumnId(
+                                                                column,
+                                                                columnIndex,
+                                                            )}
+                                                            className="min-w-0 space-y-1"
+                                                        >
+                                                            <dt className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                                                                {renderHeader(
+                                                                    column,
+                                                                )}
+                                                            </dt>
+                                                            <dd className="min-w-0 text-sm">
+                                                                {renderCell(
+                                                                    row,
+                                                                    rowIndex,
+                                                                    column,
+                                                                )}
+                                                            </dd>
+                                                        </div>
+                                                    );
+                                                })}
+                                        </dl>
+                                    </div>
+
+                                    {mobileDetailColumns.length > 0 && (
+                                        <Button
+                                            variant="outline"
+                                            className="w-full justify-between"
+                                            onClick={() =>
+                                                setDetailsRowIndex(rowIndex)
+                                            }
+                                        >
+                                            {__(
+                                                'action.view_details',
+                                                'View details',
+                                            )}
+                                            <ChevronRightIcon className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        ))
+                    )}
+                </div>
+            ) : null}
+
+            <div
+                className={cn(
+                    'overflow-x-auto rounded-md border',
+                    mobileLayout === 'cards' ? 'hidden md:block' : 'block',
+                )}
+            >
+                <table
+                    className={cn(
+                        'w-full min-w-max text-sm',
+                        tableMinWidthClassName,
+                    )}
+                >
                     <thead className="bg-muted/50">
                         <tr>
                             {columns.map((column, index) => {

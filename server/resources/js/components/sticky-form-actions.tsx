@@ -7,13 +7,19 @@ export default function StickyFormActions({
     processing = false,
     submitLabel,
     processingLabel,
+    secondaryActions,
 }: StickyFormActionsProps) {
     const __ = useTranslation();
     return (
         <>
             <div className="h-20 md:h-0" />
             <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/90 md:sticky md:inset-auto md:bottom-4 md:ml-auto md:w-fit md:rounded-lg md:border md:px-3 md:py-2 md:shadow-lg">
-                <div className="flex justify-end">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                    {secondaryActions ? (
+                        <div className="flex flex-wrap items-center gap-2">
+                            {secondaryActions}
+                        </div>
+                    ) : null}
                     <Button type="submit" form={formId} disabled={processing}>
                         {processing
                             ? (processingLabel ??

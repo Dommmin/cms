@@ -21,6 +21,7 @@ function getBlockLabel(
 }
 
 export function PageNavigator({
+    className,
     sections,
     availableSections,
     availableBlockTypes,
@@ -36,7 +37,13 @@ export function PageNavigator({
     const __ = useTranslation();
 
     return (
-        <aside className="sticky top-20 hidden max-h-[calc(100vh-6rem)] rounded-lg border bg-background lg:block">
+        <aside
+            className={cn(
+                'rounded-lg border bg-background',
+                'lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)]',
+                className,
+            )}
+        >
             <div className="border-b p-3">
                 <div className="flex items-center gap-2">
                     <MousePointer2 className="h-4 w-4 text-muted-foreground" />
@@ -49,7 +56,7 @@ export function PageNavigator({
                 </div>
             </div>
 
-            <div className="h-[calc(100vh-10rem)] overflow-y-auto">
+            <div className="max-h-[24rem] overflow-y-auto lg:h-[calc(100vh-10rem)] lg:max-h-[calc(100vh-10rem)]">
                 <div className="space-y-2 p-2">
                     {sections.length === 0 ? (
                         <p className="p-3 text-sm text-muted-foreground">

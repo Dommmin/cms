@@ -3,4 +3,5 @@ export type StickyFormActionsProps = {
     processing?: boolean;
     submitLabel?: string;
     processingLabel?: string;
+    secondaryActions?: React.ReactNode;
 };

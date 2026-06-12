@@ -33,6 +33,7 @@ import { ResponsivePreviewPanel } from './responsive-preview-panel';
 import { SectionTemplatesDialog } from './section-templates-dialog';
 import type { SectionTemplate } from './section-templates-dialog.types';
 import { SortableSection } from './sortable-section';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function PageBuilder({
     data,
@@ -352,8 +353,73 @@ export function PageBuilder({
                 onEditorModeChange={handleEditorModeChange}
             />
 
-            <div className="container grid max-w-[100rem] gap-6 py-8 lg:grid-cols-[18rem_minmax(0,1fr)_minmax(22rem,30rem)]">
+            <div className="mx-auto grid w-full max-w-[100rem] gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[18rem_minmax(0,1fr)_minmax(22rem,30rem)] lg:px-8 lg:py-8">
+                <div className="lg:hidden">
+                    <Tabs defaultValue="navigator" className="gap-3">
+                        <TabsList className="flex w-full flex-nowrap gap-1 p-1">
+                            <TabsTrigger value="navigator" className="flex-1">
+                                {__('builder.navigator', 'Navigator')}
+                            </TabsTrigger>
+                            <TabsTrigger value="inspector" className="flex-1">
+                                {__('builder.inspector', 'Inspector')}
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="navigator" className="mt-0">
+                            <PageNavigator
+                                className="block"
+                                sections={sections}
+                                availableSections={data.available_sections}
+                                availableBlockTypes={
+                                    data.available_block_relations
+                                }
+                                activeSectionId={activeSectionId}
+                                activeBlockId={activeBlockId}
+                                onSelectSection={handleSelectSection}
+                                onSelectBlock={handleSelectBlock}
+                                onToggleSectionVisibility={
+                                    handleToggleSectionVisibility
+                                }
+                                onToggleBlockVisibility={
+                                    handleToggleBlockVisibility
+                                }
+                                onDuplicateSection={duplicateSection}
+                                onDuplicateBlock={duplicateBlock}
+                            />
+                        </TabsContent>
+                        <TabsContent value="inspector" className="mt-0">
+                            <div className="rounded-lg border bg-background">
+                                <PageInspector
+                                    section={activeSection}
+                                    sectionIndex={
+                                        activeSectionIndex >= 0
+                                            ? activeSectionIndex
+                                            : null
+                                    }
+                                    block={activeBlock}
+                                    blockIndex={
+                                        activeBlockIndex >= 0
+                                            ? activeBlockIndex
+                                            : null
+                                    }
+                                    availableSections={data.available_sections}
+                                    availableBlockTypes={
+                                        data.available_block_relations
+                                    }
+                                    onUpdateSection={updateSection}
+                                    onUpdateBlock={updateBlock}
+                                    editorMode={editorMode}
+                                    onClose={() => {
+                                        setActiveSectionId(null);
+                                        setActiveBlockId(null);
+                                    }}
+                                />
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+                </div>
+
                 <PageNavigator
+                    className="hidden lg:block"
                     sections={sections}
                     availableSections={data.available_sections}
                     availableBlockTypes={data.available_block_relations}
@@ -573,7 +639,7 @@ export function PageBuilder({
                         onOpenPreview={onPreview}
                     />
                 ) : inspectorOpen && (activeSection || activeBlock) ? (
-                    <div className="max-w-[30rem] min-w-[22rem]">
+                    <div className="min-w-0 lg:min-w-[22rem] lg:max-w-[30rem]">
                         <PageInspector
                             section={activeSection}
                             sectionIndex={

@@ -71,7 +71,7 @@ export function MobileBottomNav({ modules }: MobileBottomNavProps) {
     return (
         <nav
             aria-label="Mobile navigation"
-            className="bg-background/95 border-border fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t px-2 py-2 [padding-bottom:calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden"
+            className="bg-background/95 border-border fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t px-2 py-2 [padding-bottom:calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-xl md:hidden"
         >
             <Link
                 href={homeHref}

@@ -44,6 +44,7 @@ export function LocalizedField({
     jsonValue,
     onJsonChange,
     autoFocus,
+    localeSwitcherClassName,
 }: LocalizedFieldProps) {
     const { locales = [] } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
@@ -75,20 +76,21 @@ export function LocalizedField({
                     />
                 ))}
 
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 {!hideLabel && (
                     <Label htmlFor={fieldId}>
                         {label}
                         {required && ' *'}
                     </Label>
                 )}
-                <div className="ml-auto flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:ml-auto sm:justify-end">
                     {headerEnd}
                     {locales.length > 1 && (
                         <LocaleTabSwitcher
                             locales={locales}
                             activeLocale={activeLocale}
                             onLocaleChange={setActiveLocale}
+                            className={localeSwitcherClassName}
                         />
                     )}
                 </div>

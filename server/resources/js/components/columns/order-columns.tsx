@@ -1,9 +1,15 @@
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { EyeIcon } from 'lucide-react';
+import { EyeIcon, MoreHorizontalIcon } from 'lucide-react';
 import * as OrderController from '@/actions/App/Http/Controllers/Admin/Ecommerce/OrderController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/hooks/use-translation';
 import type { OrderRow } from './order-columns.types';
 
@@ -37,7 +43,10 @@ export function useOrderColumns(
 
     const checkboxColumn: ColumnDef<OrderRow> = {
         id: 'select',
-        meta: { className: 'w-[40px]' } as ColumnDef<OrderRow>['meta'],
+        meta: {
+            className: 'w-[40px]',
+            mobileHidden: true,
+        } as ColumnDef<OrderRow>['meta'],
         header: () => (
             <input
                 type="checkbox"
@@ -109,7 +118,10 @@ export function useOrderColumns(
         },
         {
             accessorKey: 'payment_status',
-            meta: { className: 'w-[140px]' },
+            meta: {
+                className: 'w-[140px]',
+                mobileHidden: true,
+            },
             header: 'Payment',
             cell: ({ row }) => (
                 <Badge
@@ -138,7 +150,10 @@ export function useOrderColumns(
         },
         {
             accessorKey: 'created_at',
-            meta: { className: 'w-[140px]' },
+            meta: {
+                className: 'w-[140px]',
+                mobileHidden: true,
+            },
             header: __('column.created_at', 'Date'),
             cell: ({ row }) => (
                 <span className="text-sm">
@@ -158,18 +173,27 @@ export function useOrderColumns(
             meta: { className: 'w-[100px]' },
             header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
-                <div className="flex items-center gap-2">
-                    <Button asChild variant="outline" size="sm">
-                        <Link
-                            href={OrderController.show.url(row.original.id)}
-                            prefetch
-                            cacheFor={60}
-                        >
-                            <EyeIcon className="mr-1 h-3 w-3" />
-                            View
-                        </Link>
-                    </Button>
-                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-1.5">
+                            <MoreHorizontalIcon className="h-4 w-4" />
+                            {__('column.actions', 'Actions')}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={OrderController.show.url(row.original.id)}
+                                prefetch
+                                cacheFor={60}
+                                className="flex w-full items-center"
+                            >
+                                <EyeIcon className="h-4 w-4" />
+                                View
+                            </Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             ),
         },
     ];

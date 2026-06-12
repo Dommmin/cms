@@ -314,8 +314,11 @@ export default function Create({
                                         value={activeTab}
                                         onValueChange={setActiveTab}
                                     >
-                                        <TabsList className="grid w-full grid-cols-4">
-                                            <TabsTrigger value="general">
+                                        <TabsList className="flex w-full min-w-0 flex-nowrap gap-1 p-1">
+                                            <TabsTrigger
+                                                value="general"
+                                                className="min-w-[8.5rem] flex-none"
+                                            >
                                                 <Settings className="mr-2 h-4 w-4" />
                                                 General
                                                 {generalErrors > 0 && (
@@ -324,7 +327,10 @@ export default function Create({
                                                     </span>
                                                 )}
                                             </TabsTrigger>
-                                            <TabsTrigger value="pricing">
+                                            <TabsTrigger
+                                                value="pricing"
+                                                className="min-w-[10.5rem] flex-none"
+                                            >
                                                 <Settings className="mr-2 h-4 w-4" />
                                                 Pricing & Stock
                                                 {pricingErrors > 0 && (
@@ -333,7 +339,10 @@ export default function Create({
                                                     </span>
                                                 )}
                                             </TabsTrigger>
-                                            <TabsTrigger value="media">
+                                            <TabsTrigger
+                                                value="media"
+                                                className="min-w-[8rem] flex-none"
+                                            >
                                                 <ImageIcon className="mr-2 h-4 w-4" />
                                                 Media
                                                 {mediaErrors > 0 && (
@@ -342,7 +351,10 @@ export default function Create({
                                                     </span>
                                                 )}
                                             </TabsTrigger>
-                                            <TabsTrigger value="metadata">
+                                            <TabsTrigger
+                                                value="metadata"
+                                                className="min-w-[7rem] flex-none"
+                                            >
                                                 <Search className="mr-2 h-4 w-4" />
                                                 SEO
                                                 {metadataErrors > 0 && (
@@ -475,6 +487,7 @@ export default function Create({
                                                             string
                                                         >
                                                     }
+                                                    localeSwitcherClassName="sm:justify-end"
                                                 />
 
                                                 <LocalizedField
@@ -495,9 +508,10 @@ export default function Create({
                                                             string
                                                         >
                                                     }
+                                                    localeSwitcherClassName="sm:justify-end"
                                                 />
 
-                                                <div className="grid grid-cols-2 gap-4">
+                                                <div className="grid gap-4 sm:grid-cols-2">
                                                     <div className="space-y-2">
                                                         <Label htmlFor="category_id">
                                                             Category *
@@ -736,7 +750,7 @@ export default function Create({
                                                     />
                                                 </div>
 
-                                                <div className="flex items-center gap-6">
+                                                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
                                                     <div className="flex items-center gap-2">
                                                         <input
                                                             type="hidden"
@@ -874,7 +888,7 @@ export default function Create({
                                                     Default Variant
                                                 </h3>
 
-                                                <div className="grid grid-cols-2 gap-4">
+                                                <div className="grid gap-4 sm:grid-cols-2">
                                                     <div className="grid gap-2">
                                                         <Label htmlFor="variant.sku">
                                                             SKU *
@@ -928,7 +942,7 @@ export default function Create({
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-2 gap-4">
+                                                <div className="grid gap-4 sm:grid-cols-2">
                                                     <div className="grid gap-2">
                                                         <Label htmlFor="variant.price">
                                                             Price (in PLN) *
@@ -988,7 +1002,7 @@ export default function Create({
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-2 gap-4">
+                                                <div className="grid gap-4 sm:grid-cols-2">
                                                     <div className="grid gap-2">
                                                         <Label htmlFor="variant.stock_quantity">
                                                             Stock Quantity
@@ -1316,6 +1330,17 @@ export default function Create({
                                 formId={formId}
                                 processing={processing}
                                 submitLabel="Create Product"
+                                secondaryActions={
+                                    <Button asChild variant="outline">
+                                        <Link
+                                            href={ProductController.index.url()}
+                                            prefetch
+                                            cacheFor={30}
+                                        >
+                                            Cancel
+                                        </Link>
+                                    </Button>
+                                }
                             />
                         </>
                     )}

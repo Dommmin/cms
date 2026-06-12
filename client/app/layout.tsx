@@ -219,7 +219,7 @@ export default async function RootLayout({
                                         />
                                         <main
                                             id="main-content"
-                                            className="flex-1 [padding-bottom:calc(5rem+env(safe-area-inset-bottom))] md:pb-0"
+                                            className="flex-1 [padding-bottom:calc(5rem+env(safe-area-inset-bottom)+var(--cookie-consent-offset,0px))] md:[padding-bottom:var(--cookie-consent-offset,0px)]"
                                         >
                                             <PageTransition>
                                                 {children}

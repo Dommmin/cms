@@ -11,6 +11,7 @@ export interface PageHeaderActionsProps {
     children: React.ReactNode;
     className?: string;
     compact?: boolean;
+    stackOnMobile?: boolean;
 }
 
 export interface PageHeaderOverflowMenuProps {

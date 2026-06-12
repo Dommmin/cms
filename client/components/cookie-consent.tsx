@@ -169,6 +169,39 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
         return () => el.removeEventListener('keydown', onKeyDown);
     }, [visible, showDetails]);
 
+    useEffect(() => {
+        const root = document.documentElement;
+
+        if (!visible || !dialogRef.current) {
+            root.style.setProperty('--cookie-consent-offset', '0px');
+            return;
+        }
+
+        const el = dialogRef.current;
+
+        const updateOffset = () => {
+            root.style.setProperty(
+                '--cookie-consent-offset',
+                `${el.getBoundingClientRect().height + 12}px`,
+            );
+        };
+
+        updateOffset();
+
+        const resizeObserver = new ResizeObserver(() => {
+            updateOffset();
+        });
+
+        resizeObserver.observe(el);
+        window.addEventListener('resize', updateOffset);
+
+        return () => {
+            resizeObserver.disconnect();
+            window.removeEventListener('resize', updateOffset);
+            root.style.setProperty('--cookie-consent-offset', '0px');
+        };
+    }, [visible, showDetails]);
+
     if (!visible) return null;
 
     const localizedBannerTitle = t(
@@ -264,61 +297,66 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
             role="dialog"
             aria-modal="true"
             aria-label={bannerTitle}
-            className="bg-background/70 fixed right-0 bottom-0 left-0 z-[60] overflow-hidden border-t border-white/10 [padding-bottom:calc(4rem+env(safe-area-inset-bottom))] shadow-[0_-8px_32px_0_oklch(0_0_0_/_0.15)] backdrop-blur-2xl backdrop-saturate-150 md:pb-0 dark:border-white/5 dark:shadow-[0_-8px_32px_0_oklch(0_0_0_/_0.4)]"
+            className="bg-background/92 border-border/70 fixed inset-x-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-[60] overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-2xl backdrop-saturate-150 md:right-4 md:bottom-4 md:left-4 md:rounded-3xl dark:shadow-[0_12px_40px_0_oklch(0_0_0_/_0.45)]"
         >
-            <div className="store-shell mx-auto w-full px-4 py-4 sm:px-6 lg:px-8">
+            <div className="store-shell mx-auto w-full px-4 py-4 sm:px-5 md:px-6 lg:px-8">
                 {!showDetails ? (
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                         <div className="flex items-start gap-3">
                             <Cookie
                                 className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0"
                                 aria-hidden="true"
                             />
-                            <p className="text-muted-foreground text-sm">
-                                {bannerDescription}{' '}
-                                <button
-                                    onClick={() => setShowDetails(true)}
-                                    className="text-foreground font-medium underline"
-                                >
-                                    {t(
-                                        'cookie.manage_preferences',
-                                        locale === 'pl'
-                                            ? 'Zarządzaj zgodami'
-                                            : 'Manage preferences',
+                            <div className="space-y-1">
+                                <p className="text-sm font-semibold">
+                                    {bannerTitle}
+                                </p>
+                                <p className="text-muted-foreground text-sm leading-5">
+                                    {bannerDescription}{' '}
+                                    <button
+                                        onClick={() => setShowDetails(true)}
+                                        className="text-foreground font-medium underline"
+                                    >
+                                        {t(
+                                            'cookie.manage_preferences',
+                                            locale === 'pl'
+                                                ? 'Zarządzaj zgodami'
+                                                : 'Manage preferences',
+                                        )}
+                                    </button>
+                                    {' · '}
+                                    {privacyUrl ? (
+                                        <Link
+                                            href={privacyUrl}
+                                            className="text-foreground font-medium underline"
+                                        >
+                                            {privacyPolicyLabel}
+                                        </Link>
+                                    ) : (
+                                        <span className="text-foreground font-medium">
+                                            {privacyPolicyLabel}
+                                        </span>
                                     )}
-                                </button>
-                                {' · '}
-                                {privacyUrl ? (
-                                    <Link
-                                        href={privacyUrl}
-                                        className="text-foreground font-medium underline"
-                                    >
-                                        {privacyPolicyLabel}
-                                    </Link>
-                                ) : (
-                                    <span className="text-foreground font-medium">
-                                        {privacyPolicyLabel}
-                                    </span>
-                                )}
-                                {' · '}
-                                {cookiePolicyUrl ? (
-                                    <Link
-                                        href={cookiePolicyUrl}
-                                        className="text-foreground font-medium underline"
-                                    >
-                                        {cookiePolicyLabel}
-                                    </Link>
-                                ) : (
-                                    <span className="text-foreground font-medium">
-                                        {cookiePolicyLabel}
-                                    </span>
-                                )}
-                            </p>
+                                    {' · '}
+                                    {cookiePolicyUrl ? (
+                                        <Link
+                                            href={cookiePolicyUrl}
+                                            className="text-foreground font-medium underline"
+                                        >
+                                            {cookiePolicyLabel}
+                                        </Link>
+                                    ) : (
+                                        <span className="text-foreground font-medium">
+                                            {cookiePolicyLabel}
+                                        </span>
+                                    )}
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex shrink-0 items-center gap-2">
+                        <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
                             <button
                                 onClick={rejectAll}
-                                className="border-border/60 hover:bg-accent rounded-xl border px-4 py-2 text-sm backdrop-blur-sm transition-colors"
+                                className="border-border/60 hover:bg-accent min-h-11 rounded-xl border px-4 py-2 text-sm backdrop-blur-sm transition-colors"
                             >
                                 {t(
                                     'cookie.reject_all',
@@ -329,7 +367,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             </button>
                             <button
                                 onClick={acceptAll}
-                                className="bg-primary text-primary-foreground rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all hover:opacity-90 hover:shadow-md"
+                                className="bg-primary text-primary-foreground min-h-11 rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all hover:opacity-90 hover:shadow-md"
                             >
                                 {t(
                                     'cookie.accept_all',
@@ -342,7 +380,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                     </div>
                 ) : (
                     <div>
-                        <div className="mb-4 flex items-center justify-between">
+                        <div className="mb-4 flex items-center justify-between gap-3">
                             <h2 className="font-semibold">{bannerTitle}</h2>
                             <button
                                 onClick={() => {
@@ -365,8 +403,8 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
 
                         <div className="mb-4 space-y-3">
                             {/* Functional — always on */}
-                            <div className="border-border flex items-center justify-between rounded-lg border p-3">
-                                <div>
+                            <div className="border-border flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="min-w-0">
                                     <p
                                         id="consent-functional-label"
                                         className="text-sm font-medium"
@@ -401,8 +439,8 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             </div>
 
                             {/* Analytics */}
-                            <div className="border-border flex items-center justify-between rounded-lg border p-3">
-                                <div>
+                            <div className="border-border flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="min-w-0">
                                     <p
                                         id="consent-analytics-label"
                                         className="text-sm font-medium"
@@ -437,8 +475,8 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             </div>
 
                             {/* Marketing */}
-                            <div className="border-border flex items-center justify-between rounded-lg border p-3">
-                                <div>
+                            <div className="border-border flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="min-w-0">
                                     <p
                                         id="consent-marketing-label"
                                         className="text-sm font-medium"
@@ -473,10 +511,10 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                             <button
                                 onClick={savePrefs}
-                                className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90"
+                                className="bg-primary text-primary-foreground min-h-11 rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90"
                             >
                                 {t(
                                     'cookie.save_preferences',
@@ -487,7 +525,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             </button>
                             <button
                                 onClick={rejectAll}
-                                className="border-border hover:bg-accent rounded-lg border px-4 py-2 text-sm"
+                                className="border-border hover:bg-accent min-h-11 rounded-lg border px-4 py-2 text-sm"
                             >
                                 {t(
                                     'cookie.reject_all',
@@ -498,7 +536,7 @@ export function CookieConsent({ settings = {} }: CookieConsentProps) {
                             </button>
                             <button
                                 onClick={acceptAll}
-                                className="border-border hover:bg-accent rounded-lg border px-4 py-2 text-sm"
+                                className="border-border hover:bg-accent min-h-11 rounded-lg border px-4 py-2 text-sm"
                             >
                                 {t(
                                     'cookie.accept_all',

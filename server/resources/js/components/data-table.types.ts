@@ -17,4 +17,6 @@ export interface DataTableProps<T> {
     mobilePrimaryColumns?: number;
     mobileCardTitle?: (row: T, rowIndex: number) => React.ReactNode;
     mobileEmptyLabel?: string;
+    mobileLayout?: 'cards' | 'table';
+    tableMinWidthClassName?: string;
 }

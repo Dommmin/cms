@@ -377,7 +377,7 @@ export default function Onboarding({
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
                     {/* Stepper Sidebar */}
                     <Card className="border border-border/40 bg-card/60 p-4 backdrop-blur-sm lg:col-span-1">
-                        <nav className="flex flex-row gap-2 overflow-x-auto lg:flex-col lg:overflow-x-visible">
+                        <nav className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-x-visible lg:pb-0">
                             {steps.map((step) => {
                                 const isCurrent = step.id === activeStep;
                                 const isCompleted =
@@ -386,11 +386,14 @@ export default function Onboarding({
                                     <button
                                         key={step.id}
                                         onClick={() => setActiveStep(step.id)}
-                                        className={`flex w-full shrink-0 flex-col items-center gap-3 rounded-xl p-3 text-left transition-all duration-200 lg:shrink lg:flex-row lg:items-start ${
+                                        className={`flex min-w-[14rem] flex-1 shrink-0 items-start gap-3 rounded-xl p-3 text-left transition-all duration-200 lg:w-full lg:min-w-0 lg:flex-none ${
                                             isCurrent
                                                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                                                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                         }`}
+                                        aria-current={
+                                            isCurrent ? 'step' : undefined
+                                        }
                                     >
                                         <span className="mt-0.5 shrink-0">
                                             {isCompleted ? (
@@ -401,14 +404,14 @@ export default function Onboarding({
                                                 <Circle className="h-5 w-5" />
                                             )}
                                         </span>
-                                        <div className="hidden lg:block">
+                                        <div className="min-w-0">
                                             <p
                                                 className={`text-sm leading-tight font-semibold ${isCurrent ? 'text-white' : 'text-foreground'}`}
                                             >
                                                 {step.label}
                                             </p>
                                             <p
-                                                className={`mt-0.5 text-xs ${isCurrent ? 'text-blue-100' : 'text-muted-foreground'}`}
+                                                className={`mt-0.5 line-clamp-2 text-xs ${isCurrent ? 'text-blue-100' : 'text-muted-foreground'}`}
                                             >
                                                 {step.desc}
                                             </p>
@@ -418,7 +421,7 @@ export default function Onboarding({
                             })}
                         </nav>
 
-                        <div className="mt-6 hidden border-t border-border/40 pt-4 lg:block">
+                        <div className="mt-6 border-t border-border/40 pt-4">
                             <Button
                                 onClick={completeOnboarding}
                                 className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md shadow-green-500/10 hover:from-green-600 hover:to-emerald-700"

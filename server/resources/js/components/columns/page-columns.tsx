@@ -4,6 +4,7 @@ import {
     CopyIcon,
     FileTextIcon,
     GlobeIcon,
+    MoreHorizontalIcon,
     PencilIcon,
     TrashIcon,
 } from 'lucide-react';
@@ -11,6 +12,12 @@ import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageCo
 import { ConfirmButton } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/hooks/use-translation';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import type { PageRow } from './page-columns.types';
@@ -49,6 +56,9 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
         },
         {
             accessorKey: 'slug',
+            meta: {
+                mobileHidden: true,
+            },
             header: __('column.path', 'Path'),
             cell: ({ row }) => (
                 <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
@@ -78,6 +88,9 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
         },
         {
             accessorKey: 'page_type',
+            meta: {
+                mobileHidden: true,
+            },
             header: __('column.type', 'Type'),
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-xs">
@@ -107,72 +120,80 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
             id: 'actions',
             header: __('column.actions', 'Actions'),
             cell: ({ row }) => (
-                <div className="flex items-center gap-2">
-                    <Button asChild variant="outline" size="sm">
-                        <Link
-                            href={PageController.edit.url(row.original.id)}
-                            prefetch
-                            cacheFor={30}
-                        >
-                            <PencilIcon className="mr-1 h-3 w-3" />
-                            {__('action.edit', 'Edit')}
-                        </Link>
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            router.post(
-                                PageController.duplicate.url(row.original.id),
-                            )
-                        }
-                    >
-                        <CopyIcon className="mr-1 h-3 w-3" />
-                        {__('action.duplicate', 'Duplicate')}
-                    </Button>
-                    {row.original.is_published ? (
-                        <Button
-                            variant="outline"
-                            size="sm"
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-1.5">
+                            <MoreHorizontalIcon className="h-4 w-4" />
+                            {__('column.actions', 'Actions')}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={PageController.edit.url(row.original.id)}
+                                prefetch
+                                cacheFor={30}
+                                className="flex w-full items-center"
+                            >
+                                <PencilIcon className="h-4 w-4" />
+                                {__('action.edit', 'Edit')}
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
                             onClick={() =>
                                 router.post(
-                                    PageController.unpublish.url(
+                                    PageController.duplicate.url(
                                         row.original.id,
                                     ),
                                 )
                             }
                         >
-                            {__('action.unpublish', 'Unpublish')}
-                        </Button>
-                    ) : (
-                        <Button
-                            variant="outline"
+                            <CopyIcon className="h-4 w-4" />
+                            {__('action.duplicate', 'Duplicate')}
+                        </DropdownMenuItem>
+                        {row.original.is_published ? (
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.post(
+                                        PageController.unpublish.url(
+                                            row.original.id,
+                                        ),
+                                    )
+                                }
+                            >
+                                {__('action.unpublish', 'Unpublish')}
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.post(
+                                        PageController.publish.url(
+                                            row.original.id,
+                                        ),
+                                    )
+                                }
+                            >
+                                <GlobeIcon className="h-4 w-4" />
+                                {__('action.publish', 'Publish')}
+                            </DropdownMenuItem>
+                        )}
+                        <ConfirmButton
+                            variant="ghost"
                             size="sm"
-                            onClick={() =>
-                                router.post(
-                                    PageController.publish.url(row.original.id),
+                            className="w-full justify-start px-2 text-destructive hover:text-destructive"
+                            title={__('dialog.delete_title', 'Delete Page')}
+                            description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
+                            onConfirm={() =>
+                                router.delete(
+                                    PageController.destroy.url(row.original.id),
                                 )
                             }
                         >
-                            <GlobeIcon className="mr-1 h-3 w-3" />
-                            {__('action.publish', 'Publish')}
-                        </Button>
-                    )}
-                    <ConfirmButton
-                        variant="outline"
-                        size="sm"
-                        title={__('dialog.delete_title', 'Delete Page')}
-                        description={`${__('dialog.are_you_sure', 'Are you sure?')} ${__('dialog.cannot_be_undone', 'This action cannot be undone.')}`}
-                        onConfirm={() =>
-                            router.delete(
-                                PageController.destroy.url(row.original.id),
-                            )
-                        }
-                    >
-                        <TrashIcon className="mr-1 h-3 w-3" />
-                        {__('action.delete', 'Delete')}
-                    </ConfirmButton>
-                </div>
+                            <TrashIcon className="mr-2 h-4 w-4" />
+                            {__('action.delete', 'Delete')}
+                        </ConfirmButton>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             ),
         },
     ];

@@ -177,7 +177,8 @@ export default function OrdersIndex({
                     searchValue={filters?.search ?? ''}
                     baseUrl={OrderController.index.url()}
                     mobilePrimaryColumns={4}
-                    mobileCardTitle={(row) => `#${row.order_number}`}
+                    mobileLayout="table"
+                    tableMinWidthClassName="min-w-[52rem]"
                 />
             </Wrapper>
         </AppLayout>

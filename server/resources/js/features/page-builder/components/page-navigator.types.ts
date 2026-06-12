@@ -1,6 +1,7 @@
 import type { AvailableSection, BlockTypeConfig, Section } from '../types';
 
 export type PageNavigatorProps = {
+    className?: string;
     sections: Section[];
     availableSections: Record<string, AvailableSection>;
     availableBlockTypes: Record<string, BlockTypeConfig>;

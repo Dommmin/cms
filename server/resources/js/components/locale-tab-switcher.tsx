@@ -12,14 +12,19 @@ export function LocaleTabSwitcher({
     }
 
     return (
-        <div className={cn('flex flex-wrap gap-1', className)}>
+        <div
+            className={cn(
+                'flex max-w-full flex-nowrap gap-1 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0',
+                className,
+            )}
+        >
             {locales.map((locale) => (
                 <button
                     key={locale.code}
                     type="button"
                     onClick={() => onLocaleChange(locale.code)}
                     className={cn(
-                        'flex items-center gap-1 rounded border px-2 py-0.5 text-xs transition-colors',
+                        'flex shrink-0 items-center gap-1 rounded border px-2 py-1 text-[11px] font-medium transition-colors',
                         activeLocale === locale.code
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-input bg-background text-muted-foreground hover:border-ring hover:text-foreground',

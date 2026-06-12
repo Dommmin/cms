@@ -24,4 +24,5 @@ export interface LocalizedFieldProps {
     jsonValue?: Record<string, string>;
     onJsonChange?: (value: Record<string, string>) => void;
     autoFocus?: boolean;
+    localeSwitcherClassName?: string;
 }

@@ -71,11 +71,15 @@ export function PageHeaderActions({
     children,
     className,
     compact = false,
+    stackOnMobile = true,
 }: PageHeaderActionsProps) {
     return (
         <div
             className={cn(
-                'flex w-full flex-row flex-wrap items-center gap-2 sm:w-auto sm:justify-end [&_[data-slot=button]]:h-8 [&_[data-slot=button]]:px-3 [&_[data-slot=button]]:text-xs sm:[&_[data-slot=button]]:h-9 sm:[&_[data-slot=button]]:px-4 sm:[&_[data-slot=button]]:text-sm',
+                'flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end [&_[data-slot=button]]:h-8 [&_[data-slot=button]]:px-3 [&_[data-slot=button]]:text-xs sm:[&_[data-slot=button]]:h-9 sm:[&_[data-slot=button]]:px-4 sm:[&_[data-slot=button]]:text-sm',
+                stackOnMobile
+                    ? 'flex-col items-stretch sm:flex-row sm:items-center'
+                    : 'flex-row items-center',
                 !compact && '[&>*]:shrink-0',
                 className,
             )}
