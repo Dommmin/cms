@@ -60,12 +60,28 @@ export async function generateProductMetadata({
     }
 }
 
-export function ProductPage({
+export async function ProductPage({
     slug,
+    locale,
     basePath,
 }: {
     slug: string;
+    locale?: string;
     basePath: string;
 }) {
-    return <ProductDetailClient slug={slug} basePath={basePath} />;
+    const resolvedLocale = locale
+        ? await resolveLocale(locale)
+        : await getDefaultLocale();
+
+    const product = await serverFetch<Product>(`/products/${slug}`, {
+        locale: resolvedLocale,
+    }).catch(() => null);
+
+    return (
+        <ProductDetailClient
+            slug={slug}
+            basePath={basePath}
+            initialProduct={product ?? undefined}
+        />
+    );
 }

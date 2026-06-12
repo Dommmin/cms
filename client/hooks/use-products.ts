@@ -36,11 +36,12 @@ export function useProducts(filters: ProductFilters = {}) {
     });
 }
 
-export function useProduct(slug: string) {
+export function useProduct(slug: string, initialData?: Product) {
     return useQuery({
         queryKey: productKeys.detail(slug),
         queryFn: () => getProduct(slug),
         enabled: !!slug,
+        initialData,
     });
 }
 

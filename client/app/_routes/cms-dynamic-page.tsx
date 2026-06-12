@@ -4,12 +4,13 @@ import { notFound, redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { getPage } from '@/api/cms';
+import { getPublicSettings } from '@/api/settings';
 import { JsonLd } from '@/components/json-ld';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
 import { localePath, type I18nConfig, type Locale } from '@/lib/i18n';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildFaqPage, buildWebPage } from '@/lib/schema';
-import { absoluteUrl } from '@/lib/seo';
+import { absoluteUrl, generateAlternates } from '@/lib/seo';
 
 import type { PageData } from './cms-dynamic-page.types';
 
@@ -48,7 +49,13 @@ async function resolveModuleDetail(
         case 'product_listing': {
             const { ProductPage } =
                 await import('@/app/_routes/product-detail-page');
-            return <ProductPage slug={entitySlug} basePath={parentPage.path} />;
+            return (
+                <ProductPage
+                    slug={entitySlug}
+                    locale={locale}
+                    basePath={parentPage.path}
+                />
+            );
         }
         case 'category_listing': {
             const { CategoryDetailPage } =
@@ -155,19 +162,36 @@ export async function generateDynamicPageMetadata({
             }
         }
 
+        const alternates = generateAlternates(
+            page.path,
+            resolved.locale,
+            i18nConfig,
+        );
+        if (page.seo_canonical) {
+            alternates.canonical = page.seo_canonical;
+        }
+
+        const publicSettings = await getPublicSettings().catch(() => null);
+        const defaultOgImage = publicSettings?.settings.seo?.og_image;
+        const ogImage = page.og_image ?? defaultOgImage ?? null;
+
         return {
             title: page.seo_title ?? page.title,
             description: page.seo_description ?? undefined,
             robots: page.meta_robots ?? 'index, follow',
-            alternates: page.seo_canonical
-                ? { canonical: page.seo_canonical }
-                : undefined,
+            alternates,
             openGraph: {
                 title: page.seo_title ?? page.title,
                 description: page.seo_description ?? undefined,
-                images: page.og_image ? [page.og_image] : [],
+                images: ogImage ? [ogImage] : [],
+                type: 'website',
             },
-            twitter: { card: 'summary_large_image' },
+            twitter: {
+                card: 'summary_large_image',
+                title: page.seo_title ?? page.title,
+                description: page.seo_description ?? undefined,
+                images: ogImage ? [ogImage] : [],
+            },
         };
     } catch {
         return {};

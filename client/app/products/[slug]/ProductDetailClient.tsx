@@ -36,8 +36,9 @@ import {
 export default function ProductDetailClient({
     slug,
     basePath,
+    initialProduct,
 }: ProductDetailClientProps) {
-    const { data: product, isLoading } = useProduct(slug);
+    const { data: product, isLoading } = useProduct(slug, initialProduct);
     const { data: reviewsData } = useProductReviews(slug);
     const { data: relatedProducts } = useRelatedProducts(slug);
     const { mutate: addToCart, isPending } = useAddToCart();

@@ -95,7 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Products
     try {
         const products = await serverFetch<PaginatedResponse<Product>>(
-            '/products?per_page=500',
+            '/products?per_page=100',
         );
         for (const product of products.data.filter(
             (p) => !p.sitemap_exclude && !!p.public_url,
@@ -121,7 +121,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const localeResponses = await Promise.all(
             i18nConfig.locales.map((locale) =>
                 serverFetch<PaginatedResponse<BlogPost>>(
-                    '/blog/posts?per_page=500',
+                    '/blog/posts?per_page=100',
                     { locale },
                 ),
             ),
