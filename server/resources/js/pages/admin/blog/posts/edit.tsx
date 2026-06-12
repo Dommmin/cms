@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import InputError from '@/components/input-error';
+import MetafieldEditor from '@/components/metafield-editor';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { SeoPanel } from '@/components/seo-panel';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,8 @@ export default function EditBlogPost({
     post,
     categories,
     available_tags,
+    metafield_definitions,
+    metafields: initialMetafields,
 }: EditProps) {
     const { frontendUrl, locales } = usePage().props as {
         frontendUrl: string;
@@ -73,6 +76,7 @@ export default function EditBlogPost({
         meta_robots: post.meta_robots ?? 'index, follow',
         og_image: post.og_image ?? null,
         sitemap_exclude: post.sitemap_exclude ?? false,
+        metafields: initialMetafields ?? [],
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -84,6 +88,7 @@ export default function EditBlogPost({
         }),
     );
     const [tagInput, setTagInput] = useState('');
+    const [metafields, setMetafields] = useState(initialMetafields ?? []);
 
     const buttonText =
         data.status === 'published'
@@ -133,6 +138,10 @@ export default function EditBlogPost({
             ...data,
             blog_category_id: data.blog_category_id || null,
             featured_image: data.featured_image || null,
+            metafields: metafields as unknown as Record<
+                string,
+                string | number | boolean | null | undefined
+            >[],
             _method: 'PUT',
         };
 
@@ -381,6 +390,24 @@ export default function EditBlogPost({
                                     />
                                 </TabsContent>
                             </Tabs>
+
+                            <div className="mt-6 rounded-lg border bg-card p-4">
+                                <div className="mb-4 space-y-1">
+                                    <h3 className="text-base font-semibold">
+                                        Metafields
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Advanced extension layer. Keep content
+                                        and SEO data in the main blog fields.
+                                    </p>
+                                </div>
+                                <MetafieldEditor
+                                    metafields={metafields}
+                                    definitions={metafield_definitions}
+                                    onChange={setMetafields}
+                                    allowCustomFields={false}
+                                />
+                            </div>
                         </div>
 
                         {/* Sidebar */}

@@ -3,6 +3,7 @@ import { ArrowLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import InputError from '@/components/input-error';
+import MetafieldEditor from '@/components/metafield-editor';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-import type { Category } from './create.types';
+import type { Category, CreateProps } from './create.types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Categories', href: CategoryController.index.url() },
@@ -24,9 +25,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Create({
     categories = [],
-}: {
-    categories?: Category[];
-}) {
+    metafield_definitions,
+    metafields: initialMetafields,
+}: CreateProps) {
     const { locales } = usePage().props as { locales: SharedLocale[] };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
 
@@ -39,6 +40,7 @@ export default function Create({
     const [descValues, setDescValues] = useState<Record<string, string>>({});
     const [slug, setSlug] = useState('');
     const [isSlugManual, setIsSlugManual] = useState(false);
+    const [metafields, setMetafields] = useState(initialMetafields ?? []);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
 
@@ -70,6 +72,10 @@ export default function Create({
                 slug,
                 parent_id: parentId,
                 is_active: isActive,
+                metafields: metafields as unknown as Record<
+                    string,
+                    string | number | boolean | null | undefined
+                >[],
             },
             {
                 onSuccess: () => router.visit(CategoryController.index.url()),
@@ -188,6 +194,24 @@ export default function Create({
                     />
 
                     {/* Active */}
+                    <div className="rounded-lg border bg-card p-4">
+                        <div className="mb-4 space-y-1">
+                            <h3 className="text-base font-semibold">
+                                Metafields
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                                Advanced extension layer. Do not use for core
+                                category membership or SEO fields.
+                            </p>
+                        </div>
+                        <MetafieldEditor
+                            metafields={metafields}
+                            definitions={metafield_definitions}
+                            onChange={setMetafields}
+                            allowCustomFields={false}
+                        />
+                    </div>
+
                     <div className="flex items-center gap-2">
                         <input
                             type="checkbox"

@@ -76,6 +76,8 @@ export default function EditMetafieldDefinition({
         key: definition.key,
         name: definition.name,
         type: definition.type,
+        visibility: definition.visibility,
+        storefront_exposed: definition.storefront_exposed,
         description: definition.description ?? '',
         pinned: definition.pinned,
         position: definition.position,
@@ -238,6 +240,52 @@ export default function EditMetafieldDefinition({
                             </SelectContent>
                         </Select>
                         <InputError message={errors.type} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="visibility">Visibility *</Label>
+                        <Select
+                            value={data.visibility}
+                            onValueChange={(val) =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    visibility: val,
+                                }))
+                            }
+                        >
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="private">Private</SelectItem>
+                                <SelectItem value="admin_only">
+                                    Admin only
+                                </SelectItem>
+                                <SelectItem value="storefront">
+                                    Storefront
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.visibility} />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Checkbox
+                            id="storefront_exposed"
+                            checked={data.storefront_exposed}
+                            onCheckedChange={(checked) =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    storefront_exposed: checked === true,
+                                }))
+                            }
+                        />
+                        <Label
+                            htmlFor="storefront_exposed"
+                            className="font-normal"
+                        >
+                            Expose on storefront API
+                        </Label>
                     </div>
 
                     <div className="grid gap-2">

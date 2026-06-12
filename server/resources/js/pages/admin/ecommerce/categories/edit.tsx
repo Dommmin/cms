@@ -4,6 +4,7 @@ import { useState } from 'react';
 import * as CategoryController from '@/actions/App/Http/Controllers/Admin/Ecommerce/CategoryController';
 import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
 import InputError from '@/components/input-error';
+import MetafieldEditor from '@/components/metafield-editor';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { SeoPanel } from '@/components/seo-panel';
 import { SmartCollectionBuilder } from '@/components/smart-collection-builder';
@@ -20,17 +21,15 @@ import AppLayout from '@/layouts/app-layout';
 import { slugify } from '@/lib/slug';
 import type { BreadcrumbItem } from '@/types';
 import type { SharedLocale } from '@/types/global';
-import type { Category, CategoryEditProps, CollectionRule } from './edit.types';
+import type { Category, CollectionRule, EditProps } from './edit.types';
 
 export default function Edit({
     category,
     categories = [],
     smart_product_count = 0,
-}: {
-    category: CategoryEditProps;
-    categories?: Category[];
-    smart_product_count?: number;
-}) {
+    metafield_definitions,
+    metafields: initialMetafields,
+}: EditProps) {
     const { locales, frontendUrl } = usePage().props as {
         locales: SharedLocale[];
         frontendUrl: string;
@@ -59,6 +58,7 @@ export default function Edit({
     const [rulesMatch, setRulesMatch] = useState<'all' | 'any'>(
         category.rules_match ?? 'all',
     );
+    const [metafields, setMetafields] = useState(initialMetafields ?? []);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
     const [seoData, setSeoData] = useState({
@@ -104,6 +104,10 @@ export default function Edit({
                 collection_type: collectionType,
                 rules: collectionType === 'smart' ? rules : [],
                 rules_match: rulesMatch,
+                metafields: metafields as unknown as Record<
+                    string,
+                    string | number | boolean | null | undefined
+                >[],
                 ...seoData,
             },
             {
@@ -354,6 +358,25 @@ export default function Edit({
                             />
                         </TabsContent>
                     </Tabs>
+
+                    <div className="rounded-lg border bg-card p-4">
+                        <div className="mb-4 space-y-1">
+                            <h3 className="text-base font-semibold">
+                                Metafields
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                                Advanced extension layer. Keep category
+                                membership, rules, and SEO in their dedicated
+                                fields.
+                            </p>
+                        </div>
+                        <MetafieldEditor
+                            metafields={metafields}
+                            definitions={metafield_definitions}
+                            onChange={setMetafields}
+                            allowCustomFields={false}
+                        />
+                    </div>
 
                     <StickyFormActions
                         formId="category-edit-form"

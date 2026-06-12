@@ -3,6 +3,7 @@ import { ArrowLeftIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import * as PageController from '@/actions/App/Http/Controllers/Admin/Cms/PageController';
 import InputError from '@/components/input-error';
+import MetafieldEditor from '@/components/metafield-editor';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,7 +31,13 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: PageController.create.url() },
 ];
 
-export default function Create({ modules, systemPages, pages }: CreateProps) {
+export default function Create({
+    modules,
+    systemPages,
+    pages,
+    metafield_definitions,
+    metafields: initialMetafields,
+}: CreateProps) {
     const __ = useTranslation();
     const { locales } = usePage().props as { locales: SharedLocale[] };
 
@@ -49,6 +56,7 @@ export default function Create({ modules, systemPages, pages }: CreateProps) {
     const [systemPageKey, setSystemPageKey] = useState<string | null>(null);
     const [locale, setLocale] = useState<string>('global');
     const [parentId, setParentId] = useState<string>('none');
+    const [metafields, setMetafields] = useState(initialMetafields ?? []);
     const [title, setTitle] = useState('');
     const [slugValue, setSlugValue] = useState('');
     const [autoGenerateSlug, setAutoGenerateSlug] = useState(true);
@@ -633,6 +641,81 @@ export default function Create({ modules, systemPages, pages }: CreateProps) {
                                                     />
                                                 </div>
                                             </TabsContent>
+
+                                            <div className="rounded-lg border bg-card p-4">
+                                                <div className="mb-4 space-y-1">
+                                                    <h3 className="text-base font-semibold">
+                                                        Metafields
+                                                    </h3>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Advanced extension
+                                                        layer. Do not use it for
+                                                        page SEO or core routing
+                                                        data.
+                                                    </p>
+                                                </div>
+                                                <MetafieldEditor
+                                                    metafields={metafields}
+                                                    definitions={
+                                                        metafield_definitions
+                                                    }
+                                                    onChange={setMetafields}
+                                                    allowCustomFields={false}
+                                                />
+                                                {metafields.map(
+                                                    (field, index) => (
+                                                        <div
+                                                            key={`${field.namespace}::${field.key}::${index}`}
+                                                        >
+                                                            <input
+                                                                type="hidden"
+                                                                name={`metafields[${index}][namespace]`}
+                                                                value={
+                                                                    field.namespace
+                                                                }
+                                                            />
+                                                            <input
+                                                                type="hidden"
+                                                                name={`metafields[${index}][key]`}
+                                                                value={
+                                                                    field.key
+                                                                }
+                                                            />
+                                                            <input
+                                                                type="hidden"
+                                                                name={`metafields[${index}][type]`}
+                                                                value={
+                                                                    field.type
+                                                                }
+                                                            />
+                                                            <input
+                                                                type="hidden"
+                                                                name={`metafields[${index}][value]`}
+                                                                value={
+                                                                    field.value ??
+                                                                    ''
+                                                                }
+                                                            />
+                                                            {field.id && (
+                                                                <input
+                                                                    type="hidden"
+                                                                    name={`metafields[${index}][id]`}
+                                                                    value={
+                                                                        field.id
+                                                                    }
+                                                                />
+                                                            )}
+                                                            {field._delete && (
+                                                                <input
+                                                                    type="hidden"
+                                                                    name={`metafields[${index}][_delete]`}
+                                                                    value="1"
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
 
                                             <div className="flex items-center gap-4 pt-2">
                                                 <Button

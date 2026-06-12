@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import * as BlogPostController from '@/actions/App/Http/Controllers/Admin/BlogPostController';
 
 import InputError from '@/components/input-error';
+import MetafieldEditor from '@/components/metafield-editor';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +37,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function CreateBlogPost({
     categories,
     available_tags,
+    metafield_definitions,
+    metafields: initialMetafields,
 }: CreateProps) {
     const { locales } = usePage<{ locales: SharedLocale[] }>().props;
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
@@ -57,11 +60,13 @@ export default function CreateBlogPost({
         featured_image: '',
         seo_title: '',
         seo_description: '',
+        metafields: initialMetafields ?? [],
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
     const [autoGenerateSlug, setAutoGenerateSlug] = useState(true);
     const [tagInput, setTagInput] = useState('');
+    const [metafields, setMetafields] = useState(initialMetafields ?? []);
 
     const handleTitleChange = (value: Record<string, string>) => {
         setData((prev) => ({
@@ -104,6 +109,10 @@ export default function CreateBlogPost({
             ...data,
             blog_category_id: data.blog_category_id || null,
             featured_image: data.featured_image || null,
+            metafields: metafields as unknown as Record<
+                string,
+                string | number | boolean | null | undefined
+            >[],
         };
 
         router.post(BlogPostController.store.url(), payload, {
@@ -322,6 +331,25 @@ export default function CreateBlogPost({
                                     </div>
                                 </TabsContent>
                             </Tabs>
+
+                            <div className="mt-6 rounded-lg border bg-card p-4">
+                                <div className="mb-4 space-y-1">
+                                    <h3 className="text-base font-semibold">
+                                        Metafields
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Advanced extension layer. Keep SEO,
+                                        content, and publishing data in the
+                                        primary form fields.
+                                    </p>
+                                </div>
+                                <MetafieldEditor
+                                    metafields={metafields}
+                                    definitions={metafield_definitions}
+                                    onChange={setMetafields}
+                                    allowCustomFields={false}
+                                />
+                            </div>
                         </div>
 
                         {/* Sidebar */}

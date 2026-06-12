@@ -1,4 +1,8 @@
 import type {
+    MetafieldDefinitionEntry,
+    MetafieldEntry,
+} from '@/components/metafield-editor.types';
+import type {
     CoreAttributeSchemaItem,
     ProductAttributeFormValue,
 } from './core-attributes.types';
@@ -41,6 +45,7 @@ export type FormData = {
     seo_description: string;
     flags: number[];
     attribute_values: ProductAttributeFormValue[];
+    metafields: MetafieldEntry[];
     variant: {
         sku: string;
         name: string;
@@ -53,4 +58,13 @@ export type FormData = {
         is_active: boolean;
     };
     categories: number[];
+};
+
+export type CreateProps = {
+    categories: Category[];
+    types: ProductType[];
+    brands: Brand[];
+    flags: ProductFlag[];
+    metafield_definitions: MetafieldDefinitionEntry[];
+    metafields: MetafieldEntry[];
 };

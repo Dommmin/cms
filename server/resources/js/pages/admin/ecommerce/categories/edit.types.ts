@@ -1,3 +1,8 @@
+import type {
+    MetafieldDefinitionEntry,
+    MetafieldEntry,
+} from '@/components/metafield-editor.types';
+
 export type Category = { id: number; name: string; slug: string };
 
 export type CollectionRule = {
@@ -21,4 +26,13 @@ export type CategoryEditProps = {
     meta_robots?: string | null;
     og_image?: string | null;
     sitemap_exclude?: boolean;
+};
+
+export type EditProps = {
+    category: CategoryEditProps;
+    categories?: Category[];
+    smart_product_count?: number;
+    available_attributes: unknown[];
+    metafield_definitions: MetafieldDefinitionEntry[];
+    metafields: MetafieldEntry[];
 };

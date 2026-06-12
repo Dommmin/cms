@@ -1,4 +1,8 @@
 import type {
+    MetafieldDefinitionEntry,
+    MetafieldEntry,
+} from '@/components/metafield-editor.types';
+import type {
     CoreAttributeSchemaItem,
     ProductAttributeFormValue,
 } from './core-attributes.types';
@@ -72,6 +76,42 @@ export type FormData = {
     sitemap_exclude: boolean;
     flags: number[];
     attribute_values: ProductAttributeFormValue[];
+    metafields: MetafieldEntry[];
     variant: ProductVariant;
     categories: number[];
+};
+
+export type EditProps = {
+    categories: Category[];
+    types: ProductType[];
+    brands: Brand[];
+    flags: ProductFlag[];
+    price_history: PriceHistoryEntry[];
+    product: {
+        id: number;
+        name: Record<string, string>;
+        slug: Record<string, string>;
+        description?: Record<string, string>;
+        short_description?: Record<string, string>;
+        sku_prefix?: string;
+        category_id: number;
+        product_type_id: number;
+        brand_id?: number;
+        is_active: boolean;
+        is_saleable: boolean;
+        is_search_promoted?: boolean;
+        is_featured?: boolean;
+        seo_title?: string;
+        seo_description?: string;
+        meta_robots?: string;
+        og_image?: string | null;
+        sitemap_exclude?: boolean;
+        variant?: ProductVariant;
+        images?: ProductImage[];
+        categories?: Category[];
+        flag_ids?: number[];
+        attribute_values?: FormData['attribute_values'];
+        metafields: MetafieldEntry[];
+    };
+    metafield_definitions: MetafieldDefinitionEntry[];
 };

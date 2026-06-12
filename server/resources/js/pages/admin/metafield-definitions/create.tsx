@@ -70,6 +70,8 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
         key: '',
         name: '',
         type: 'string',
+        visibility: 'admin_only',
+        storefront_exposed: false,
         description: '',
         pinned: false,
         position: 0,
@@ -231,6 +233,52 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                             </SelectContent>
                         </Select>
                         <InputError message={errors.type} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="visibility">Visibility *</Label>
+                        <Select
+                            value={data.visibility}
+                            onValueChange={(val) =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    visibility: val,
+                                }))
+                            }
+                        >
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="private">Private</SelectItem>
+                                <SelectItem value="admin_only">
+                                    Admin only
+                                </SelectItem>
+                                <SelectItem value="storefront">
+                                    Storefront
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.visibility} />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Checkbox
+                            id="storefront_exposed"
+                            checked={data.storefront_exposed}
+                            onCheckedChange={(checked) =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    storefront_exposed: checked === true,
+                                }))
+                            }
+                        />
+                        <Label
+                            htmlFor="storefront_exposed"
+                            className="font-normal"
+                        >
+                            Expose on storefront API
+                        </Label>
                     </div>
 
                     <div className="grid gap-2">

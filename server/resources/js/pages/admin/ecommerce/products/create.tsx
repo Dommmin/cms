@@ -15,6 +15,7 @@ import {
     type MediaItem,
     type SelectedImage,
 } from '@/components/media-picker-modal';
+import MetafieldEditor from '@/components/metafield-editor';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
@@ -42,15 +43,7 @@ import {
     alignAttributeValuesToSchema,
     getCategoryAttributeSchema,
 } from './core-attributes.utils';
-import type {
-    Brand,
-    Category,
-    FormData,
-    FormErrors,
-    ProductFlag,
-    ProductType,
-    TabKey,
-} from './create.types';
+import type { CreateProps, FormData, FormErrors, TabKey } from './create.types';
 
 const formId = 'product-create-form';
 
@@ -76,6 +69,7 @@ const defaultFormData = (defaultLocale: string): FormData => ({
     seo_description: '',
     flags: [],
     attribute_values: [],
+    metafields: [],
     variant: {
         sku: '',
         name: '',
@@ -160,12 +154,8 @@ export default function Create({
     types,
     brands,
     flags,
-}: {
-    categories: Category[];
-    types: ProductType[];
-    brands: Brand[];
-    flags: ProductFlag[];
-}) {
+    metafield_definitions,
+}: CreateProps) {
     const { locales } = usePage().props as { locales: SharedLocale[] };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const [activeTab, setActiveTab] = useState('general');
@@ -206,6 +196,10 @@ export default function Create({
         value: FormData[K],
     ) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleMetafieldsChange = (metafields: FormData['metafields']) => {
+        handleFormChange('metafields', metafields);
     };
 
     const handleVariantChange = (
@@ -1400,6 +1394,24 @@ export default function Create({
                                     </Tabs>
                                 );
                             })()}
+
+                            <div className="rounded-xl border bg-card p-6">
+                                <div className="mb-4 space-y-1">
+                                    <h3 className="text-base font-semibold">
+                                        Metafields
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Advanced extension layer. Keep core
+                                        product data in the main fields above.
+                                    </p>
+                                </div>
+                                <MetafieldEditor
+                                    metafields={formData.metafields}
+                                    definitions={metafield_definitions}
+                                    onChange={handleMetafieldsChange}
+                                    allowCustomFields={false}
+                                />
+                            </div>
 
                             <StickyFormActions
                                 formId={formId}

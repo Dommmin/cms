@@ -5,6 +5,8 @@ export interface MetafieldDefinition {
     key: string;
     name: string;
     type: string;
+    visibility: string;
+    storefront_exposed: boolean;
     description: string | null;
     pinned: boolean;
     position: number;

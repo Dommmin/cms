@@ -147,6 +147,7 @@ export default function MetafieldEditor({
     metafields,
     definitions,
     onChange,
+    allowCustomFields = true,
 }: MetafieldEditorProps) {
     const [showAddForm, setShowAddForm] = useState(false);
     const [newField, setNewField] = useState<{
@@ -333,7 +334,7 @@ export default function MetafieldEditor({
                         {availableDefinitions.length > 0 && (
                             <div className="grid gap-1">
                                 <Label className="text-xs">
-                                    From definition (optional)
+                                    From definition
                                 </Label>
                                 <Select onValueChange={handleDefinitionSelect}>
                                     <SelectTrigger>
@@ -353,59 +354,63 @@ export default function MetafieldEditor({
                                 </Select>
                             </div>
                         )}
-                        <div className="grid grid-cols-2 gap-2">
-                            <div className="grid gap-1">
-                                <Label className="text-xs">Namespace *</Label>
-                                <Input
-                                    value={newField.namespace}
-                                    onChange={(e) =>
-                                        setNewField((prev) => ({
-                                            ...prev,
-                                            namespace: e.target.value,
-                                        }))
-                                    }
-                                    placeholder="e.g. specs"
-                                    className="h-8 text-sm"
-                                />
+                        {allowCustomFields && (
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="grid gap-1">
+                                    <Label className="text-xs">
+                                        Namespace *
+                                    </Label>
+                                    <Input
+                                        value={newField.namespace}
+                                        onChange={(e) =>
+                                            setNewField((prev) => ({
+                                                ...prev,
+                                                namespace: e.target.value,
+                                            }))
+                                        }
+                                        placeholder="e.g. specs"
+                                        className="h-8 text-sm"
+                                    />
+                                </div>
+                                <div className="grid gap-1">
+                                    <Label className="text-xs">Key *</Label>
+                                    <Input
+                                        value={newField.key}
+                                        onChange={(e) =>
+                                            setNewField((prev) => ({
+                                                ...prev,
+                                                key: e.target.value,
+                                            }))
+                                        }
+                                        placeholder="e.g. weight"
+                                        className="h-8 text-sm"
+                                    />
+                                </div>
+                                <div className="grid gap-1">
+                                    <Label className="text-xs">Type</Label>
+                                    <Select
+                                        value={newField.type}
+                                        onValueChange={(val) =>
+                                            setNewField((prev) => ({
+                                                ...prev,
+                                                type: val,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger className="h-8 text-sm">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {FIELD_TYPES.map((t) => (
+                                                <SelectItem key={t} value={t}>
+                                                    {t}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
-                            <div className="grid gap-1">
-                                <Label className="text-xs">Key *</Label>
-                                <Input
-                                    value={newField.key}
-                                    onChange={(e) =>
-                                        setNewField((prev) => ({
-                                            ...prev,
-                                            key: e.target.value,
-                                        }))
-                                    }
-                                    placeholder="e.g. weight"
-                                    className="h-8 text-sm"
-                                />
-                            </div>
-                        </div>
-                        <div className="grid gap-1">
-                            <Label className="text-xs">Type</Label>
-                            <Select
-                                value={newField.type}
-                                onValueChange={(val) =>
-                                    setNewField((prev) => ({
-                                        ...prev,
-                                        type: val,
-                                    }))
-                                }
-                            >
-                                <SelectTrigger className="h-8 text-sm">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {FIELD_TYPES.map((t) => (
-                                        <SelectItem key={t} value={t}>
-                                            {t}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        )}
                         <div className="grid gap-1">
                             <Label className="text-xs">
                                 Initial value (optional)
@@ -452,17 +457,25 @@ export default function MetafieldEditor({
                 </div>
             )}
 
-            {!showAddForm && (
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAddForm(true)}
-                >
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    Add Metafield
-                </Button>
-            )}
+            {!showAddForm &&
+                (availableDefinitions.length > 0 ? (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAddForm(true)}
+                    >
+                        <PlusIcon className="mr-2 h-4 w-4" />
+                        {allowCustomFields
+                            ? 'Add Metafield'
+                            : 'Add Defined Metafield'}
+                    </Button>
+                ) : (
+                    <p className="text-sm text-muted-foreground">
+                        No metafield definitions available for this content type
+                        yet.
+                    </p>
+                ))}
         </div>
     );
 }

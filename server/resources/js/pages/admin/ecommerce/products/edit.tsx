@@ -20,6 +20,7 @@ import {
     type MediaItem,
     type SelectedImage,
 } from '@/components/media-picker-modal';
+import MetafieldEditor from '@/components/metafield-editor';
 import {
     PageHeader,
     PageHeaderActions,
@@ -55,14 +56,9 @@ import {
     getCategoryAttributeSchema,
 } from './core-attributes.utils';
 import type {
-    Brand,
-    Category,
+    EditProps,
     FormData,
     FormErrors,
-    PriceHistoryEntry,
-    ProductFlag,
-    ProductImage,
-    ProductType,
     ProductVariant,
     TabKey,
 } from './edit.types';
@@ -169,38 +165,8 @@ export default function Edit({
     flags,
     product,
     price_history,
-}: {
-    categories: Category[];
-    types: ProductType[];
-    brands: Brand[];
-    flags: ProductFlag[];
-    price_history: PriceHistoryEntry[];
-    product: {
-        id: number;
-        name: Record<string, string>;
-        slug: Record<string, string>;
-        description?: Record<string, string>;
-        short_description?: Record<string, string>;
-        sku_prefix?: string;
-        category_id: number;
-        product_type_id: number;
-        brand_id?: number;
-        is_active: boolean;
-        is_saleable: boolean;
-        is_search_promoted?: boolean;
-        is_featured?: boolean;
-        seo_title?: string;
-        seo_description?: string;
-        meta_robots?: string;
-        og_image?: string | null;
-        sitemap_exclude?: boolean;
-        variant?: ProductVariant;
-        images?: ProductImage[];
-        categories?: Category[];
-        flag_ids?: number[];
-        attribute_values?: FormData['attribute_values'];
-    };
-}) {
+    metafield_definitions,
+}: EditProps) {
     const { frontendUrl, locales } = usePage().props as {
         frontendUrl: string;
         locales: SharedLocale[];
@@ -216,6 +182,9 @@ export default function Edit({
             is_thumbnail: img.is_thumbnail,
         })),
     );
+    const handleMetafieldsChange = (metafields: FormData['metafields']) => {
+        setFormData((prev) => ({ ...prev, metafields }));
+    };
 
     const [formData, setFormData] = useState<FormData>({
         name: product.name ?? { [defaultLocale]: '' },
@@ -240,6 +209,7 @@ export default function Edit({
             getCategoryAttributeSchema(categoriesList, product.category_id),
             product.attribute_values ?? [],
         ),
+        metafields: product.metafields ?? [],
         variant: product.variant
             ? {
                   id: product.variant.id,
@@ -1953,6 +1923,24 @@ export default function Edit({
                                     </Tabs>
                                 );
                             })()}
+
+                            <div className="rounded-xl border bg-card p-6">
+                                <div className="mb-4 space-y-1">
+                                    <h3 className="text-base font-semibold">
+                                        Metafields
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Advanced extension layer. Keep core
+                                        product data in the main fields above.
+                                    </p>
+                                </div>
+                                <MetafieldEditor
+                                    metafields={formData.metafields}
+                                    definitions={metafield_definitions}
+                                    onChange={handleMetafieldsChange}
+                                    allowCustomFields={false}
+                                />
+                            </div>
 
                             <StickyFormActions
                                 formId={formId}

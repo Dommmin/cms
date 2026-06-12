@@ -1,3 +1,8 @@
+import type {
+    MetafieldDefinitionEntry,
+    MetafieldEntry,
+} from '@/components/metafield-editor.types';
+
 export type TagOption = { id: number; name: string; slug: string };
 export type Category = { id: number; name: string };
 export type BlogPost = {
@@ -26,6 +31,8 @@ export type EditProps = {
     post: BlogPost;
     categories: Category[];
     available_tags: TagOption[];
+    metafield_definitions: MetafieldDefinitionEntry[];
+    metafields: MetafieldEntry[];
 };
 export type FormData = {
     title: Record<string, string>;
@@ -47,4 +54,5 @@ export type FormData = {
     meta_robots: string;
     og_image: string | null;
     sitemap_exclude: boolean;
+    metafields: MetafieldEntry[];
 };
