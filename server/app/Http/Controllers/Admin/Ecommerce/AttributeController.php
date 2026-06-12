@@ -45,15 +45,7 @@ class AttributeController extends Controller
             unset($data['values']);
 
             $attribute = Attribute::query()->create($data);
-
-            foreach ($values as $index => $valueData) {
-                $attribute->values()->create([
-                    'value' => $valueData['value'],
-                    'label' => $valueData['label'] ?? $valueData['value'],
-                    'color_code' => $valueData['color_code'] ?? null,
-                    'position' => $valueData['position'] ?? $index,
-                ]);
-            }
+            $this->upsertValues($attribute, $values);
         });
 
         return to_route('admin.ecommerce.attributes.index')->with('success', 'Atrybut został utworzony');
@@ -72,7 +64,16 @@ class AttributeController extends Controller
     {
         $data = $request->validated();
 
-        $attribute->update($data);
+        DB::transaction(function () use ($attribute, $data): void {
+            $values = $data['values'] ?? null;
+            unset($data['values']);
+
+            $attribute->update($data);
+
+            if (is_array($values)) {
+                $this->upsertValues($attribute, $values);
+            }
+        });
 
         return back()->with('success', 'Atrybut został zaktualizowany');
     }
@@ -82,5 +83,30 @@ class AttributeController extends Controller
         $attribute->delete();
 
         return back()->with('success', 'Atrybut został usunięty');
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $values
+     */
+    private function upsertValues(Attribute $attribute, array $values): void
+    {
+        foreach ($values as $index => $valueData) {
+            $payload = [
+                'value' => $valueData['value'],
+                'slug' => $valueData['slug'],
+                'color_hex' => $valueData['color_hex'] ?? null,
+                'position' => $valueData['position'] ?? $index,
+            ];
+
+            if (isset($valueData['id'])) {
+                $attribute->values()
+                    ->whereKey($valueData['id'])
+                    ->update($payload);
+
+                continue;
+            }
+
+            $attribute->values()->create($payload);
+        }
     }
 }

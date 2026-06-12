@@ -319,6 +319,92 @@ Równolegle przez fazy 3-6:
 
 Równolegle przez fazy 4-6:
 
+## Release 1 implementation summary
+
+### Co zostało wdrożone
+
+- Single-blog by default został wdrożony przez automatyczne rozwiązywanie `default blog`.
+- `BlogPost` utworzony bez `blog_id` dostaje domyślny blog automatycznie.
+- Dodano backfill dla istniejących `blog_posts` z pustym `blog_id`.
+- Zachowano kompatybilność endpointów `/api/v1/blogs/*`.
+- Utrzymano `/api/v1/blog/posts` jako primary public feed bez wdrażania multi-blog routingu.
+- Ujednolicono kontrakt atrybutów do wspieranego zestawu typów: `text`, `numeric`, `select`, `multiselect`, `color`.
+- Dodano normalizację legacy payloadów `number -> numeric`, `label -> slug`, `color_code -> color_hex`.
+- Naprawiono zapis `AttributeValue` tak, aby backend używał realnych kolumn `slug` i `color_hex`.
+- Admin UI atrybutów wysyła teraz payload zgodny z backend validation i istniejącym modelem danych.
+- Zachowano compatibility guardrails: bez zmian w `ProductType`, `ProductTypeAttribute`, `VariantAttributeValue`, `variant.attributes` i `attributes: []` w product detail API.
+
+### Jakie pliki zmieniono
+
+- `server/app/Services/DefaultBlogResolver.php`
+- `server/app/Models/BlogPost.php`
+- `server/database/migrations/2026_06_12_090000_backfill_default_blog_for_blog_posts.php`
+- `server/app/Http/Requests/Admin/Ecommerce/Concerns/NormalizesAttributePayload.php`
+- `server/app/Http/Requests/Admin/Ecommerce/StoreAttributeRequest.php`
+- `server/app/Http/Requests/Admin/Ecommerce/UpdateAttributeRequest.php`
+- `server/app/Http/Controllers/Admin/Ecommerce/AttributeController.php`
+- `server/resources/js/pages/admin/ecommerce/attributes/create.tsx`
+- `server/resources/js/pages/admin/ecommerce/attributes/edit.tsx`
+- `server/resources/js/pages/admin/ecommerce/attributes/create.types.ts`
+- `server/resources/js/pages/admin/ecommerce/attributes/edit.types.ts`
+- `server/tests/Feature/BlogTest.php`
+- `server/tests/Feature/AttributeManagementTest.php`
+- `server/tests/Feature/Api/ProductAttributeFilterTest.php`
+
+### Jakie testy dodano lub poprawiono
+
+- Blog:
+  - create bez `blog_id` przypisuje default blog,
+  - update adminowy nie czyści `blog_id`,
+  - migration/backfill przypisuje default blog istniejącym postom bez bloga,
+  - `/api/v1/blog/posts` nadal działa jako primary feed.
+- Attributes:
+  - tworzenie atrybutu dla wszystkich wspieranych typów,
+  - legacy `number` normalizuje się do `numeric`,
+  - walidacja odrzuca niewspierane typy,
+  - `AttributeValue` zapisuje `slug` i `color_hex`,
+  - legacy `label` i `color_code` są mapowane do kanonicznych pól,
+  - update atrybutu działa na kanonicznym admin payload.
+- Compatibility:
+  - filtracja storefront po variant attributes nadal działa,
+  - product detail zachowuje `variants[].attributes` oraz top-level `attributes: []`.
+
+### Jakie testy uruchomiono
+
+- Uruchomiono Docker-backed PHP lint (`php -l`) dla wszystkich zmienionych plików backendowych:
+  - `DefaultBlogResolver`
+  - `NormalizesAttributePayload`
+  - `BlogPost`
+  - `StoreAttributeRequest`
+  - `UpdateAttributeRequest`
+  - `AttributeController`
+  - migracja backfill
+- Próbowano uruchomić:
+  - releasowe backend tests przez Pest,
+  - `npm run types` w kontenerze PHP.
+- W tym środowisku długie `docker compose exec` dla Pest/TypeScript nie zwracały wyniku w rozsądnym czasie mimo startu procesu, więc nie zostały wiarygodnie domknięte w tej sesji.
+
+### Co zostało celowo odłożone
+
+- `Category Attribute Schema`
+- `ProductAttributeValue`
+- pełne Metafields end-to-end
+- przebudowa storefront filters
+- zmiany kontraktu publicznego storefrontu poza kompatybilną normalizacją backend/admin
+- usuwanie legacy modeli i tabel (`ProductType`, `ProductTypeAttribute`, `VariantAttributeValue`)
+
+### Następne kroki
+
+- Dokończyć pełną walidację w działającym, responsywnym środowisku Docker:
+  - targeted Pest suites,
+  - Pint,
+  - Larastan/PHPStan,
+  - `npm run types`.
+- Po stabilizacji quality gates przejść do Release 2:
+  - projekt `Category Attribute Schema`,
+  - product-level attribute values,
+  - etapowe rozszerzenie API/storefront bez łamania obecnego kontraktu wariantów.
+
 - produkt: osobne sekcje core attributes / variant options / metafields
 - kategoria: osobna sekcja attribute schema
 - blog post: uproszczony single-blog flow

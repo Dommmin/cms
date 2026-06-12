@@ -9,6 +9,7 @@ use App\Concerns\HasTags;
 use App\Concerns\HasVersions;
 use App\Concerns\SanitizesTranslatableHtml;
 use App\Enums\BlogPostStatusEnum;
+use App\Services\DefaultBlogResolver;
 use App\Traits\HasSeoMetadata;
 use Carbon\CarbonImmutable;
 use Database\Factories\BlogPostFactory;
@@ -163,6 +164,15 @@ class BlogPost extends Model
     ];
 
     protected int $maxVersions = 30;
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $post): void {
+            if ($post->blog_id === null) {
+                $post->blog_id = resolve(DefaultBlogResolver::class)->resolve()->id;
+            }
+        });
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

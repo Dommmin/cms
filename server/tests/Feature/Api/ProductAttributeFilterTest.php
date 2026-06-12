@@ -40,5 +40,38 @@ it('allows filtering products by variant attributes', function (): void {
     $this->getJson('/api/v1/products?filter[attributes][package]=basic')
         ->assertOk()
         ->assertJsonFragment(['slug' => $matchingProduct->slug])
-        ->assertJsonMissing(['slug' => $otherProduct->slug]);
+        ->assertJsonMissing(['slug' => $otherProduct->slug])
+        ->assertJsonPath('meta.available_filters.0.slug', 'package');
+});
+
+it('keeps the storefront variant attributes contract on product detail', function (): void {
+    $color = Attribute::factory()->create([
+        'name' => 'Color',
+        'slug' => 'color',
+    ]);
+    $red = AttributeValue::factory()->for($color)->create([
+        'value' => 'Red',
+        'slug' => 'red',
+        'color_hex' => '#ff0000',
+    ]);
+
+    $product = Product::factory()->create([
+        'name' => 'Contract-safe product',
+        'slug' => ['en' => 'contract-safe-product'],
+    ]);
+    $variant = ProductVariant::factory()->for($product)->create([
+        'stock_quantity' => 3,
+        'is_active' => true,
+    ]);
+
+    VariantAttributeValue::factory()
+        ->for($variant, 'variant')
+        ->for($color, 'attribute')
+        ->for($red, 'attributeValue')
+        ->create();
+
+    $this->getJson('/api/v1/products/contract-safe-product')
+        ->assertOk()
+        ->assertJsonPath('attributes', [])
+        ->assertJsonPath('variants.0.attributes.Color', 'Red');
 });
