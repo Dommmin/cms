@@ -24,6 +24,8 @@ class ProductData extends Data
         public ?int $discount_percentage = null,
         public ?string $seo_title = null,
         public ?string $seo_description = null,
+        public ?string $meta_robots = 'index, follow',
+        public ?string $og_image = null,
         public bool $sitemap_exclude = false,
         /** @var CategoryData|null Included when relation loaded */
         public ?CategoryData $category = null,

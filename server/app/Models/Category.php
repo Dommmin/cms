@@ -114,7 +114,7 @@ class Category extends Model
     use Searchable;
 
     /** @var array<int, string> */
-    public array $translatable = ['name', 'slug', 'description'];
+    public array $translatable = ['name', 'slug', 'description', 'seo_title', 'seo_description'];
 
     /** @var array<int, string> */
     protected array $versionedAttributes = ['name', 'slug', 'description', 'is_active', 'parent_id'];
