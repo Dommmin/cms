@@ -22,7 +22,7 @@ function getApiHostname(): string {
 const apiHostname = getApiHostname();
 
 const nextConfig: NextConfig = {
-    output: 'standalone',
+    output: process.env.DOCKER_BUILD === '1' ? 'standalone' : undefined,
     poweredByHeader: false,
     compress: true,
     reactStrictMode: true,
@@ -39,6 +39,21 @@ const nextConfig: NextConfig = {
 
     typescript: {
         ignoreBuildErrors: process.env.DOCKER_BUILD === '1',
+    },
+
+    webpack: (config, context) => {
+        config.watchOptions = {
+            poll: process.env.WATCHPACK_POLLING === 'true' ? 1000 : false,
+            ignored: [
+                '**/node_modules/**',
+                '**/.git/**',
+                '**/.next/cache/**',
+                '**/coverage/**',
+                '**/playwright-report/**',
+                '**/test-results/**',
+            ],
+        };
+        return config;
     },
 
     images: {

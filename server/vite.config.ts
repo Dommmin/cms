@@ -9,7 +9,14 @@ export default defineConfig({
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
-            refresh: true,
+            refresh: [
+                'app/**/*.php',
+                'routes/**/*.php',
+                'resources/views/**/*.php',
+                'resources/js/**/*.ts',
+                'resources/js/**/*.tsx',
+                'resources/css/**/*.css'
+            ],
         }),
         inertia(),
         react({
@@ -38,14 +45,14 @@ export default defineConfig({
                 '**/storage/**',
                 '**/bootstrap/cache/**',
                 '**/.git/**',
+                '**/.next/**',
+                '**/.turbo/**',
+                '**/coverage/**',
+                '**/playwright-report/**',
+                '**/test-results/**',
             ],
 
-            // set false at beginning (MacOS)
-            usePolling: false,
-
-            // If it is needed, set:
-            // usePolling: true,
-            // interval: 300,
+            usePolling: process.env.VITE_USE_POLLING === 'true',
         },
     },
 });

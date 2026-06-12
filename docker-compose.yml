@@ -26,6 +26,54 @@ services:
       redis:
         condition: service_healthy
 
+  horizon:
+    build:
+      context: .
+      dockerfile: ./.docker/php/Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME}_horizon
+    restart: on-failure
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /var/www/html
+    command: php artisan horizon
+    environment:
+      COMPOSER_HOME: /tmp/composer
+    volumes:
+      - ./server:/var/www/html:cached
+      - server_node_modules:/var/www/html/node_modules
+    networks:
+      - cms-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles:
+      - workers
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: ./.docker/php/Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME}_scheduler
+    restart: on-failure
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /var/www/html
+    command: php artisan schedule:work
+    environment:
+      COMPOSER_HOME: /tmp/composer
+    volumes:
+      - ./server:/var/www/html:cached
+      - server_node_modules:/var/www/html/node_modules
+    networks:
+      - cms-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles:
+      - workers
+
   node:
     build:
       context: .
@@ -130,6 +178,8 @@ services:
     restart: unless-stopped
     networks:
       - cms-network
+    profiles:
+      - pdf
 
   typesense:
     image: typesense/typesense:27.1
@@ -144,6 +194,8 @@ services:
       - "8108:8108"
     networks:
       - cms-network
+    profiles:
+      - search
 
   mailpit:
     image: axllent/mailpit

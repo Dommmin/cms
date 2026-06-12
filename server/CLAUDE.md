@@ -14,6 +14,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/cashier (CASHIER) - v16
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v13
+- laravel/horizon (HORIZON) - v5
 - laravel/prompts (PROMPTS) - v0
 - laravel/sanctum (SANCTUM) - v4
 - laravel/scout (SCOUT) - v11

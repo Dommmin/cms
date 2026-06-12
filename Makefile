@@ -45,6 +45,18 @@ help:
 	@echo "  glitchtip-up       - Start the local GlitchTip stack"
 	@echo "  glitchtip-down     - Stop the local GlitchTip stack"
 	@echo "  glitchtip-logs     - Tail GlitchTip logs"
+	@echo "  up-full            - Start all services (including workers, search, etc)"
+	@echo "  up-workers         - Start background workers"
+	@echo "  up-search          - Start search services"
+	@echo "  up-pdf             - Start PDF services"
+	@echo "  up-testing         - Start testing services"
+	@echo "  restart            - Restart the application"
+	@echo "  stats              - Show docker stats"
+	@echo "  ps-php             - Show top processes in PHP container"
+	@echo "  ps-node            - Show top processes in Node container"
+	@echo "  ps-horizon         - Show top processes in Horizon container"
+	@echo "  ide-install        - Install dependencies locally for IDE"
+	@echo "  docker-install     - Install dependencies inside Docker containers"
 	@echo "  help               - Show this help"
 
 # Remove dependency volumes + local dirs, then rebuild clean
@@ -59,7 +71,37 @@ nuke-volumes:
 
 # Start the application
 up:
-	docker compose up -d
+	docker compose up -d php node nginx mysql redis mailpit
+
+up-full:
+	docker compose --profile search --profile pdf --profile workers --profile testing up -d
+
+up-workers:
+	docker compose --profile workers up -d
+
+up-search:
+	docker compose --profile search up -d
+
+up-pdf:
+	docker compose --profile pdf up -d
+
+up-testing:
+	docker compose --profile testing up -d
+
+restart:
+	docker compose restart
+
+stats:
+	docker stats
+
+ps-php:
+	docker compose exec php sh -lc "ps aux | sort -nrk 3 | head -20"
+
+ps-node:
+	docker compose exec node sh -lc "ps aux | sort -nrk 3 | head -20"
+
+ps-horizon:
+	docker compose exec horizon sh -lc "ps aux | sort -nrk 3 | head -20"
 
 # Stop the application
 down:
@@ -77,14 +119,15 @@ build:
 	fi
 	docker compose build
 
-# Install dependencies
-install:
+# Install dependencies inside Docker containers
+docker-install:
 	docker compose exec php composer install
 	docker compose exec -e NODE_OPTIONS="--max-old-space-size=512" php npm install
-	docker compose run --rm node npm install
+	docker compose exec node npm install
 
-# Install dependencies locally (need for phpstorm index)
-install-local:
+# Install dependencies locally for IDE (PhpStorm/Cursor)
+ide-install:
+	cd server && composer install
 	cd server && npm install
 	cd client && npm install
 
