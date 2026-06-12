@@ -61,11 +61,10 @@ export async function generateSitemaps() {
     return sitemaps;
 }
 
-export default async function sitemap({
-    id,
-}: {
-    id: string;
-}): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap(
+    props: { id: string } | Promise<{ id: string }>,
+): Promise<MetadataRoute.Sitemap> {
+    const { id } = await props;
     const i18nConfig = await getI18nConfig();
     const defaultLocale = i18nConfig.defaultLocale;
     const entries: MetadataRoute.Sitemap = [];
