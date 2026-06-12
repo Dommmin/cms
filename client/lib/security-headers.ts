@@ -39,10 +39,7 @@ export function buildStaticSecurityHeaders(
         },
     ];
 
-    if (
-        options.includeStrictTransportSecurity &&
-        process.env.NEXT_PUBLIC_API_URL?.startsWith('https')
-    ) {
+    if (options.includeStrictTransportSecurity) {
         headers.push({
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains',

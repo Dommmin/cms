@@ -11,6 +11,7 @@ import { useSubscribeStock } from '@/hooks/use-products';
 import { CompareButton } from '@/components/compare-button';
 import { LiveViewers } from '@/components/live-viewers';
 import { ProductCard } from '@/components/product-card';
+import { getProductSpecificationEntries } from '@/lib/product-attributes';
 import { sanitizeHtml } from '@/lib/sanitize';
 import type {
     DeliveryPanelProps,
@@ -451,6 +452,11 @@ export function ProductTabs({
     onMarkHelpful,
     labels,
 }: ProductTabsProps) {
+    const specifications = getProductSpecificationEntries(product, {
+        trueLabel: labels.yes,
+        falseLabel: labels.no,
+    });
+
     return (
         <div className="mt-12">
             <div
@@ -488,11 +494,43 @@ export function ProductTabs({
                         role="tabpanel"
                         id="tabpanel-description"
                         aria-labelledby="tab-description"
-                        className="prose prose-lg"
-                        dangerouslySetInnerHTML={{
-                            __html: sanitizeHtml(product.description ?? ''),
-                        }}
-                    />
+                        className="space-y-8"
+                    >
+                        {specifications.length > 0 && (
+                            <section
+                                aria-label={labels.specifications}
+                                className="border-border bg-card rounded-[var(--store-card-radius)] border"
+                            >
+                                <div className="border-border border-b px-5 py-4">
+                                    <h2 className="text-base font-semibold">
+                                        {labels.specifications}
+                                    </h2>
+                                </div>
+                                <dl className="divide-border divide-y">
+                                    {specifications.map((attribute) => (
+                                        <div
+                                            key={attribute.slug}
+                                            className="grid gap-2 px-5 py-4 sm:grid-cols-[minmax(0,220px)_1fr] sm:gap-6"
+                                        >
+                                            <dt className="text-muted-foreground text-sm font-medium">
+                                                {attribute.label}
+                                            </dt>
+                                            <dd className="text-sm font-medium">
+                                                {attribute.values.join(', ')}
+                                            </dd>
+                                        </div>
+                                    ))}
+                                </dl>
+                            </section>
+                        )}
+
+                        <div
+                            className="prose prose-lg"
+                            dangerouslySetInnerHTML={{
+                                __html: sanitizeHtml(product.description ?? ''),
+                            }}
+                        />
+                    </div>
                 )}
 
                 {activeTab === 'reviews' && (

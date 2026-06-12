@@ -22,6 +22,7 @@ import {
 import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { useTranslation } from '@/hooks/use-translation';
 import { trackViewItem } from '@/lib/datalayer';
+import { getVariantAttributeGroups } from '@/lib/product-attributes';
 import { resolveCategoryPath } from '@/lib/public-paths';
 import { buildBreadcrumbList, buildProduct } from '@/lib/schema';
 import { generateCanonical } from '@/lib/seo';
@@ -141,26 +142,7 @@ export default function ProductDetailClient({
     const selectedVariant = currentProduct.variants?.find(
         (v) => v.id === (selectedVariantId ?? currentProduct.variants?.[0]?.id),
     );
-    const variantAttributeGroups = Object.entries(
-        (currentProduct.variants ?? []).reduce<Record<string, string[]>>(
-            (accumulator, variant) => {
-                Object.entries(variant.attributes).forEach(
-                    ([attributeName, value]) => {
-                        if (!accumulator[attributeName]) {
-                            accumulator[attributeName] = [];
-                        }
-
-                        if (!accumulator[attributeName].includes(value)) {
-                            accumulator[attributeName].push(value);
-                        }
-                    },
-                );
-
-                return accumulator;
-            },
-            {},
-        ),
-    );
+    const variantAttributeGroups = getVariantAttributeGroups(currentProduct);
     const price = formatPrice(selectedVariant?.price ?? product.price_min);
     function handleAddToCart() {
         const variant = selectedVariant ?? product?.variants?.[0];
@@ -431,8 +413,14 @@ export default function ProductDetailClient({
                 onMarkHelpful={markHelpful}
                 labels={{
                     tabs: t('product.tabs_label', 'Product information'),
+                    specifications: t(
+                        'product.specifications',
+                        'Specifications',
+                    ),
                     description: t('product.tab_description', 'Description'),
                     reviews: t('product.tab_reviews', 'Reviews'),
+                    yes: t('common.yes', 'Yes'),
+                    no: t('common.no', 'No'),
                     noReviews: t(
                         'product.no_reviews',
                         'No reviews yet. Be the first!',

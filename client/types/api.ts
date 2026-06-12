@@ -137,6 +137,17 @@ export interface ProductAttributeValue {
     display_value: string | number | boolean | null | Array<string>;
 }
 
+export interface ProductAttributeSummaryEntry {
+    label: string;
+    value: string;
+}
+
+export interface ProductVariantOption {
+    slug: string;
+    label: string;
+    values: string[];
+}
+
 export interface ProductVariant {
     id: number;
     sku: string;
@@ -188,7 +199,8 @@ export interface Product {
     brand: Brand | null;
     attributes: Attribute[];
     attribute_values?: ProductAttributeValue[];
-    attribute_summary?: Record<string, { label: string; value: string }>;
+    attribute_summary?: Record<string, ProductAttributeSummaryEntry>;
+    variant_options?: ProductVariantOption[];
     /** Aggregated attribute values per key, present only in compare endpoint response */
     attribute_map?: Record<string, string[]>;
     /** Active promotions attached to this product (when loaded) */

@@ -15,6 +15,7 @@ import {
     useIsInWishlist,
     useRemoveFromWishlist,
 } from '@/hooks/use-wishlist';
+import { getListingAttributeEntries } from '@/lib/product-attributes';
 import { resolveProductPath } from '@/lib/public-paths';
 import type { ProductListItemProps } from './product-list-item.types';
 
@@ -34,8 +35,10 @@ export function ProductListItem({
     const { mutate: addToWishlist } = useAddToWishlist();
     const { mutate: removeFromWishlist } = useRemoveFromWishlist();
 
-    const attributeMap = product.attribute_map ?? {};
-    const attributeEntries = Object.entries(attributeMap).slice(0, 6);
+    const attributeEntries = getListingAttributeEntries(product, {
+        trueLabel: t('common.yes', 'Yes'),
+        falseLabel: t('common.no', 'No'),
+    }).slice(0, 6);
 
     function handleWishlistToggle(e: React.MouseEvent) {
         e.preventDefault();
@@ -115,15 +118,15 @@ export function ProductListItem({
                 {/* Attribute pills */}
                 {attributeEntries.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
-                        {attributeEntries.map(([key, values]) => (
+                        {attributeEntries.map((attribute) => (
                             <span
-                                key={key}
+                                key={attribute.label}
                                 className="border-border text-foreground/80 inline-flex items-baseline gap-1 rounded-md border px-2 py-0.5 text-xs"
                             >
                                 <span className="text-muted-foreground font-medium">
-                                    {key}:
+                                    {attribute.label}:
                                 </span>
-                                <span>{values.join(', ')}</span>
+                                <span>{attribute.values.join(', ')}</span>
                             </span>
                         ))}
                     </div>

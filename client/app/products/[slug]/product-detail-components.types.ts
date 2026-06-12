@@ -103,8 +103,11 @@ export interface ProductTabsProps {
     onMarkHelpful: (reviewId: number) => void;
     labels: {
         tabs: string;
+        specifications: string;
         description: string;
         reviews: string;
+        yes: string;
+        no: string;
         noReviews: string;
         verified: string;
         helpful: string;
