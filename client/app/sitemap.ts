@@ -39,7 +39,9 @@ export async function generateSitemaps() {
     const sitemaps = [{ id: 'static' }];
 
     try {
-        const products = await serverFetch<PaginatedResponse<Product>>('/products?per_page=500');
+        const products = await serverFetch<PaginatedResponse<Product>>(
+            '/products?per_page=500',
+        );
         const totalProductPages = products.meta?.last_page ?? 1;
         for (let i = 1; i <= totalProductPages; i++) {
             sitemaps.push({ id: `products-${i}` });
@@ -47,7 +49,9 @@ export async function generateSitemaps() {
     } catch {}
 
     try {
-        const blogs = await serverFetch<PaginatedResponse<BlogPost>>('/blog/posts?per_page=500');
+        const blogs = await serverFetch<PaginatedResponse<BlogPost>>(
+            '/blog/posts?per_page=500',
+        );
         const totalBlogPages = blogs.meta?.last_page ?? 1;
         for (let i = 1; i <= totalBlogPages; i++) {
             sitemaps.push({ id: `blogs-${i}` });
@@ -85,7 +89,14 @@ export default async function sitemap({
     if (id === 'static') {
         // Static pages
         entries.push(
-            sitemapEntry(i18nConfig, '/', defaultLocale, undefined, 'daily', 1.0),
+            sitemapEntry(
+                i18nConfig,
+                '/',
+                defaultLocale,
+                undefined,
+                'daily',
+                1.0,
+            ),
         );
         if (productListingPath) {
             entries.push(
@@ -130,7 +141,9 @@ export default async function sitemap({
             for (const product of products.data.filter(
                 (p) => !p.sitemap_exclude && !!p.public_url,
             )) {
-                const d = product.created_at ? new Date(product.created_at) : null;
+                const d = product.created_at
+                    ? new Date(product.created_at)
+                    : null;
                 entries.push(
                     sitemapEntry(
                         i18nConfig,

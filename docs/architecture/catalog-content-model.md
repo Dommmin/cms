@@ -137,6 +137,20 @@ Nie `ProductType`.
 - is_comparable_override nullable
 - position
 
+### Release 2 backend foundation
+
+Aktualna implementacja Release 2 używa istniejącej tabeli `attributes` jako źródła definicji, więc backendowy pivot ma postać:
+
+`category_attribute_schemas`
+
+- id
+- category_id
+- attribute_id
+- is_required
+- position
+
+Semantycznie `attribute_id` jest w tym etapie odpowiednikiem docelowego `attribute_definition_id`.
+
 Opcjonalnie:
 
 - `inherits_from_parent` jako zachowanie systemowe, nie osobna wartość per row
@@ -453,6 +467,7 @@ Formularz produktu powinien mieć osobne sekcje:
 ### Category schema
 
 - `category_id + attribute_definition_id` unikalne
+- w aktualnym backend foundation odpowiada temu unikalność `category_id + attribute_id`
 - `is_required` jawne
 
 ### Product attributes
@@ -507,6 +522,67 @@ Zmiany w tych warstwach powinny invalidować:
 3. Wprowadzić `ProductAttributeValue`
 4. Przenieść ownership schematu z `ProductType` na `Category`
 5. Zachować kompatybilne czytanie starych variant attributes w okresie przejściowym
+
+## Release 2 implementation summary
+
+### Co zostało wdrożone
+
+- Dodano backendowy model `CategoryAttributeSchema` z tabelą `category_attribute_schemas`.
+- `Category` ma teraz własne relacje do direct schema i helper `resolvedAttributeSchemas()` do dziedziczenia definicji po parent category.
+- Admin backend kategorii akceptuje opcjonalny payload `attribute_schema` z polami:
+  - `attribute_id`
+  - `is_required`
+  - `position`
+- Sync schema działa w `store` i `update` kategorii bez breaking change dla istniejącego formularza.
+- Dodano backfill, który mapuje legacy `product_type_attributes` na `category_attribute_schemas` przez `categories.product_type_id`.
+- Kategorie bez `product_type_id` albo bez legacy `product_type_attributes` nie są mapowane automatycznie i pozostają na ścieżce przejściowej do czasu jawnego przypisania schema kategorii.
+- Legacy `ProductType`, `ProductTypeAttribute` i `variant_attribute_values` pozostają aktywne dla kompatybilności.
+
+### Jak działa Category Attribute Schema
+
+- Kategoria jest właścicielem definicji dostępnych atrybutów katalogowych.
+- Schema określa tylko definicje i flagę required/optional.
+- Schema nie przypisuje żadnych wartości do produktu.
+- Child category dziedziczy schema parenta na poziomie definicji, a direct wpis childa nadpisuje odziedziczoną definicję tego samego atrybutu.
+- Storefront filters i `variant.attributes` nadal działają na istniejącym modelu wariantów; Release 2 ich nie przepina.
+- Jeśli kategoria nie ma jeszcze własnego schema po backfillu, system nadal zachowuje legacy `ProductTypeAttribute` jako warstwę kompatybilności i migracji przejściowej.
+
+### Jakie pliki zmieniono
+
+- `server/app/Models/Category.php`
+- `server/app/Models/Attribute.php`
+- `server/app/Models/CategoryAttributeSchema.php`
+- `server/database/factories/CategoryAttributeSchemaFactory.php`
+- `server/database/migrations/2026_06_12_130000_create_category_attribute_schemas_table.php`
+- `server/app/Http/Requests/Admin/Ecommerce/StoreCategoryRequest.php`
+- `server/app/Http/Requests/Admin/Ecommerce/UpdateCategoryRequest.php`
+- `server/app/Http/Controllers/Admin/Ecommerce/CategoryController.php`
+- `server/tests/Feature/CategoryAttributeSchemaTest.php`
+- `server/tests/Feature/Api/ProductAttributeFilterTest.php`
+
+### Jakie testy dodano
+
+- przypisywanie attribute definitions do kategorii w admin flow,
+- required/optional flags na schema kategorii,
+- unikalność `category_id + attribute_id`,
+- dziedziczenie schema po parent category bez dziedziczenia wartości produktu,
+- backfill z `product_type_attributes` bez usuwania legacy danych,
+- regresja dla storefront variant filters przy równoległym istnieniu category schema.
+
+### Co zostało celowo odłożone
+
+- `ProductAttributeValue`
+- walidacja produktu względem required schema przy zapisie produktu
+- pełny admin UX do edycji produktu według schema kategorii
+- storefront integration nowego schema
+- migracja storefront filters z `variant_attribute_values`
+- Metafields end-to-end
+
+### Następne kroki
+
+- Podpiąć schema kategorii do przyszłej warstwy `ProductAttributeValue`.
+- Dodać walidację produktu względem required category schema przy create/update produktu.
+- Dopiero po tym etapowo przepinać admin UX produktu i storefront filters na nowy model danych.
 
 ### Variants
 

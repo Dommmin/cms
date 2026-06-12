@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
             i18nConfig.defaultLocale,
             i18nConfig,
         );
-        if (page.seo_canonical) {
+        if (page.seo_canonical && alternates) {
             alternates.canonical = page.seo_canonical;
         }
 

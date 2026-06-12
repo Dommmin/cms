@@ -264,7 +264,6 @@ export default function CreateBlog({ users }: CreateProps) {
                         </div>
                     )}
 
-
                     <div className="grid gap-2">
                         <Label htmlFor="position">
                             {__('label.position', 'Position')}

@@ -232,7 +232,7 @@ class EcommerceRelationSeeder extends Seeder
                 $type = ProductType::query()->create([
                     'slug' => $typeSlug,
                     'name' => $typeInfo['name'],
-                    'has_variants' => $typeInfo['attributes'] !== [],
+                    'has_variants' => true,
                     'variant_selection_attributes' => $typeInfo['attributes'],
                     'is_shippable' => true,
                 ]);
@@ -272,7 +272,7 @@ class EcommerceRelationSeeder extends Seeder
                     $pos = 1;
                     foreach ($prodData['variants'] as $varData) {
                         $sku = 'SKU-'.Str::upper(Str::random(8));
-                        $variantName = implode(' / ', array_filter([$varData['color'] ?? null, $varData['size'] ?? null]));
+                        $variantName = implode(' / ', array_filter([$varData['color'], $varData['size'] ?? null]));
                         $variant = ProductVariant::query()->create([
                             'product_id' => $product->id,
                             'sku' => $sku,

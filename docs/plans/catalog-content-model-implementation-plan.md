@@ -446,6 +446,70 @@ Powód:
 - Phase 3
 - backend foundations Phase 4
 
+## Release 2 implementation summary
+
+### Co zostało wdrożone
+
+- Dodano backend-only `CategoryAttributeSchema` jako nowego ownera schema atrybutów po stronie kategorii.
+- Dodano tabelę `category_attribute_schemas` z polami `category_id`, `attribute_id`, `is_required`, `position`.
+- Dodano relacje modeli oraz helper `Category::resolvedAttributeSchemas()` dla inheritance po parent category.
+- Rozszerzono admin category requests/controller o opcjonalny payload `attribute_schema` i sync schema przy zapisie kategorii.
+- Dodano backfill z `product_type_attributes` przez `categories.product_type_id`, bez kasowania legacy danych.
+- Kategorie bez `product_type_id` albo bez powiązanych legacy rows nie są mapowane automatycznie i wymagają późniejszego jawnego przypisania schema.
+
+### Jak działa Category Attribute Schema
+
+- Schema kategorii definiuje tylko, jakie atrybuty są dostępne dla produktów w danej kategorii i które z nich są required.
+- Child category dziedziczy definicje schema parenta, ale nie dziedziczy żadnych wartości produktu.
+- Jeśli child ma direct wpis dla tego samego atrybutu, jego definicja wygrywa nad wpisem odziedziczonym.
+- Na tym etapie schema działa równolegle do legacy `ProductTypeAttribute`; storefront i produkt nadal używają dotychczasowego kontraktu.
+- Dla kategorii, których nie dało się bezpiecznie zmapować przez `product_type_id`, legacy `ProductTypeAttribute` pozostaje fallbackiem przejściowym do Release 3+.
+
+### Jakie pliki zmieniono
+
+- `server/app/Models/Category.php`
+- `server/app/Models/Attribute.php`
+- `server/app/Models/CategoryAttributeSchema.php`
+- `server/database/factories/CategoryAttributeSchemaFactory.php`
+- `server/database/migrations/2026_06_12_130000_create_category_attribute_schemas_table.php`
+- `server/app/Http/Requests/Admin/Ecommerce/StoreCategoryRequest.php`
+- `server/app/Http/Requests/Admin/Ecommerce/UpdateCategoryRequest.php`
+- `server/app/Http/Controllers/Admin/Ecommerce/CategoryController.php`
+- `server/tests/Feature/CategoryAttributeSchemaTest.php`
+- `server/tests/Feature/Api/ProductAttributeFilterTest.php`
+- `docs/architecture/catalog-content-model.md`
+- `docs/plans/catalog-content-model-implementation-plan.md`
+
+### Jakie testy dodano
+
+- kategoria może mieć przypisane attribute definitions,
+- atrybut w kategorii może być required lub optional,
+- `category_id + attribute_id` jest unikalne,
+- child category dziedziczy schema parenta,
+- wartości produktów nie są dziedziczone z kategorii,
+- backfill nie usuwa legacy `ProductTypeAttribute`,
+- istniejące variant filters nadal działają przy równoległym category schema.
+
+### Jakie testy uruchomiono
+
+- W tej sesji nie uruchamiano Docker-backed testów ani quality gates.
+- Zmiany zostały przygotowane pod testy relewantne dla kategorii/produktów/atrybutów, ale runtime verification pozostaje do wykonania osobno.
+
+### Co zostało celowo odłożone
+
+- `ProductAttributeValue`
+- pełny admin UX produktu oparty o schema kategorii
+- walidacja required schema przy zapisie produktu
+- storefront integration
+- przebudowa storefront filters
+- Metafields end-to-end
+
+### Następne kroki
+
+- Uruchomić relewantne testy backendowe dla kategorii/produktów/atrybutów.
+- Następnie wdrożyć `ProductAttributeValue` i walidację produktu względem schema kategorii.
+- Dopiero po tym przygotować admin UX produktu i bezpieczną migrację storefront filters.
+
 ### Release 3
 
 - admin UX + storefront integration for Phase 4

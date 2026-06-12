@@ -45,7 +45,9 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
             color_hex: value.color_hex ?? '',
         })),
     });
-    const supportsValues = ['select', 'multiselect', 'color'].includes(data.type);
+    const supportsValues = ['select', 'multiselect', 'color'].includes(
+        data.type,
+    );
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -167,10 +169,13 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                                 onChange={(event) =>
                                     setData((prev) => ({
                                         ...prev,
-                                        type: event.target.value as AttributeData['type'],
-                                        values: ['select', 'multiselect', 'color'].includes(
-                                            event.target.value,
-                                        )
+                                        type: event.target
+                                            .value as AttributeData['type'],
+                                        values: [
+                                            'select',
+                                            'multiselect',
+                                            'color',
+                                        ].includes(event.target.value)
                                             ? prev.values
                                             : [],
                                     }))
@@ -211,7 +216,9 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                                 onChange={(event) =>
                                     setData((prev) => ({
                                         ...prev,
-                                        position: Number(event.target.value || 0),
+                                        position: Number(
+                                            event.target.value || 0,
+                                        ),
                                     }))
                                 }
                             />
@@ -373,7 +380,9 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                                             <div className="grid gap-2 md:col-span-2">
                                                 <Label>Color hex</Label>
                                                 <Input
-                                                    value={value.color_hex ?? ''}
+                                                    value={
+                                                        value.color_hex ?? ''
+                                                    }
                                                     onChange={(event) =>
                                                         updateValue(
                                                             index,
@@ -402,15 +411,14 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                                                     onClick={() =>
                                                         setData((prev) => ({
                                                             ...prev,
-                                                            values:
-                                                                prev.values.filter(
-                                                                    (
-                                                                        _item,
-                                                                        currentIndex,
-                                                                    ) =>
-                                                                        currentIndex !==
-                                                                        index,
-                                                                ),
+                                                            values: prev.values.filter(
+                                                                (
+                                                                    _item,
+                                                                    currentIndex,
+                                                                ) =>
+                                                                    currentIndex !==
+                                                                    index,
+                                                            ),
                                                         }))
                                                     }
                                                 >
@@ -427,10 +435,7 @@ export default function EditAttribute({ attribute }: EditAttributeProps) {
                     <StickyFormActions
                         formId={formId}
                         processing={processing}
-                        submitLabel={__(
-                            'action.save_changes',
-                            'Save Changes',
-                        )}
+                        submitLabel={__('action.save_changes', 'Save Changes')}
                     />
                 </form>
             </Wrapper>

@@ -40,7 +40,5 @@ return new class extends Migration
             ->update(['blog_id' => $blogId]);
     }
 
-    public function down(): void
-    {
-    }
+    public function down(): void {}
 };

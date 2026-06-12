@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Models\Attribute;
 use App\Models\AttributeValue;
+use App\Models\Category;
+use App\Models\CategoryAttributeSchema;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
@@ -41,7 +43,7 @@ it('allows filtering products by variant attributes', function (): void {
         ->assertOk()
         ->assertJsonFragment(['slug' => $matchingProduct->slug])
         ->assertJsonMissing(['slug' => $otherProduct->slug])
-        ->assertJsonPath('meta.available_filters.0.slug', 'package');
+        ->assertJsonPath('meta.available_filters.attributes.0.slug', 'package');
 });
 
 it('keeps the storefront variant attributes contract on product detail', function (): void {
@@ -74,4 +76,43 @@ it('keeps the storefront variant attributes contract on product detail', functio
         ->assertOk()
         ->assertJsonPath('attributes', [])
         ->assertJsonPath('variants.0.attributes.Color', 'Red');
+});
+
+it('keeps variant filters working when category schema exists in parallel', function (): void {
+    $category = Category::factory()->create();
+    $style = Attribute::factory()->create([
+        'name' => 'Style',
+        'slug' => 'style',
+        'is_filterable' => true,
+    ]);
+    CategoryAttributeSchema::factory()->for($category)->create([
+        'attribute_id' => $style->id,
+        'is_required' => true,
+        'position' => 0,
+    ]);
+    $modern = AttributeValue::factory()->for($style)->create([
+        'value' => 'Modern',
+        'slug' => 'modern',
+    ]);
+
+    $product = Product::factory()->create([
+        'category_id' => $category->id,
+        'name' => 'Schema-safe chair',
+        'slug' => ['en' => 'schema-safe-chair'],
+    ]);
+    $variant = ProductVariant::factory()->for($product)->create([
+        'stock_quantity' => 8,
+        'is_active' => true,
+    ]);
+
+    VariantAttributeValue::factory()
+        ->for($variant, 'variant')
+        ->for($style, 'attribute')
+        ->for($modern, 'attributeValue')
+        ->create();
+
+    $this->getJson('/api/v1/products?filter[attributes][style]=modern')
+        ->assertOk()
+        ->assertJsonFragment(['slug' => $product->slug])
+        ->assertJsonPath('meta.available_filters.attributes.0.slug', 'style');
 });

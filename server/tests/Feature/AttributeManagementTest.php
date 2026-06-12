@@ -24,7 +24,7 @@ dataset('supported-attribute-types', [
 
 it('creates attributes with every supported canonical type', function (string $type): void {
     $payload = [
-        'name' => 'Attribute '.strtoupper($type),
+        'name' => 'Attribute '.mb_strtoupper($type),
         'slug' => 'attribute-'.$type,
         'type' => $type,
         'unit' => $type === 'numeric' ? 'cm' : null,

@@ -17,8 +17,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as SupportCollection;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -55,6 +57,10 @@ use Spatie\Translatable\HasTranslations;
  * @property-read int|null $all_children_count
  * @property-read Collection<int, Category> $children
  * @property-read int|null $children_count
+ * @property-read Collection<int, CategoryAttributeSchema> $attributeSchemas
+ * @property-read int|null $attribute_schemas_count
+ * @property-read Collection<int, Attribute> $schemaAttributes
+ * @property-read int|null $schema_attributes_count
  * @property-read array $translatable_columns_from
  * @property-read Collection<int, Metafield> $metafields
  * @property-read int|null $metafields_count
@@ -189,6 +195,54 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function attributeSchemas(): HasMany
+    {
+        return $this->hasMany(CategoryAttributeSchema::class)->orderBy('position');
+    }
+
+    public function schemaAttributes(): BelongsToMany
+    {
+        return $this->belongsToMany(Attribute::class, 'category_attribute_schemas')
+            ->withPivot(['is_required', 'position'])
+            ->orderBy('category_attribute_schemas.position');
+    }
+
+    public function resolvedAttributeSchemas(): SupportCollection
+    {
+        $resolvedSchemas = $this->parent
+            ? $this->parent->resolvedAttributeSchemas()
+                ->map(
+                    function (CategoryAttributeSchema $schema): CategoryAttributeSchema {
+                        $inheritedSchema = clone $schema;
+                        $inheritedSchema->setAttribute('is_inherited', true);
+
+                        return $inheritedSchema;
+                    }
+                )
+                ->keyBy('attribute_id')
+            : collect();
+
+        $directSchemas = $this->attributeSchemas()
+            ->with('attribute')
+            ->get()
+            ->map(function ($schema): CategoryAttributeSchema {
+                /** @var CategoryAttributeSchema $schema */
+                $schema->setAttribute('is_inherited', false);
+                $schema->setAttribute('schema_owner_category_id', $schema->category_id);
+
+                return $schema;
+            })
+            ->keyBy('attribute_id');
+
+        foreach ($directSchemas as $attributeId => $schema) {
+            $resolvedSchemas->put($attributeId, $schema);
+        }
+
+        return $resolvedSchemas
+            ->sortBy(fn (CategoryAttributeSchema $schema): string => mb_str_pad((string) $schema->position, 3, '0', STR_PAD_LEFT).'-'.$schema->attribute->name)
+            ->values();
     }
 
     /**

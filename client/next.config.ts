@@ -41,7 +41,7 @@ const nextConfig: NextConfig = {
         ignoreBuildErrors: process.env.DOCKER_BUILD === '1',
     },
 
-    webpack: (config, context) => {
+    webpack: (config) => {
         config.watchOptions = {
             poll: process.env.WATCHPACK_POLLING === 'true' ? 1000 : false,
             ignored: [

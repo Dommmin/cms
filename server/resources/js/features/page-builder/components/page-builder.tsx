@@ -639,7 +639,7 @@ export function PageBuilder({
                         onOpenPreview={onPreview}
                     />
                 ) : inspectorOpen && (activeSection || activeBlock) ? (
-                    <div className="min-w-0 lg:min-w-[22rem] lg:max-w-[30rem]">
+                    <div className="min-w-0 lg:max-w-[30rem] lg:min-w-[22rem]">
                         <PageInspector
                             section={activeSection}
                             sectionIndex={

@@ -29,6 +29,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $updated_at
  * @property-read Collection<int, ProductType> $productTypes
  * @property-read int|null $product_types_count
+ * @property-read Collection<int, CategoryAttributeSchema> $categorySchemas
+ * @property-read int|null $category_schemas_count
  * @property-read Collection<int, AttributeValue> $values
  * @property-read int|null $values_count
  *
@@ -65,6 +67,11 @@ class Attribute extends Model
     public function productTypes(): BelongsToMany
     {
         return $this->belongsToMany(ProductType::class, 'product_type_attributes');
+    }
+
+    public function categorySchemas(): HasMany
+    {
+        return $this->hasMany(CategoryAttributeSchema::class)->orderBy('position');
     }
 
     protected function casts(): array

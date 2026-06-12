@@ -33,7 +33,6 @@ trait NormalizesAttributePayload
     }
 
     /**
-     * @param  mixed  $values
      * @return array<int, array<string, mixed>>
      */
     private function normalizeAttributeValues(mixed $values): array
@@ -45,8 +44,8 @@ trait NormalizesAttributePayload
         return collect($values)
             ->filter(fn (mixed $value): bool => is_array($value))
             ->map(function (array $value): array {
-                $resolvedValue = trim((string) ($value['value'] ?? ''));
-                $resolvedSlug = trim((string) ($value['slug'] ?? $value['label'] ?? $resolvedValue));
+                $resolvedValue = mb_trim((string) ($value['value'] ?? ''));
+                $resolvedSlug = mb_trim((string) ($value['slug'] ?? $value['label'] ?? $resolvedValue));
                 $colorHex = $value['color_hex'] ?? $value['color_code'] ?? null;
 
                 return array_filter([

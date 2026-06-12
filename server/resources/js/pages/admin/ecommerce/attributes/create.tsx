@@ -58,7 +58,9 @@ export default function CreateAttribute() {
         position: 0,
         values: [],
     });
-    const supportsValues = ['select', 'multiselect', 'color'].includes(data.type);
+    const supportsValues = ['select', 'multiselect', 'color'].includes(
+        data.type,
+    );
 
     const updateValue = (
         index: number,
@@ -178,10 +180,13 @@ export default function CreateAttribute() {
                                 onChange={(event) =>
                                     setData((prev) => ({
                                         ...prev,
-                                        type: event.target.value as AttributeFormData['type'],
-                                        values: ['select', 'multiselect', 'color'].includes(
-                                            event.target.value,
-                                        )
+                                        type: event.target
+                                            .value as AttributeFormData['type'],
+                                        values: [
+                                            'select',
+                                            'multiselect',
+                                            'color',
+                                        ].includes(event.target.value)
                                             ? prev.values
                                             : [],
                                     }))
@@ -222,7 +227,9 @@ export default function CreateAttribute() {
                                 onChange={(event) =>
                                     setData((prev) => ({
                                         ...prev,
-                                        position: Number(event.target.value || 0),
+                                        position: Number(
+                                            event.target.value || 0,
+                                        ),
                                     }))
                                 }
                                 min={0}
@@ -413,15 +420,14 @@ export default function CreateAttribute() {
                                                 onClick={() =>
                                                     setData((prev) => ({
                                                         ...prev,
-                                                        values:
-                                                            prev.values.filter(
-                                                                (
-                                                                    _item,
-                                                                    currentIndex,
-                                                                ) =>
-                                                                    currentIndex !==
-                                                                    index,
-                                                            ),
+                                                        values: prev.values.filter(
+                                                            (
+                                                                _item,
+                                                                currentIndex,
+                                                            ) =>
+                                                                currentIndex !==
+                                                                index,
+                                                        ),
                                                     }))
                                                 }
                                             >

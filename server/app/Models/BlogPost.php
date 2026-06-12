@@ -165,15 +165,6 @@ class BlogPost extends Model
 
     protected int $maxVersions = 30;
 
-    protected static function booted(): void
-    {
-        static::creating(function (self $post): void {
-            if ($post->blog_id === null) {
-                $post->blog_id = resolve(DefaultBlogResolver::class)->resolve()->id;
-            }
-        });
-    }
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -271,6 +262,15 @@ class BlogPost extends Model
     {
         return $this->status === BlogPostStatusEnum::Published
             && (bool) Setting::get('search', 'index_blog_posts', true);
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $post): void {
+            if ($post->blog_id === null) {
+                $post->blog_id = resolve(DefaultBlogResolver::class)->resolve()->id;
+            }
+        });
     }
 
     protected function scopePublished(Builder $query): Builder

@@ -25,7 +25,7 @@ export async function generateMetadata({
         const alternates = isLocaleSegment
             ? generateAlternates('/', fetchLocale, i18nConfig)
             : generateAlternates(page.path, fetchLocale, i18nConfig);
-        if (page.seo_canonical) {
+        if (page.seo_canonical && alternates) {
             alternates.canonical = page.seo_canonical;
         }
 

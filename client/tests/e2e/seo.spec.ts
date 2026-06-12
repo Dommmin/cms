@@ -13,8 +13,9 @@ try {
     while ((match = locRegex.exec(xml)) !== null) {
         urls.push(match[1]);
     }
-} catch (error: any) {
-    console.error(`Error loading sitemap.xml synchronously: ${error.message}`);
+} catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`Error loading sitemap.xml synchronously: ${message}`);
 }
 
 // Fallback to basic URLs if sitemap couldn't be loaded/parsed
@@ -169,9 +170,14 @@ for (const urlStr of urlsToAudit) {
                 } else {
                     try {
                         JSON.parse(text);
-                    } catch (e: any) {
+                    } catch (error: unknown) {
+                        const message =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
+
                         failures.push(
-                            `invalid JSON in JSON-LD at index ${i}: ${e.message}`,
+                            `invalid JSON in JSON-LD at index ${i}: ${message}`,
                         );
                     }
                 }

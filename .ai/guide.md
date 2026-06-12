@@ -102,6 +102,8 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 - **Smart Category** — `collection_type` column on `categories` (`manual`|`smart`), `rules` (JSON), `rules_match` (`all`|`any`); migration `2026_04_14_000008_add_smart_collection_to_categories_table.php`
 - **`SmartCollectionService`** (`app/Services/SmartCollectionService.php`) — `buildQuery(Category)`, `getMatchingProducts(Category)`, `countMatchingProducts(Category)`; supported fields: `price` (less/greater than cents), `brand_id`, `product_type_id`, `tag` (equals/not_equals name), `is_active`, `created_at` (after/before)
 - **Category model** — `rules` cast to array, `isSmartCollection(): bool`; `collection_type`, `rules`, `rules_match` allowed in FormRequests
+- **Category Attribute Schema (backend foundation)** — `category_attribute_schemas` table (`category_id`, `attribute_id`, `is_required`, `position`) with unique pair on category+attribute; `Category::attributeSchemas()` exposes direct rows and `Category::resolvedAttributeSchemas()` merges parent schema inheritance without inheriting product values
+- **Transition compatibility** — migration `2026_06_12_130000_create_category_attribute_schemas_table.php` backfills schema from `product_type_attributes` through `categories.product_type_id` but does not remove or disable legacy `ProductTypeAttribute`
 - **API**: `ProductController::byCategory()` uses `SmartCollectionService->buildQuery()` when `category->isSmartCollection()`
 - **Admin**: Category edit page has Collection Type radio (Manual/Smart) + `SmartCollectionBuilder` component (`resources/js/components/smart-collection-builder.tsx`) for rule editing; `smart_product_count` prop passed from controller
 

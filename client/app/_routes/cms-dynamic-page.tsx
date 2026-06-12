@@ -107,6 +107,7 @@ export async function generateDynamicPageMetadata({
 }): Promise<Metadata> {
     try {
         const resolved = await resolveDynamicPageParams({ locale, slug });
+        const i18nConfig = await getI18nConfig();
         const cookieStore = await cookies();
         const previewToken = cookieStore.get('page_preview_token')?.value;
         const page = await getPage(
@@ -167,7 +168,7 @@ export async function generateDynamicPageMetadata({
             resolved.locale,
             i18nConfig,
         );
-        if (page.seo_canonical) {
+        if (page.seo_canonical && alternates) {
             alternates.canonical = page.seo_canonical;
         }
 

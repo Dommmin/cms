@@ -43,6 +43,11 @@ class StoreCategoryRequest extends FormRequest
             'rules.*.condition' => ['nullable', 'string'],
             'rules.*.value' => ['nullable'],
             'rules_match' => ['sometimes', 'string', 'in:all,any'],
+            'attribute_schema' => ['sometimes', 'array'],
+            'attribute_schema.*' => ['array'],
+            'attribute_schema.*.attribute_id' => ['required', 'integer', 'exists:attributes,id'],
+            'attribute_schema.*.is_required' => ['sometimes', 'boolean'],
+            'attribute_schema.*.position' => ['sometimes', 'integer', 'min:0', 'max:255'],
         ];
     }
 
@@ -54,6 +59,16 @@ class StoreCategoryRequest extends FormRequest
                     if (Category::query()->where('slug->'.$locale, $slug)->exists()) {
                         $validator->errors()->add('slug.'.$locale, 'The slug must be unique for this locale.');
                     }
+                }
+            },
+            function (Validator $validator): void {
+                $attributeIds = collect($this->input('attribute_schema', []))
+                    ->pluck('attribute_id')
+                    ->filter()
+                    ->map(fn (mixed $id): int => (int) $id);
+
+                if ($attributeIds->duplicates()->isNotEmpty()) {
+                    $validator->errors()->add('attribute_schema', 'Attribute schema entries must be unique per category.');
                 }
             },
         ];
@@ -69,7 +84,7 @@ class StoreCategoryRequest extends FormRequest
         $slug = $this->input('slug');
         $slugInput = is_array($slug) ? $slug : [$defaultLocale => $slug];
 
-        $this->merge([
+        $payload = [
             'slug' => array_filter(
                 array_map(
                     fn (mixed $value): string => Str::slug((string) ($value ?: $nameForSlug)),
@@ -77,6 +92,22 @@ class StoreCategoryRequest extends FormRequest
                 ),
                 fn (string $value): bool => $value !== '',
             ),
-        ]);
+        ];
+
+        if (is_array($this->input('attribute_schema'))) {
+            $payload['attribute_schema'] = collect($this->input('attribute_schema', []))
+                ->filter(fn (mixed $row): bool => is_array($row) && filled($row['attribute_id'] ?? null))
+                ->values()
+                ->map(
+                    fn (array $row, int $index): array => [
+                        'attribute_id' => (int) $row['attribute_id'],
+                        'is_required' => filter_var($row['is_required'] ?? false, FILTER_VALIDATE_BOOL),
+                        'position' => isset($row['position']) ? (int) $row['position'] : $index,
+                    ]
+                )
+                ->all();
+        }
+
+        $this->merge($payload);
     }
 }

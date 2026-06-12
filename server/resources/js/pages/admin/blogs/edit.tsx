@@ -272,7 +272,6 @@ export default function EditBlog({ blog, users }: EditProps) {
                         </div>
                     )}
 
-
                     <div className="grid gap-2">
                         <Label htmlFor="position">
                             {__('label.position', 'Position')}

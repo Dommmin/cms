@@ -109,14 +109,14 @@ function parsePayload(body: string): CmsWebhookPayload | null {
 function getTags(payload: CmsWebhookPayload): Set<string> {
     const tags = new Set<string>();
     const slugs = getSlugs(payload);
-    
+
     const isProduct = payload.event?.startsWith('product');
     const isBlogPost = payload.event?.startsWith('blog_post');
 
     if (isProduct) {
         tags.add('products');
     }
-    
+
     if (isBlogPost) {
         tags.add('blog-posts');
     }
