@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\BlogPost;
+use App\Models\Metafield;
 use App\Models\Page;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
 use App\Observers\BlogPostObserver;
 use App\Observers\MediaObserver;
+use App\Observers\MetafieldObserver;
 use App\Observers\PageObserver;
 use App\Services\PushNotificationService;
 use Carbon\CarbonImmutable;
@@ -84,6 +86,7 @@ class AppServiceProvider extends ServiceProvider
         Page::observe(PageObserver::class);
         Media::observe(MediaObserver::class);
         BlogPost::observe(BlogPostObserver::class);
+        Metafield::observe(MetafieldObserver::class);
     }
 
     protected function configureRateLimiting(): void

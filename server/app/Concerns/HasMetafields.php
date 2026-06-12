@@ -31,13 +31,7 @@ trait HasMetafields
 
     public function setMetafield(string $namespace, string $key, string $type, mixed $value): Metafield
     {
-        $serialized = match ($type) {
-            'json' => json_encode($value),
-            'boolean' => $value ? 'true' : 'false',
-            'date' => $value instanceof Carbon ? $value->toDateString() : $value,
-            'datetime' => $value instanceof Carbon ? $value->toDateTimeString() : $value,
-            default => (string) $value,
-        };
+        $serialized = $this->serializeMetafieldValue($type, $value);
 
         return $this->metafields()->updateOrCreate(
             ['namespace' => $namespace, 'key' => $key],
@@ -70,5 +64,22 @@ trait HasMetafields
     public function getMetafieldsByNamespace(string $namespace): Collection
     {
         return $this->metafields()->where('namespace', $namespace)->get();
+    }
+
+    private function serializeMetafieldValue(string $type, mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return match ($type) {
+            'json' => is_string($value)
+                ? $value
+                : (string) json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 'true' : 'false',
+            'date' => $value instanceof Carbon ? $value->toDateString() : (string) $value,
+            'datetime' => $value instanceof Carbon ? $value->toDateTimeString() : (string) $value,
+            default => (string) $value,
+        };
     }
 }
