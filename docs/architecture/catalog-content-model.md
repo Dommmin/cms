@@ -814,3 +814,15 @@ Strategia:
 - listing response ma spójną strukturę
 - detail response rozdziela attributes / variant_options / variants / metafields
 - TS types storefrontu odpowiadają realnemu payloadowi
+
+## Release 5 implementation summary
+
+- Wdrożono `visibility` i `storefront_exposed` w `MetafieldDefinition` oraz migrację dla istniejących rekordów.
+- Dodano backendowy `MetafieldVisibilityService`, observer dla zmian metafields i kontrolę publicznej widoczności przez definicję, nie przez sam payload.
+- Admin formularze `Product`, `Category`, `Page` i `BlogPost` mają osobną sekcję `Metafields` opartą o definicje, z walidacją typów i bez mieszania z core fields, variants ani SEO.
+- Publiczne API zwraca tylko metafields jawnie publiczne (`storefront` lub `storefront_exposed=true`), a endpoint `GET /api/v1/metafields/{type}/{id}` nie ujawnia adminowych danych.
+- Storefront renderuje tylko allowlistowane metafields z dedykowanych komponentów; brak automatycznego renderowania całego zbioru.
+- Zmiana publicznego metafield invaliduje owner detail page przez webhook/revalidation; zmiana prywatnego metafield nie musi ruszać storefront cache.
+- Dodano testy dla zapisu metafields z formularzy admina, walidacji typów, filtrowania public API i braku automatycznego renderowania prywatnych danych.
+- Metafields nie powinny przechowywać: SKU, stock, price, compare_at_price, variant options, membership w kategoriach, core attributes, SEO core fields, tax/shipping data ani checkout-critical data.
+- Kolejny krok: doprecyzować allowlisty rendererów storefront dla konkretnych namespace/key pairs, jeśli pojawią się nowe publiczne use case’y.

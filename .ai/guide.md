@@ -109,12 +109,14 @@ Communication: REST API (`/api/v1/*`) + Inertia protocol for admin
 
 ### Metafields
 - **Metafields** — Shopify-like arbitrary key/value metadata on any model; `metafields` table (polymorphic `owner_type`/`owner_id`, `namespace`, `key`, `type`, `value`); types: string, integer, float, boolean, json, date, datetime, url, color, image, rich_text
-- **MetafieldDefinitions** — admin-managed schema definitions for metafields per owner type; `metafield_definitions` table; supports `pinned`, `position`, `validations`
+- **MetafieldDefinitions** — admin-managed schema definitions for metafields per owner type; `metafield_definitions` table; supports `visibility` (`private|admin_only|storefront`), `storefront_exposed`, `pinned`, `position`, `validations`
 - **`HasMetafields` trait** (`app/Concerns/HasMetafields.php`) — added to Product, BlogPost, Page, Category; methods: `metafields()`, `metafield()`, `getMetafield()`, `setMetafield()`, `deleteMetafield()`, `syncMetafields()`, `getMetafieldsByNamespace()`
 - **`Metafield` model** — `getCastedValue()` auto-casts value to correct PHP type
-- **API**: `GET /api/v1/metafields/{type}/{id}` — public, returns `MetafieldResource` collection with `casted_value`; types: product, blog-post, page, category
+- **Visibility service** — `app/Services/MetafieldVisibilityService.php` serializes definitions/current values, filters public metafields, and resolves owner revalidation paths/events
+- **API**: `GET /api/v1/metafields/{type}/{id}` — public, returns only public metafields (`visibility=storefront` or `storefront_exposed=true`) with `casted_value`; types: product, blog-post, page, category
 - **Admin CRUD** — `/admin/metafield-definitions` (index/create/edit/destroy), `/admin/metafields/{type}/{id}/sync` (POST)
-- **`MetafieldEditor` component** — reusable React component (`resources/js/components/metafield-editor.tsx`) embeddable in any admin edit form; grouped by namespace, type-specific inputs, add/delete, definition autocomplete
+- **Admin editing** — Product, Category, Page, and BlogPost forms have a dedicated advanced `Metafields` section using `MetafieldEditor`; controlled forms use definition-backed fields and type validation
+- **Storefront rendering** — storefront API exposes only public metafields, but UI renders only explicit allowlisted keys with dedicated components; private/admin-only data is not auto-rendered
 
 ### System / Infrastructure
 - **Settings** — 6 groups (general, mail, etc.), DB-driven, cached 1h, admin UI

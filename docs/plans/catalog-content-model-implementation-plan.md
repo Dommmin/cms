@@ -684,3 +684,14 @@ Powód:
 - nie przenosić wariantów do metafields ani odwrotnie
 - nie utrzymywać `ProductType` jako równoległego właściciela schema, jeśli `Category` przejmie tę rolę
 - nie wystawiać wszystkich metafields publicznie “na wszelki wypadek”
+
+## Release 5 implementation summary
+
+- Wdrożono extension layer dla metafields end-to-end: backend definitions, admin editing, validation, public exposure i selektywny storefront rendering.
+- Zmodyfikowane pliki obejmują m.in. `server/app/Models/MetafieldDefinition.php`, `server/app/Services/MetafieldVisibilityService.php`, `server/app/Observers/MetafieldObserver.php`, requesty admina dla Product/Category/Page/BlogPost, publiczne resource’y API oraz storefront helper `client/lib/metafields.ts`.
+- `visibility` działa jako źródło prawdy dla publicznej widoczności, a `storefront_exposed` działa jako jawny override dla public exposure bez otwierania całego admin payloadu.
+- Admin sekcja `Metafields` jest wydzielona od core fields, attributes, variants i SEO, a wartości są walidowane wg definicji.
+- Public API nie zwraca prywatnych ani admin-only metafields; storefront renderuje tylko allowlistowane klucze z dedykowanymi komponentami.
+- Dodano testy zapisów dla Product, Category, Page i BlogPost, testy typu/visibility, test filtrowania public API i test regresji na brak automatycznego renderowania prywatnych danych.
+- Guardrails pozostają bez zmian: metafields nie są zamiennikiem SKU, stock, price, compare_at_price, variant options, category membership, core product attributes, SEO core fields, tax/shipping data ani checkout-critical data.
+- Następny etap to rozszerzanie storefront allowlist o konkretne komponenty tylko wtedy, gdy biznesowo potrzebne i bezpieczne.
