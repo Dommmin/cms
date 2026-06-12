@@ -2,12 +2,18 @@
 
 declare(strict_types=1);
 
+use App\Jobs\DeliverWebhookJob;
 use App\Models\BlogPost;
+use App\Models\Category;
 use App\Models\Metafield;
 use App\Models\MetafieldDefinition;
+use App\Models\Page;
 use App\Models\Product;
+use App\Models\ProductType;
 use App\Models\User;
+use App\Models\Webhook;
 use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Support\Facades\Queue;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\seed;
@@ -169,15 +175,51 @@ it('forOwnerType scope filters correctly', function (): void {
 
 // ── API: GET /api/v1/metafields/{type}/{id} ──────────────────────────────────
 
-it('returns metafields via public API', function (): void {
+it('returns only public metafields via public API', function (): void {
     $product = Product::factory()->create();
-    $product->setMetafield('specs', 'weight', 'integer', 500);
-    $product->setMetafield('specs', 'color', 'string', 'blue');
+
+    MetafieldDefinition::query()->create([
+        'owner_type' => Product::class,
+        'namespace' => 'specs',
+        'key' => 'weight',
+        'name' => 'Weight',
+        'type' => 'integer',
+        'visibility' => 'storefront',
+        'storefront_exposed' => false,
+    ]);
+
+    MetafieldDefinition::query()->create([
+        'owner_type' => Product::class,
+        'namespace' => 'internal',
+        'key' => 'note',
+        'name' => 'Internal note',
+        'type' => 'string',
+        'visibility' => 'private',
+        'storefront_exposed' => false,
+    ]);
+
+    MetafieldDefinition::query()->create([
+        'owner_type' => Product::class,
+        'namespace' => 'internal',
+        'key' => 'admin_note',
+        'name' => 'Admin note',
+        'type' => 'string',
+        'visibility' => 'admin_only',
+        'storefront_exposed' => false,
+    ]);
+
+    $product->syncMetafields([
+        ['namespace' => 'specs', 'key' => 'weight', 'type' => 'integer', 'value' => 500],
+        ['namespace' => 'internal', 'key' => 'note', 'type' => 'string', 'value' => 'secret'],
+        ['namespace' => 'internal', 'key' => 'admin_note', 'type' => 'string', 'value' => 'admin secret'],
+    ]);
 
     $this->getJson('/api/v1/metafields/product/'.$product->id)
         ->assertSuccessful()
-        ->assertJsonCount(2)
-        ->assertJsonFragment(['namespace' => 'specs', 'key' => 'weight', 'type' => 'integer']);
+        ->assertJsonCount(1)
+        ->assertJsonFragment(['namespace' => 'specs', 'key' => 'weight', 'type' => 'integer'])
+        ->assertJsonMissing(['namespace' => 'internal', 'key' => 'note'])
+        ->assertJsonMissing(['namespace' => 'internal', 'key' => 'admin_note']);
 });
 
 it('returns 404 for unknown resource type via API', function (): void {
@@ -192,11 +234,43 @@ it('returns 404 for nonexistent resource via API', function (): void {
 
 it('returns casted_value in API response', function (): void {
     $product = Product::factory()->create();
+    MetafieldDefinition::query()->create([
+        'owner_type' => Product::class,
+        'namespace' => 'specs',
+        'key' => 'weight',
+        'name' => 'Weight',
+        'type' => 'integer',
+        'visibility' => 'storefront',
+        'storefront_exposed' => false,
+    ]);
     $product->setMetafield('specs', 'weight', 'integer', 500);
 
     $this->getJson('/api/v1/metafields/product/'.$product->id)
         ->assertSuccessful()
         ->assertJsonFragment(['casted_value' => 500]);
+});
+
+it('returns storefront_exposed metafields even when visibility is admin_only', function (): void {
+    $product = Product::factory()->create();
+
+    MetafieldDefinition::query()->create([
+        'owner_type' => Product::class,
+        'namespace' => 'marketing',
+        'key' => 'label',
+        'name' => 'Label',
+        'type' => 'string',
+        'visibility' => 'admin_only',
+        'storefront_exposed' => true,
+    ]);
+
+    $product->syncMetafields([
+        ['namespace' => 'marketing', 'key' => 'label', 'type' => 'string', 'value' => 'Public label'],
+    ]);
+
+    $this->getJson('/api/v1/metafields/product/'.$product->id)
+        ->assertSuccessful()
+        ->assertJsonCount(1)
+        ->assertJsonFragment(['namespace' => 'marketing', 'key' => 'label']);
 });
 
 // ── Admin: sync metafields ───────────────────────────────────────────────────
@@ -214,6 +288,212 @@ it('admin can sync metafields for a blog post', function (): void {
         ->assertRedirect();
 
     expect($post->getMetafield('seo', 'title'))->toBe('My Title');
+});
+
+it('admin can save metafields on product, category, page, and blog post forms', function (): void {
+    $productType = ProductType::factory()->create();
+    $category = Category::factory()->create();
+    $product = Product::factory()->create([
+        'product_type_id' => $productType->id,
+        'category_id' => $category->id,
+    ]);
+    $page = Page::factory()->create();
+    $post = BlogPost::factory()->draft()->create();
+
+    MetafieldDefinition::query()->create([
+        'owner_type' => Product::class,
+        'namespace' => 'marketing',
+        'key' => 'badge',
+        'name' => 'Badge',
+        'type' => 'string',
+        'visibility' => 'storefront',
+        'storefront_exposed' => false,
+    ]);
+    MetafieldDefinition::query()->create([
+        'owner_type' => Category::class,
+        'namespace' => 'display',
+        'key' => 'subtitle',
+        'name' => 'Subtitle',
+        'type' => 'string',
+        'visibility' => 'admin_only',
+        'storefront_exposed' => false,
+    ]);
+    MetafieldDefinition::query()->create([
+        'owner_type' => Page::class,
+        'namespace' => 'content',
+        'key' => 'note',
+        'name' => 'Note',
+        'type' => 'rich_text',
+        'visibility' => 'admin_only',
+        'storefront_exposed' => false,
+    ]);
+    MetafieldDefinition::query()->create([
+        'owner_type' => BlogPost::class,
+        'namespace' => 'content',
+        'key' => 'badge',
+        'name' => 'Badge',
+        'type' => 'string',
+        'visibility' => 'storefront',
+        'storefront_exposed' => false,
+    ]);
+
+    actingAs($this->user)
+        ->put(route('admin.ecommerce.products.update', $product), [
+            'name' => ['en' => 'Extension product'],
+            'slug' => ['en' => 'extension-product'],
+            'description' => ['en' => 'Description'],
+            'short_description' => ['en' => 'Short description'],
+            'sku_prefix' => 'EXT',
+            'product_type_id' => $productType->id,
+            'category_id' => $category->id,
+            'brand_id' => null,
+            'is_active' => true,
+            'is_saleable' => true,
+            'is_featured' => false,
+            'seo_title' => null,
+            'seo_description' => null,
+            'variant' => [
+                'id' => $product->defaultVariant?->id,
+                'sku' => 'EXT-001',
+                'price' => 1000,
+                'is_active' => true,
+            ],
+            'categories' => [],
+            'flags' => [],
+            'images' => [],
+            'metafields' => [
+                ['namespace' => 'marketing', 'key' => 'badge', 'type' => 'string', 'value' => 'Featured'],
+            ],
+        ])
+        ->assertRedirect();
+
+    actingAs($this->user)
+        ->put(route('admin.ecommerce.categories.update', $category), [
+            'name' => ['en' => 'Extension category'],
+            'slug' => ['en' => 'extension-category'],
+            'description' => ['en' => 'Category description'],
+            'parent_id' => null,
+            'is_active' => true,
+            'metafields' => [
+                ['namespace' => 'display', 'key' => 'subtitle', 'type' => 'string', 'value' => 'Category subtitle'],
+            ],
+        ])
+        ->assertRedirect();
+
+    actingAs($this->user)
+        ->put(route('admin.cms.pages.update', $page), [
+            'title' => ['en' => 'Extension page'],
+            'slug' => ['en' => 'extension-page'],
+            'layout' => 'default',
+            'page_type' => 'blocks',
+            'module_name' => '',
+            'system_page_key' => '',
+            'seo_title' => null,
+            'seo_description' => null,
+            'seo_canonical' => null,
+            'metafields' => [
+                ['namespace' => 'content', 'key' => 'note', 'type' => 'rich_text', 'value' => '<p>Page note</p>'],
+            ],
+        ])
+        ->assertRedirect();
+
+    actingAs($this->user)
+        ->put(route('admin.blog.posts.update', $post), [
+            'title' => ['en' => 'Extension post'],
+            'slug' => ['en' => 'extension-post'],
+            'excerpt' => ['en' => 'Excerpt'],
+            'content' => ['en' => 'Post content'],
+            'content_json' => ['en' => '{}'],
+            'content_type' => 'richtext',
+            'status' => 'draft',
+            'published_at' => null,
+            'blog_category_id' => null,
+            'tags' => [],
+            'available_locales' => null,
+            'is_featured' => false,
+            'featured_image' => null,
+            'seo_title' => null,
+            'seo_description' => null,
+            'metafields' => [
+                ['namespace' => 'content', 'key' => 'badge', 'type' => 'string', 'value' => 'New'],
+            ],
+        ])
+        ->assertRedirect();
+
+    expect($product->fresh()->getMetafield('marketing', 'badge'))->toBe('Featured')
+        ->and($category->fresh()->getMetafield('display', 'subtitle'))->toBe('Category subtitle')
+        ->and($page->fresh()->getMetafield('content', 'note'))->toBe('<p>Page note</p>')
+        ->and($post->fresh()->getMetafield('content', 'badge'))->toBe('New');
+});
+
+it('validates metafield values by type', function (): void {
+    $productType = ProductType::factory()->create();
+    $category = Category::factory()->create();
+    MetafieldDefinition::query()->create([
+        'owner_type' => Product::class,
+        'namespace' => 'specs',
+        'key' => 'weight',
+        'name' => 'Weight',
+        'type' => 'integer',
+        'visibility' => 'admin_only',
+        'storefront_exposed' => false,
+    ]);
+
+    actingAs($this->user)
+        ->post(route('admin.ecommerce.products.store'), [
+            'name' => ['en' => 'Validation product'],
+            'slug' => ['en' => 'validation-product'],
+            'description' => ['en' => 'Description'],
+            'short_description' => ['en' => 'Short description'],
+            'sku_prefix' => 'VAL',
+            'product_type_id' => $productType->id,
+            'category_id' => $category->id,
+            'brand_id' => null,
+            'is_active' => true,
+            'is_saleable' => true,
+            'is_featured' => false,
+            'seo_title' => null,
+            'seo_description' => null,
+            'variant' => [
+                'sku' => 'VAL-001',
+                'price' => 1000,
+                'is_active' => true,
+            ],
+            'categories' => [],
+            'flags' => [],
+            'images' => [],
+            'metafields' => [
+                ['namespace' => 'specs', 'key' => 'weight', 'type' => 'integer', 'value' => 'not-a-number'],
+            ],
+        ])
+        ->assertSessionHasErrors(['metafields.0.value']);
+});
+
+it('dispatches webhook revalidation for public metafield changes', function (): void {
+    Queue::fake();
+
+    $product = Product::factory()->create();
+
+    MetafieldDefinition::query()->create([
+        'owner_type' => Product::class,
+        'namespace' => 'marketing',
+        'key' => 'badge',
+        'name' => 'Badge',
+        'type' => 'string',
+        'visibility' => 'storefront',
+        'storefront_exposed' => false,
+    ]);
+
+    Webhook::factory()->create([
+        'events' => ['product.updated'],
+        'is_active' => true,
+    ]);
+
+    $product->syncMetafields([
+        ['namespace' => 'marketing', 'key' => 'badge', 'type' => 'string', 'value' => 'Featured'],
+    ]);
+
+    Queue::assertPushed(DeliverWebhookJob::class, fn (DeliverWebhookJob $job): bool => $job->event === 'product.updated');
 });
 
 // ── Admin: MetafieldDefinition CRUD ─────────────────────────────────────────
