@@ -44,6 +44,7 @@ class DatabaseSeeder extends Seeder
             EmailTemplateSeeder::class,
             AnalyticsEventSeeder::class,
             OrderDemoSeeder::class,
+            EcommerceRelationSeeder::class,
         ]);
 
         // ── Newsletter (seeded only when module is active) ───────────────────
