@@ -11,6 +11,7 @@ import { useSubscribeStock } from '@/hooks/use-products';
 import { CompareButton } from '@/components/compare-button';
 import { LiveViewers } from '@/components/live-viewers';
 import { ProductCard } from '@/components/product-card';
+import { getRenderableMetafields } from '@/lib/metafields';
 import { getProductSpecificationEntries } from '@/lib/product-attributes';
 import { sanitizeHtml } from '@/lib/sanitize';
 import type {
@@ -456,6 +457,10 @@ export function ProductTabs({
         trueLabel: labels.yes,
         falseLabel: labels.no,
     });
+    const renderableMetafields = getRenderableMetafields(
+        'product',
+        product.metafields,
+    );
 
     return (
         <div className="mt-12">
@@ -521,6 +526,39 @@ export function ProductTabs({
                                         </div>
                                     ))}
                                 </dl>
+                            </section>
+                        )}
+
+                        {renderableMetafields.length > 0 && (
+                            <section className="border-border bg-card rounded-[var(--store-card-radius)] border">
+                                <div className="border-border border-b px-5 py-4">
+                                    <h2 className="text-base font-semibold">
+                                        Extra details
+                                    </h2>
+                                </div>
+                                <div className="space-y-4 px-5 py-4">
+                                    {renderableMetafields.map((metafield) => (
+                                        <div
+                                            key={`${metafield.namespace}::${metafield.key}`}
+                                        >
+                                            <p className="text-muted-foreground text-sm font-medium">
+                                                {metafield.label}
+                                            </p>
+                                            {metafield.html ? (
+                                                <div
+                                                    className="prose prose-sm mt-2"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: metafield.html,
+                                                    }}
+                                                />
+                                            ) : (
+                                                <p className="mt-1 text-sm">
+                                                    {metafield.value}
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </section>
                         )}
 

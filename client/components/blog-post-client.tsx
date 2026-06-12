@@ -8,6 +8,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { JsonLd } from '@/components/json-ld';
 import { enrichArticleHtml } from '@/lib/blog-content';
 import { localePath } from '@/lib/i18n';
+import { getRenderableMetafields } from '@/lib/metafields';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { buildBlogPosting, buildBreadcrumbList } from '@/lib/schema';
 import { absoluteUrl, localizedBlogPath } from '@/lib/seo';
@@ -28,6 +29,10 @@ export function BlogPostClient({
     );
     const articleUrl = post.canonical_url ?? absoluteUrl(locale, articlePath);
     const { html, toc } = enrichArticleHtml(sanitizeHtml(post.content));
+    const renderableMetafields = getRenderableMetafields(
+        'blog_post',
+        post.metafields,
+    );
 
     return (
         <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -146,6 +151,35 @@ export function BlogPostClient({
                 className="prose prose-lg mt-8"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
             />
+
+            {renderableMetafields.length > 0 && (
+                <section className="border-border mt-8 rounded-xl border p-5">
+                    <h2 className="text-xl font-semibold">Extra details</h2>
+                    <div className="mt-4 space-y-4">
+                        {renderableMetafields.map((metafield) => (
+                            <div
+                                key={`${metafield.namespace}::${metafield.key}`}
+                            >
+                                <p className="text-muted-foreground text-sm font-medium">
+                                    {metafield.label}
+                                </p>
+                                {metafield.html ? (
+                                    <div
+                                        className="prose prose-sm mt-2"
+                                        dangerouslySetInnerHTML={{
+                                            __html: metafield.html,
+                                        }}
+                                    />
+                                ) : (
+                                    <p className="mt-1 text-sm">
+                                        {metafield.value}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {post.author && (
                 <aside className="border-border mt-10 border-t pt-6">

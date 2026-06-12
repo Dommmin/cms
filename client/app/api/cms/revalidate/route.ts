@@ -19,9 +19,11 @@ type CmsWebhookPayload = {
 const ALLOWED_EVENTS = new Set([
     'page.published',
     'page.unpublished',
+    'page.updated',
     'product.published',
     'product.unpublished',
     'product.updated',
+    'category.updated',
     'blog_post.published',
     'blog_post.unpublished',
     'blog_post.updated',
@@ -112,9 +114,14 @@ function getTags(payload: CmsWebhookPayload): Set<string> {
 
     const isProduct = payload.event?.startsWith('product');
     const isBlogPost = payload.event?.startsWith('blog_post');
+    const isCategory = payload.event?.startsWith('category');
 
     if (isProduct) {
         tags.add('products');
+    }
+
+    if (isCategory) {
+        tags.add('categories');
     }
 
     if (isBlogPost) {
@@ -124,6 +131,8 @@ function getTags(payload: CmsWebhookPayload): Set<string> {
     for (const slug of slugs) {
         if (isProduct) {
             tags.add(`product:${slug}`);
+        } else if (isCategory) {
+            tags.add(`category:${slug}`);
         } else if (isBlogPost) {
             tags.add(`blog-post:${slug}`);
         } else {

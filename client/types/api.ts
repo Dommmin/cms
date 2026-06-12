@@ -43,6 +43,16 @@ export interface ProductAvailableFilters {
     attributes: ProductAttributeFilter[];
 }
 
+export interface Metafield {
+    id: number;
+    namespace: string;
+    key: string;
+    type: string;
+    value: string | null;
+    description: string | null;
+    casted_value: string | number | boolean | Record<string, unknown> | null;
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export interface User {
@@ -205,6 +215,7 @@ export interface Product {
     attribute_map?: Record<string, string[]>;
     /** Active promotions attached to this product (when loaded) */
     active_promotions?: Array<{ id: number; name: string; type: string }>;
+    metafields?: Metafield[];
     product_type_id?: number | null;
     created_at: string;
     seo_title: string | null;
@@ -232,6 +243,7 @@ export interface Category {
     meta_robots?: string;
     og_image?: string | null;
     sitemap_exclude?: boolean;
+    metafields?: Metafield[];
 }
 
 export interface CategoryShowResponse {
@@ -690,6 +702,7 @@ export interface BlogPost {
     meta_robots: string;
     og_image: string | null;
     sitemap_exclude: boolean;
+    metafields?: Metafield[];
     created_at: string;
     updated_at: string;
 }
@@ -823,6 +836,7 @@ export interface Page {
     meta_robots: string;
     og_image: string | null;
     sitemap_exclude: boolean;
+    metafields?: Metafield[];
     sections: PageSection[];
     children?: Page[];
 }
