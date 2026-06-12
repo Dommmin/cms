@@ -39,8 +39,6 @@ export default function CreateBlog({ users }: CreateProps) {
         layout: 'grid',
         commentable: true,
         default_author_id: '',
-        seo_title: '',
-        seo_description: '',
         is_active: true,
         position: 0,
     });
@@ -78,8 +76,6 @@ export default function CreateBlog({ users }: CreateProps) {
                 layout: data.layout,
                 commentable: data.commentable,
                 default_author_id: data.default_author_id || null,
-                seo_title: data.seo_title || null,
-                seo_description: data.seo_description || null,
                 is_active: data.is_active,
                 position: data.position,
             },
@@ -268,42 +264,6 @@ export default function CreateBlog({ users }: CreateProps) {
                         </div>
                     )}
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="seo_title">
-                            {__('label.seo_title', 'SEO Title')}
-                        </Label>
-                        <Input
-                            id="seo_title"
-                            value={data.seo_title}
-                            onChange={(e) =>
-                                setData((prev) => ({
-                                    ...prev,
-                                    seo_title: e.target.value,
-                                }))
-                            }
-                            placeholder="SEO title"
-                        />
-                        <InputError message={errors.seo_title} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="seo_description">
-                            {__('label.seo_description', 'SEO Description')}
-                        </Label>
-                        <Textarea
-                            id="seo_description"
-                            value={data.seo_description}
-                            onChange={(e) =>
-                                setData((prev) => ({
-                                    ...prev,
-                                    seo_description: e.target.value,
-                                }))
-                            }
-                            placeholder="SEO description"
-                            rows={2}
-                        />
-                        <InputError message={errors.seo_description} />
-                    </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="position">

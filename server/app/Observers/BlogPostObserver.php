@@ -6,6 +6,7 @@ namespace App\Observers;
 
 use App\Enums\BlogPostStatusEnum;
 use App\Models\BlogPost;
+use App\Services\StorefrontPathService;
 use App\Services\WebhookService;
 
 class BlogPostObserver
@@ -34,7 +35,13 @@ class BlogPostObserver
     private function dispatchBlogWebhook(BlogPost $post, string $event): void
     {
         $frontendUrl = mb_rtrim((string) config('app.frontend_url', ''), '/');
-        $path = '/blog/'.$post->slug;
+        $storefrontPathService = resolve(StorefrontPathService::class);
+        $path = $storefrontPathService->blogPostPath($post, config('app.locale'));
+
+        $paths = [];
+        foreach (array_keys($post->getTranslations('slug')) as $locale) {
+            $paths[$locale] = $storefrontPathService->blogPostPath($post, $locale);
+        }
 
         $payload = [
             'type' => 'blog_post',
@@ -43,6 +50,7 @@ class BlogPostObserver
             'slug' => $post->slug,
             'slug_translations' => $post->getTranslations('slug'),
             'path' => $path,
+            'paths' => $paths,
             'url' => $frontendUrl !== '' ? $frontendUrl.$path : $path,
             'status' => $post->status instanceof BlogPostStatusEnum ? $post->status->value : (string) $post->status,
             'published_at' => $post->published_at?->toIso8601String(),

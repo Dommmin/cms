@@ -201,6 +201,12 @@ export interface Category {
     parent_id: number | null;
     public_url?: string | null;
     children?: Category[];
+    seo_title?: string | null;
+    seo_description?: string | null;
+    canonical_url?: string | null;
+    meta_robots?: string;
+    og_image?: string | null;
+    sitemap_exclude?: boolean;
 }
 
 export interface CategoryShowResponse {

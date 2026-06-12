@@ -12,6 +12,7 @@ final readonly class PagePublicationWebhookService
 {
     public function __construct(
         private WebhookService $webhookService,
+        private StorefrontPathService $storefrontPathService,
     ) {}
 
     public function dispatchPublished(Page $page, string $source): void
@@ -31,7 +32,12 @@ final readonly class PagePublicationWebhookService
     private function payload(Page $page, string $source): array
     {
         $frontendUrl = mb_rtrim((string) config('app.frontend_url', ''), '/');
-        $path = '/'.$page->slug;
+        $path = $this->storefrontPathService->pagePath($page, config('app.locale'));
+
+        $paths = [];
+        foreach (array_keys($page->getTranslations('slug')) as $locale) {
+            $paths[$locale] = $this->storefrontPathService->pagePath($page, $locale);
+        }
 
         return [
             'type' => 'page',
@@ -40,6 +46,7 @@ final readonly class PagePublicationWebhookService
             'slug' => $page->slug,
             'slug_translations' => $page->getTranslations('slug'),
             'path' => $path,
+            'paths' => $paths,
             'url' => $frontendUrl !== '' ? $frontendUrl.$path : $path,
             'is_published' => $page->is_published,
             'published_at' => $page->published_at?->toIso8601String(),

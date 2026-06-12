@@ -15,12 +15,21 @@ export async function generateCategoryMetadata({
         const response = await getCategory(slug);
         const category = response.category;
 
+        const title = category.seo_title || category.name;
+        const description = category.seo_description || category.description;
+        const canonical = category.canonical_url || category.public_url;
+
         return {
-            title: category.name,
-            description: category.description ?? undefined,
-            robots: 'index, follow',
-            alternates: category.public_url
-                ? generateAlternates(category.public_url, locale ?? 'en')
+            title,
+            description: description ?? undefined,
+            robots: category.meta_robots ?? 'index, follow',
+            alternates: canonical
+                ? generateAlternates(canonical, locale ?? 'en')
+                : undefined,
+            openGraph: category.og_image
+                ? {
+                      images: [{ url: category.og_image }],
+                  }
                 : undefined,
         };
     } catch {

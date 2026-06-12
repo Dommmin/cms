@@ -35,10 +35,37 @@ function sitemapEntry(
     };
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export async function generateSitemaps() {
+    const sitemaps = [{ id: 'static' }];
+
+    try {
+        const products = await serverFetch<PaginatedResponse<Product>>('/products?per_page=500');
+        const totalProductPages = products.meta?.last_page ?? 1;
+        for (let i = 1; i <= totalProductPages; i++) {
+            sitemaps.push({ id: `products-${i}` });
+        }
+    } catch {}
+
+    try {
+        const blogs = await serverFetch<PaginatedResponse<BlogPost>>('/blog/posts?per_page=500');
+        const totalBlogPages = blogs.meta?.last_page ?? 1;
+        for (let i = 1; i <= totalBlogPages; i++) {
+            sitemaps.push({ id: `blogs-${i}` });
+        }
+    } catch {}
+
+    return sitemaps;
+}
+
+export default async function sitemap({
+    id,
+}: {
+    id: string;
+}): Promise<MetadataRoute.Sitemap> {
     const i18nConfig = await getI18nConfig();
     const defaultLocale = i18nConfig.defaultLocale;
     const entries: MetadataRoute.Sitemap = [];
+
     const [productListingPage, faqPage, blogListingPages] = await Promise.all([
         getSystemPage('product_listing', defaultLocale).catch(() => null),
         getSystemPage('faq_page', defaultLocale).catch(() => null),
@@ -55,129 +82,131 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const blogListingPathByLocale = Object.fromEntries(blogListingPages);
     const blogListingPath = blogListingPathByLocale[defaultLocale] ?? '/blog';
 
-    // Static pages
-    entries.push(
-        sitemapEntry(i18nConfig, '/', defaultLocale, undefined, 'daily', 1.0),
-    );
-    if (productListingPath) {
+    if (id === 'static') {
+        // Static pages
         entries.push(
-            sitemapEntry(
-                i18nConfig,
-                productListingPath,
-                defaultLocale,
-                undefined,
-                'daily',
-                0.9,
-            ),
+            sitemapEntry(i18nConfig, '/', defaultLocale, undefined, 'daily', 1.0),
         );
-    }
-    entries.push(
-        sitemapEntry(
-            i18nConfig,
-            blogListingPath,
-            defaultLocale,
-            undefined,
-            'daily',
-            0.8,
-        ),
-    );
-    entries.push(
-        sitemapEntry(
-            i18nConfig,
-            faqPath,
-            defaultLocale,
-            undefined,
-            'monthly',
-            0.5,
-        ),
-    );
-
-    // Products
-    try {
-        const products = await serverFetch<PaginatedResponse<Product>>(
-            '/products?per_page=100',
-        );
-        for (const product of products.data.filter(
-            (p) => !p.sitemap_exclude && !!p.public_url,
-        )) {
-            const d = product.created_at ? new Date(product.created_at) : null;
+        if (productListingPath) {
             entries.push(
                 sitemapEntry(
                     i18nConfig,
-                    product.public_url!,
+                    productListingPath,
                     defaultLocale,
-                    d && !isNaN(d.getTime()) ? d : new Date(),
-                    'weekly',
-                    0.8,
+                    undefined,
+                    'daily',
+                    0.9,
                 ),
             );
         }
-    } catch {
-        // skip if API unavailable during build
-    }
-
-    // Blog posts
-    try {
-        const localeResponses = await Promise.all(
-            i18nConfig.locales.map((locale) =>
-                serverFetch<PaginatedResponse<BlogPost>>(
-                    '/blog/posts?per_page=100',
-                    { locale },
-                ),
+        entries.push(
+            sitemapEntry(
+                i18nConfig,
+                blogListingPath,
+                defaultLocale,
+                undefined,
+                'daily',
+                0.8,
             ),
         );
-        const posts = new Map<number, BlogPost>();
-        for (const response of localeResponses) {
-            for (const post of response.data) {
-                posts.set(post.id, post);
-            }
-        }
+        entries.push(
+            sitemapEntry(
+                i18nConfig,
+                faqPath,
+                defaultLocale,
+                undefined,
+                'monthly',
+                0.5,
+            ),
+        );
+    }
 
-        for (const post of [...posts.values()].filter(
-            (p) => !p.sitemap_exclude,
-        )) {
-            for (const locale of i18nConfig.locales) {
-                if (!post.available_locales.includes(locale)) {
-                    continue;
-                }
-
+    if (id.startsWith('products-')) {
+        const page = parseInt(id.replace('products-', ''), 10);
+        try {
+            const products = await serverFetch<PaginatedResponse<Product>>(
+                `/products?per_page=500&page=${page}`,
+            );
+            for (const product of products.data.filter(
+                (p) => !p.sitemap_exclude && !!p.public_url,
+            )) {
+                const d = product.created_at ? new Date(product.created_at) : null;
                 entries.push(
                     sitemapEntry(
                         i18nConfig,
-                        post.public_url ??
-                            localizedBlogPath(
-                                locale,
-                                post.slug_translations,
-                                post.canonical_slug,
-                                blogListingPathByLocale[locale] ??
-                                    blogListingPath,
-                            ),
-                        locale,
-                        post.updated_at
-                            ? new Date(post.updated_at)
-                            : new Date(),
-                        'monthly',
-                        0.7,
-                        Object.fromEntries(
-                            i18nConfig.locales.map((availableLocale) => [
-                                availableLocale,
-                                post.public_url ??
-                                    localizedBlogPath(
-                                        availableLocale,
-                                        post.slug_translations,
-                                        post.canonical_slug,
-                                        blogListingPathByLocale[
-                                            availableLocale
-                                        ] ?? blogListingPath,
-                                    ),
-                            ]),
-                        ),
+                        product.public_url!,
+                        defaultLocale,
+                        d && !isNaN(d.getTime()) ? d : new Date(),
+                        'weekly',
+                        0.8,
                     ),
                 );
             }
-        }
-    } catch {
-        // skip if API unavailable during build
+        } catch {}
+    }
+
+    if (id.startsWith('blogs-')) {
+        const page = parseInt(id.replace('blogs-', ''), 10);
+        try {
+            const localeResponses = await Promise.all(
+                i18nConfig.locales.map((locale) =>
+                    serverFetch<PaginatedResponse<BlogPost>>(
+                        `/blog/posts?per_page=500&page=${page}`,
+                        { locale },
+                    ),
+                ),
+            );
+            const posts = new Map<number, BlogPost>();
+            for (const response of localeResponses) {
+                for (const post of response.data) {
+                    posts.set(post.id, post);
+                }
+            }
+
+            for (const post of [...posts.values()].filter(
+                (p) => !p.sitemap_exclude,
+            )) {
+                for (const locale of i18nConfig.locales) {
+                    if (!post.available_locales.includes(locale)) {
+                        continue;
+                    }
+
+                    entries.push(
+                        sitemapEntry(
+                            i18nConfig,
+                            post.public_url ??
+                                localizedBlogPath(
+                                    locale,
+                                    post.slug_translations,
+                                    post.canonical_slug,
+                                    blogListingPathByLocale[locale] ??
+                                        blogListingPath,
+                                ),
+                            locale,
+                            post.updated_at
+                                ? new Date(post.updated_at)
+                                : new Date(),
+                            'monthly',
+                            0.7,
+                            Object.fromEntries(
+                                i18nConfig.locales.map((availableLocale) => [
+                                    availableLocale,
+                                    post.public_url ??
+                                        localizedBlogPath(
+                                            availableLocale,
+                                            post.slug_translations,
+                                            post.canonical_slug,
+                                            blogListingPathByLocale[
+                                                availableLocale
+                                            ] ?? blogListingPath,
+                                        ),
+                                ]),
+                            ),
+                        ),
+                    );
+                }
+            }
+        } catch {}
     }
 
     return entries;

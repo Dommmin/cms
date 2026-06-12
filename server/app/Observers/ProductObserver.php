@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\Product;
+use App\Services\StorefrontPathService;
 use App\Services\WebhookService;
 use Illuminate\Support\Facades\Cache;
 
@@ -38,7 +39,13 @@ class ProductObserver
     private function dispatchProductWebhook(Product $product, string $event): void
     {
         $frontendUrl = mb_rtrim((string) config('app.frontend_url', ''), '/');
-        $path = '/products/'.$product->slug;
+        $storefrontPathService = resolve(StorefrontPathService::class);
+        $path = $storefrontPathService->productPath($product, config('app.locale'));
+
+        $paths = [];
+        foreach (array_keys($product->getTranslations('slug')) as $locale) {
+            $paths[$locale] = $storefrontPathService->productPath($product, $locale);
+        }
 
         $payload = [
             'type' => 'product',
@@ -47,6 +54,7 @@ class ProductObserver
             'slug' => $product->slug,
             'slug_translations' => $product->getTranslations('slug'),
             'path' => $path,
+            'paths' => $paths,
             'url' => $frontendUrl !== '' ? $frontendUrl.$path : $path,
             'is_active' => $product->is_active,
             'updated_at' => $product->updated_at?->toIso8601String(),

@@ -178,7 +178,6 @@ export function usePageColumns(): ColumnDef<PageRow>[] {
                             </DropdownMenuItem>
                         )}
                         <ConfirmButton
-                            variant="ghost"
                             size="sm"
                             className="w-full justify-start px-2 text-destructive hover:text-destructive"
                             title={__('dialog.delete_title', 'Delete Page')}

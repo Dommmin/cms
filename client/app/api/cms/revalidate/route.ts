@@ -12,10 +12,20 @@ type CmsWebhookPayload = {
         slug?: string;
         slug_translations?: Record<string, string>;
         path?: string;
+        paths?: Record<string, string>;
     };
 };
 
-const PAGE_EVENTS = new Set(['page.published', 'page.unpublished']);
+const ALLOWED_EVENTS = new Set([
+    'page.published',
+    'page.unpublished',
+    'product.published',
+    'product.unpublished',
+    'product.updated',
+    'blog_post.published',
+    'blog_post.unpublished',
+    'blog_post.updated',
+]);
 
 export async function POST(request: NextRequest) {
     const secret = process.env.CMS_REVALIDATION_SECRET;
@@ -38,15 +48,15 @@ export async function POST(request: NextRequest) {
 
     const payload = parsePayload(body);
 
-    if (!payload || !payload.event || !PAGE_EVENTS.has(payload.event)) {
+    if (!payload || !payload.event || !ALLOWED_EVENTS.has(payload.event)) {
         return NextResponse.json(
             { error: 'Unsupported webhook event' },
             { status: 400 },
         );
     }
 
-    const tags = getPageTags(payload);
-    const paths = getPagePaths(payload);
+    const tags = getTags(payload);
+    const paths = getPaths(payload);
 
     for (const tag of tags) {
         revalidateTag(tag, 'max');
@@ -96,18 +106,35 @@ function parsePayload(body: string): CmsWebhookPayload | null {
     }
 }
 
-function getPageTags(payload: CmsWebhookPayload): Set<string> {
+function getTags(payload: CmsWebhookPayload): Set<string> {
     const tags = new Set<string>();
     const slugs = getSlugs(payload);
+    
+    const isProduct = payload.event?.startsWith('product');
+    const isBlogPost = payload.event?.startsWith('blog_post');
+
+    if (isProduct) {
+        tags.add('products');
+    }
+    
+    if (isBlogPost) {
+        tags.add('blog-posts');
+    }
 
     for (const slug of slugs) {
-        tags.add(`page:${slug}`);
+        if (isProduct) {
+            tags.add(`product:${slug}`);
+        } else if (isBlogPost) {
+            tags.add(`blog-post:${slug}`);
+        } else {
+            tags.add(`page:${slug}`);
+        }
     }
 
     return tags;
 }
 
-function getPagePaths(payload: CmsWebhookPayload): Set<string> {
+function getPaths(payload: CmsWebhookPayload): Set<string> {
     const paths = new Set<string>();
     const data = payload.data;
 
@@ -115,14 +142,21 @@ function getPagePaths(payload: CmsWebhookPayload): Set<string> {
         paths.add(normalizePath(data.path));
     }
 
-    if (data?.slug) {
-        paths.add(normalizePath(data.slug));
-    }
+    if (data?.paths) {
+        for (const path of Object.values(data.paths)) {
+            paths.add(normalizePath(path));
+        }
+    } else {
+        // Fallback for older payloads
+        if (data?.slug) {
+            paths.add(normalizePath(data.slug));
+        }
 
-    for (const [locale, slug] of Object.entries(
-        data?.slug_translations ?? {},
-    )) {
-        paths.add(normalizePath(`${locale}/${slug}`));
+        for (const [locale, slug] of Object.entries(
+            data?.slug_translations ?? {},
+        )) {
+            paths.add(normalizePath(`${locale}/${slug}`));
+        }
     }
 
     return paths;
