@@ -176,7 +176,7 @@ export function FaqClientModule({
                         {pageTitle || texts.title}
                     </h1>
                     <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed">
-                        {pageExcerpt || texts.description}
+                        {pageExcerpt ?? texts.description}
                     </p>
                 </div>
 

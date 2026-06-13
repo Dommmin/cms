@@ -155,7 +155,7 @@ class BlogPost extends Model
     public array $translatable = ['title', 'slug', 'excerpt', 'content', 'seo_title', 'seo_description'];
 
     /** @var array<int, string> */
-    protected array $htmlAttributes = ['content', 'excerpt'];
+    protected array $htmlAttributes = ['content'];
 
     /** @var array<int, string> */
     protected array $versionedAttributes = [

@@ -179,7 +179,7 @@ class Page extends Model
     public array $translatable = ['title', 'slug', 'excerpt', 'content', 'rich_content'];
 
     /** @var array<int, string> */
-    protected array $htmlAttributes = ['content', 'rich_content', 'excerpt'];
+    protected array $htmlAttributes = ['content', 'rich_content'];
 
     /**
      * Find a published page by path segments (e.g. ['parent', 'child'] for URL /parent/child).

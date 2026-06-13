@@ -52,6 +52,14 @@ class PagesDemoSeeder extends Seeder
             ->when($locale !== 'en', fn ($query) => $query->where('locale', $locale))
             ->first() ?? new Page;
 
+        if (! array_key_exists('excerpt', $attributes)) {
+            $seoDescription = $attributes['seo_description'] ?? null;
+
+            if (is_string($seoDescription) && $seoDescription !== '') {
+                $attributes['excerpt'] = [$locale => $seoDescription];
+            }
+        }
+
         $attributes['slug'] = array_merge($page->getTranslations('slug'), [$locale => $slug]);
         $attributes['locale'] = $locale === 'en' ? null : $locale;
 
