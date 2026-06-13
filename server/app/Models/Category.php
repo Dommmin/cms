@@ -227,7 +227,7 @@ class Category extends Model
             : collect();
 
         $directSchemas = $this->attributeSchemas()
-            ->with('attribute')
+            ->with('attribute.values')
             ->get()
             ->map(function ($schema): CategoryAttributeSchema {
                 /** @var CategoryAttributeSchema $schema */
