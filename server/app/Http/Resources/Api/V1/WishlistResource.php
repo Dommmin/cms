@@ -6,6 +6,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Models\Wishlist;
 use App\Models\WishlistItem;
+use App\Services\StorefrontPathService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -32,7 +33,14 @@ class WishlistResource extends JsonResource
                     'id' => $variant->product->id,
                     'name' => $variant->product->name,
                     'slug' => $variant->product->slug,
-                    'thumbnail' => null,
+                    'public_url' => resolve(StorefrontPathService::class)->productPath($variant->product),
+                    'thumbnail' => ($thumbnail = $variant->product->relationLoaded('thumbnail') ? $variant->product->thumbnail : null) ? [
+                        'id' => $thumbnail->id,
+                        'url' => $thumbnail->path,
+                        'thumb_url' => $thumbnail->path,
+                        'alt' => $thumbnail->alt_text ?? $variant->product->name,
+                        'position' => $thumbnail->position,
+                    ] : null,
                 ] : null,
                 'variant' => (function () use ($variant): array {
                     $isOnSale = $variant->compare_at_price && $variant->compare_at_price > $variant->price;

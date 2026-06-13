@@ -22,7 +22,7 @@ class WishlistController extends ApiController
             $user,
             $request->header('X-Wishlist-Token'),
         );
-        $wishlist->load('items.variant.product');
+        $wishlist->load('items.variant.product.thumbnail');
 
         $response = $this->ok(new WishlistResource($wishlist));
 
@@ -50,7 +50,7 @@ class WishlistController extends ApiController
             ]);
         }
 
-        $wishlist->load('items.variant.product');
+        $wishlist->load('items.variant.product.thumbnail');
 
         $response = $this->ok(new WishlistResource($wishlist));
 
@@ -71,7 +71,7 @@ class WishlistController extends ApiController
         );
 
         $wishlist->items()->where('product_variant_id', $variantId)->delete();
-        $wishlist->load('items.variant.product');
+        $wishlist->load('items.variant.product.thumbnail');
 
         $response = $this->ok(new WishlistResource($wishlist));
 
