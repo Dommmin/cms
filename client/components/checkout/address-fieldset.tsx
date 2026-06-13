@@ -2,10 +2,13 @@
 
 import { MapPin } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import usePlacesAutocomplete, { getDetails } from 'use-places-autocomplete';
 import { z } from 'zod/v4';
 
 import type { AddressPayload } from '@/api/checkout';
+import {
+    useGooglePlacesAutocomplete,
+    type GooglePlacesSuggestion,
+} from '@/hooks/use-google-places-autocomplete';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Address } from '@/types/api';
 import type {
@@ -250,53 +253,11 @@ export function AddressFieldset({
         suggestions: { status, data: suggestions },
         setValue: setStreetQuery,
         clearSuggestions,
-        init,
-    } = usePlacesAutocomplete({
-        requestOptions: {
-            componentRestrictions: {
-                country: value.country_code.toLowerCase(),
-            },
-        },
+        resetSessionToken,
+    } = useGooglePlacesAutocomplete({
+        countryCode: value.country_code,
         debounce: 300,
-        initOnMount:
-            typeof window !== 'undefined' &&
-            !!(window as Window & { google?: typeof google }).google?.maps
-                ?.places,
     });
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const win = window as Window & { google?: typeof google };
-            if (win.google?.maps?.places) {
-                init();
-            } else {
-                const checkGoogleMaps = () => {
-                    if (win.google?.maps?.places) {
-                        init();
-                        return true;
-                    }
-                    return false;
-                };
-
-                if (checkGoogleMaps()) return;
-
-                const interval = setInterval(() => {
-                    if (checkGoogleMaps()) {
-                        clearInterval(interval);
-                    }
-                }, 500);
-
-                const timeout = setTimeout(() => {
-                    clearInterval(interval);
-                }, 30000);
-
-                return () => {
-                    clearInterval(interval);
-                    clearTimeout(timeout);
-                };
-            }
-        }
-    }, [init]);
 
     const errors = validateAddress(value);
 
@@ -326,25 +287,18 @@ export function AddressFieldset({
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
-    async function applySuggestion(
-        suggestion: google.maps.places.AutocompletePrediction,
-    ) {
+    async function applySuggestion(suggestion: GooglePlacesSuggestion) {
         setStreetQuery(suggestion.description, false);
         clearSuggestions();
         setShowSuggestions(false);
 
         try {
-            const details = (await getDetails({
-                placeId: suggestion.place_id,
-                fields: ['address_components'],
-            })) as google.maps.places.PlaceResult | string;
+            const place = suggestion.placePrediction.toPlace();
+            await place.fetchFields({ fields: ['addressComponents'] });
+            resetSessionToken();
 
-            if (
-                typeof details === 'string' ||
-                !details ||
-                !details.address_components
-            )
-                return;
+            const addressComponents = place.addressComponents;
+            if (!addressComponents) return;
 
             let streetName = '';
             let streetNumber = '';
@@ -352,14 +306,15 @@ export function AddressFieldset({
             let postal = '';
             let country = value.country_code;
 
-            details.address_components.forEach((c) => {
+            addressComponents.forEach((c) => {
                 const types = c.types;
-                if (types.includes('route')) streetName = c.long_name;
-                if (types.includes('street_number')) streetNumber = c.long_name;
+                if (types.includes('route')) streetName = c.longText ?? '';
+                if (types.includes('street_number'))
+                    streetNumber = c.longText ?? '';
                 if (types.includes('locality') || types.includes('postal_town'))
-                    city = c.long_name;
-                if (types.includes('postal_code')) postal = c.long_name;
-                if (types.includes('country')) country = c.short_name;
+                    city = c.longText ?? '';
+                if (types.includes('postal_code')) postal = c.longText ?? '';
+                if (types.includes('country')) country = c.shortText ?? '';
             });
 
             const street = [streetName, streetNumber].filter(Boolean).join(' ');

@@ -424,7 +424,7 @@ export default function CheckoutPage() {
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
             {googleMapsApiKey && (
                 <Script
-                    src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places`}
+                    src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&loading=async`}
                     strategy="lazyOnload"
                 />
             )}
