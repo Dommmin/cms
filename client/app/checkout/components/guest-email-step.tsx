@@ -70,8 +70,10 @@ export function GuestEmailStep({
         }
     };
 
-    const handleVerifyCode = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleVerifyCode = async (
+        e?: React.FormEvent | React.KeyboardEvent,
+    ) => {
+        if (e) e.preventDefault();
         if (code.length !== 6) {
             toast.error(
                 t('auth.invalid_code_length', 'Please enter the 6-digit code.'),
@@ -110,7 +112,7 @@ export function GuestEmailStep({
                 <div className="from-primary/30 via-primary to-primary/30 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r" />
 
                 {otpStep === 'email' ? (
-                    <form onSubmit={handleSendCode} className="space-y-4">
+                    <div className="space-y-4">
                         <div>
                             <div className="mb-2 flex items-center justify-between">
                                 <label
@@ -144,6 +146,13 @@ export function GuestEmailStep({
                                     setOtpEmail(e.target.value);
                                     onGuestEmailChange(e.target.value);
                                 }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleSendCode();
+                                    }
+                                }}
                                 placeholder="you@example.com"
                                 required
                                 disabled={isLoading}
@@ -152,7 +161,8 @@ export function GuestEmailStep({
                         </div>
                         <div className="flex gap-3 pt-1">
                             <button
-                                type="submit"
+                                type="button"
+                                onClick={() => handleSendCode()}
                                 disabled={isLoading || !otpEmail}
                                 className="bg-primary text-primary-foreground flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
                             >
@@ -162,9 +172,9 @@ export function GuestEmailStep({
                                 {t('checkout.send_code', 'Send Code')}
                             </button>
                         </div>
-                    </form>
+                    </div>
                 ) : (
-                    <form onSubmit={handleVerifyCode} className="space-y-4">
+                    <div className="space-y-4">
                         <div>
                             <div className="mb-2 flex items-center justify-between">
                                 <label
@@ -203,6 +213,15 @@ export function GuestEmailStep({
                                 onChange={(e) =>
                                     setCode(e.target.value.replace(/\D/g, ''))
                                 }
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (code.length === 6) {
+                                            handleVerifyCode(e);
+                                        }
+                                    }
+                                }}
                                 placeholder="000000"
                                 required
                                 disabled={isLoading}
@@ -211,7 +230,8 @@ export function GuestEmailStep({
                         </div>
                         <div className="flex flex-col gap-2 pt-1">
                             <button
-                                type="submit"
+                                type="button"
+                                onClick={() => handleVerifyCode()}
                                 disabled={isLoading || code.length !== 6}
                                 className="bg-primary text-primary-foreground flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
                             >
@@ -234,7 +254,7 @@ export function GuestEmailStep({
                                     : t('checkout.resend_code', 'Resend code')}
                             </button>
                         </div>
-                    </form>
+                    </div>
                 )}
             </div>
         );
