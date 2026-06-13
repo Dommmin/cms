@@ -7,27 +7,40 @@ import type { BlogPost, PaginatedResponse, Product } from '@/types/api';
 import type { MetadataRoute } from 'next';
 
 /** Build sitemap entries for a given path with all locale alternates. */
+function normalizePath(
+    path: string | null | undefined,
+    fallback: string | null = '/',
+): string | null {
+    return typeof path === 'string' && path.length > 0 ? path : fallback;
+}
+
 function sitemapEntry(
     i18nConfig: I18nConfig,
-    path: string,
+    path: string | null | undefined,
     locale: string,
     lastModified?: Date,
     changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] = 'weekly',
     priority = 0.8,
     localizedAlternates?: Record<string, string>,
 ): MetadataRoute.Sitemap[number] {
+    const normalizedPath = normalizePath(path) ?? '/';
     const alternates: Record<string, string> = {};
     for (const alternateLocale of i18nConfig.locales) {
+        const alternatePath =
+            normalizePath(
+                localizedAlternates?.[alternateLocale],
+                normalizedPath,
+            ) ?? normalizedPath;
         alternates[alternateLocale] = absoluteUrl(
             alternateLocale,
-            localizedAlternates?.[alternateLocale] ?? path,
+            alternatePath,
             i18nConfig,
         );
     }
     alternates['x-default'] = alternates[i18nConfig.defaultLocale];
 
     return {
-        url: absoluteUrl(locale, path, i18nConfig),
+        url: absoluteUrl(locale, normalizedPath, i18nConfig),
         lastModified: lastModified ?? new Date(),
         changeFrequency,
         priority,
@@ -62,9 +75,20 @@ export async function generateSitemaps() {
 }
 
 export default async function sitemap(
-    props: { id: string } | Promise<{ id: string }>,
+    props:
+        | { id: string | Promise<string | undefined> }
+        | Promise<{ id: string | Promise<string | undefined> }>,
 ): Promise<MetadataRoute.Sitemap> {
-    const { id } = await props;
+    const resolvedProps = await props;
+    const id =
+        typeof resolvedProps.id === 'string'
+            ? resolvedProps.id
+            : await resolvedProps.id;
+
+    if (!id) {
+        return [];
+    }
+
     const i18nConfig = await getI18nConfig();
     const defaultLocale = i18nConfig.defaultLocale;
     const entries: MetadataRoute.Sitemap = [];
@@ -80,10 +104,18 @@ export default async function sitemap(
             ]),
         ),
     ]);
-    const productListingPath = productListingPage?.path ?? null;
-    const faqPath = faqPage?.path ?? '/faq';
-    const blogListingPathByLocale = Object.fromEntries(blogListingPages);
-    const blogListingPath = blogListingPathByLocale[defaultLocale] ?? '/blog';
+    const productListingPath = normalizePath(productListingPage?.path, null);
+    const faqPath = normalizePath(faqPage?.path, '/faq');
+    const blogListingPathByLocale = Object.fromEntries(
+        blogListingPages.map(([locale, path]) => [
+            locale,
+            normalizePath(path, '/blog'),
+        ]),
+    );
+    const blogListingPath = normalizePath(
+        blogListingPathByLocale[defaultLocale],
+        '/blog',
+    );
 
     if (id === 'static') {
         // Static pages
