@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <rect width="1200" height="675" fill="#14532d" />
+  <text x="96" y="220" fill="#f0fdf4" font-family="Arial, sans-serif" font-size="84" font-weight="700">Category Listing Demo</text>
+  <text x="96" y="300" fill="#bbf7d0" font-family="Arial, sans-serif" font-size="34">Parent and child categories seeded with attribute schemas.</text>
+</svg>

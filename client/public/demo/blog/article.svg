@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <rect width="1200" height="675" fill="#111827" />
+  <rect x="70" y="70" width="1060" height="535" rx="28" fill="#1f2937" stroke="#374151" stroke-width="4" />
+  <text x="120" y="240" fill="#f9fafb" font-family="Arial, sans-serif" font-size="72" font-weight="700">Editorial Demo Post</text>
+  <text x="120" y="330" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="32">Published and draft flows seeded offline for final verification.</text>
+</svg>

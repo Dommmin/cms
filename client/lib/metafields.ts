@@ -10,8 +10,12 @@ type RenderableMetafield = {
 };
 
 const SAFE_RENDER_KEYS: Record<string, Set<string>> = {
-    product: new Set(['marketing::badge', 'marketing::highlights']),
-    blog_post: new Set(['content::callout', 'content::note']),
+    product: new Set([
+        'content::product_story',
+        'content::care_instructions',
+        'badges::custom_badge_text',
+    ]),
+    blog_post: new Set(['content::source_url']),
 };
 
 export function getRenderableMetafields(

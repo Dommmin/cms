@@ -22,11 +22,8 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             FormSeeder::class,
-            PagesDemoSeeder::class,
             ThemeSeeder::class,
             SettingsSeeder::class,
-            MenuSeeder::class,
-            BlogSeeder::class,
             LocaleSeeder::class,
             TranslationSeeder::class,
             DashboardWidgetSeeder::class,
@@ -34,17 +31,22 @@ class DatabaseSeeder extends Seeder
 
         // ── E-commerce ───────────────────────────────────────────────────────
         $this->call([
+            DefaultBlogSeeder::class,
+            DemoCmsPageSeeder::class,
+            AttributeDefinitionSeeder::class,
+            CategoryAttributeSchemaSeeder::class,
+            DemoProductSeeder::class,
+            DemoProductVariantSeeder::class,
+            DemoBlogSeeder::class,
+            DemoCmsPageSeeder::class,
+            DemoMetafieldSeeder::class,
+            MenuSeeder::class,
             ProductTypeSeeder::class,
-            // EcommerceDemoSeeder::class,
-            ElectronicsSeeder::class,
             DiscountSeeder::class,
             PromotionSeeder::class,
             ShippingMethodSeeder::class,
             CurrencySeeder::class,
             EmailTemplateSeeder::class,
-            AnalyticsEventSeeder::class,
-            OrderDemoSeeder::class,
-            EcommerceRelationSeeder::class,
         ]);
 
         // ── Newsletter (seeded only when module is active) ───────────────────

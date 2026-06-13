@@ -37,11 +37,13 @@ trait CachesImages
     {
         $imageCount = min($count, max(0, (int) config('media-library.seed_images_per_product', 1)));
         $originalSkipSeedConversions = (bool) config('media-library.skip_seed_conversions', false);
+        $originalDiskName = config('media-library.disk_name');
 
         Config::set(
             'media-library.skip_seed_conversions',
             ! (bool) config('media-library.generate_seed_conversions', false),
         );
+        Config::set('media-library.disk_name', 'public');
 
         try {
             for ($i = 0; $i < $imageCount; $i++) {
@@ -65,6 +67,7 @@ trait CachesImages
             }
         } finally {
             Config::set('media-library.skip_seed_conversions', $originalSkipSeedConversions);
+            Config::set('media-library.disk_name', $originalDiskName);
         }
     }
 

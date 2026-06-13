@@ -304,7 +304,7 @@ class Product extends Model implements HasMedia
     public function toSearchableArray(): array
     {
         $priceRange = $this->priceRange();
-        $this->loadMissing(['category', 'brand', 'media']);
+        $this->loadMissing(['category', 'brand', 'media', 'variants']);
 
         return [
             'id' => (string) $this->id,

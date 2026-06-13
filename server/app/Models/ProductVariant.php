@@ -160,6 +160,8 @@ class ProductVariant extends Model
      */
     public function effectiveTaxRate(): ?TaxRate
     {
+        $this->loadMissing(['taxRate', 'product.category.taxRate']);
+
         $rate = $this->taxRate;
 
         if (! $rate) {

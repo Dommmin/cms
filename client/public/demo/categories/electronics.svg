@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#dbeafe" />
+  <rect x="120" y="120" width="220" height="420" rx="28" fill="#1d4ed8" opacity="0.9" />
+  <rect x="410" y="170" width="380" height="250" rx="24" fill="#60a5fa" />
+  <text x="120" y="640" fill="#1e3a8a" font-family="Arial, sans-serif" font-size="84" font-weight="700">Electronics</text>
+  <text x="120" y="708" fill="#1d4ed8" font-family="Arial, sans-serif" font-size="34">Phones, accessories, headphones</text>
+</svg>

@@ -268,6 +268,8 @@ class Page extends Model
 
     public function localizedPath(string $locale): string
     {
+        $this->loadMissing('parent');
+
         $segments = [];
         $current = $this;
 

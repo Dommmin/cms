@@ -211,6 +211,8 @@ class Category extends Model
 
     public function resolvedAttributeSchemas(): SupportCollection
     {
+        $this->loadMissing('parent');
+
         $resolvedSchemas = $this->parent
             ? $this->parent->resolvedAttributeSchemas()
                 ->map(
@@ -259,6 +261,8 @@ class Category extends Model
      */
     public function breadcrumb(): array
     {
+        $this->loadMissing('parent');
+
         $path = [];
         $current = $this;
 

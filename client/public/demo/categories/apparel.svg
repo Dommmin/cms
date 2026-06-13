@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#fef3c7" />
+  <path d="M260 240L410 120H790L940 240L850 360L760 300V620H440V300L350 360Z" fill="#f59e0b" />
+  <text x="120" y="690" fill="#78350f" font-family="Arial, sans-serif" font-size="84" font-weight="700">Apparel</text>
+  <text x="120" y="758" fill="#92400e" font-family="Arial, sans-serif" font-size="34">T-shirts, hoodies, shoes</text>
+</svg>

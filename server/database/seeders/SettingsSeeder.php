@@ -11,6 +11,6 @@ class SettingsSeeder extends Seeder
 {
     public function run(): void
     {
-        Setting::set('seo', 'og_image', 'https://images.unsplash.com/photo-1557821314-4a50fd44fc82?w=1200&auto=format&fit=crop');
+        Setting::set('seo', 'og_image', '/demo/site-og.svg');
     }
 }
