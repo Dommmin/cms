@@ -49,7 +49,12 @@ export function localizedBlogPath(
     locale: string,
     slugs: Record<string, string> | undefined,
     fallbackSlug: string,
-    basePath: string = '/blog',
+    basePath: string | null | undefined = '/blog',
 ): string {
-    return `${basePath}/${slugs?.[locale] ?? fallbackSlug}`;
+    const normalizedBasePath =
+        typeof basePath === 'string' && basePath.length > 0
+            ? basePath
+            : '/blog';
+
+    return `${normalizedBasePath}/${slugs?.[locale] ?? fallbackSlug}`;
 }

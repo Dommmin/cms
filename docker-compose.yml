@@ -200,6 +200,7 @@ services:
   mailpit:
     image: axllent/mailpit
     container_name: ${COMPOSE_PROJECT_NAME}_mailpit
+    restart: unless-stopped
     ports:
       - "1025:1025"
       - "8025:8025"
@@ -213,6 +214,7 @@ services:
   minio:
     image: minio/minio:latest
     container_name: ${COMPOSE_PROJECT_NAME}_minio
+    restart: unless-stopped
     ports:
       - "9000:9000"
       - "8900:8900"
@@ -234,7 +236,9 @@ services:
       - cms-network
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set minio http://minio:9000 minioadmin miniopassword;
+      until /usr/bin/mc alias set minio http://minio:9000 minioadmin miniopassword >/dev/null 2>&1; do
+      sleep 2;
+      done;
       /usr/bin/mc mb minio/cms-local --ignore-existing;
       /usr/bin/mc anonymous set public minio/cms-local;
       exit 0;

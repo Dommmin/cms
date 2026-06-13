@@ -25,6 +25,8 @@ php artisan migrate --seed
 make fresh          # Fresh migrate + seed
 ```
 
+`make up` starts MinIO as part of the default stack. The `minio-setup` container waits for MinIO, creates the `cms-local` bucket, and makes it publicly readable for local media URLs.
+
 ### Services after `make up`
 
 | Service             | URL                         |
@@ -35,6 +37,7 @@ make fresh          # Fresh migrate + seed
 | API docs (Scramble) | https://localhost/docs/api  |
 | Telescope           | https://localhost/telescope |
 | MailHog             | http://localhost:8025       |
+| MinIO console       | http://localhost:8900       |
 | MySQL               | localhost:3306              |
 | Redis               | localhost:6379              |
 

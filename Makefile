@@ -71,7 +71,7 @@ nuke-volumes:
 
 # Start the application
 up:
-	docker compose up -d php node nginx mysql redis mailpit
+	docker compose up -d php node nginx mysql redis mailpit minio minio-setup
 
 up-full:
 	docker compose --profile search --profile pdf --profile workers --profile testing up -d
@@ -114,8 +114,8 @@ stop:
 build:
 	@echo "Setting up the project..."
 	@if [ ! -f .env ]; then \
-		cp .env.local .env; \
-		echo "Created .env file from .env.local"; \
+		cp .env.example .env; \
+		echo "Created .env file from .env.example"; \
 	fi
 	docker compose build
 
