@@ -145,7 +145,7 @@ class Product extends Model implements HasMedia
     public array $translatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
 
     /** @var array<int, string> */
-    protected array $htmlAttributes = ['description', 'short_description'];
+    protected array $htmlAttributes = ['description'];
 
     /** @var array<int, string> */
     protected array $versionedAttributes = [
