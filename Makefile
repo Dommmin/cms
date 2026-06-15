@@ -188,26 +188,27 @@ fix:
 # Read-only CI check — mirrors GitHub Actions exactly (fails if anything is wrong)
 # Run this before pushing: make fix && make check
 check:
-	@echo ">>> [1/8] PHP: Pint (check)"
+	@echo ">>> [1/10] PHP: Pint (check)"
 	docker compose exec php vendor/bin/pint --test
-	@echo ">>> [2/8] PHP: Rector (dry-run)"
+	@echo ">>> [2/10] PHP: Rector (dry-run)"
 	docker compose exec php php -d memory_limit=1G vendor/bin/rector process --dry-run
-	@echo ">>> [3/8] PHP: Larastan"
+	@echo ">>> [3/10] PHP: Larastan"
 	docker compose exec php php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress
-	@echo ">>> [4/8] Server TS: Type check"
+	@echo ">>> [4/10] Server TS: Type check"
 	docker compose exec php npm run types
-	@echo ">>> [5/8] Server TS: ESLint (--max-warnings=0)"
+	@echo ">>> [5/10] Server TS: ESLint (--max-warnings=0)"
 	docker compose exec php npx eslint . --max-warnings=0
-	@echo ">>> [6/8] Server TS: Prettier (check)"
+	@echo ">>> [6/10] Server TS: Prettier (check)"
 	docker compose exec php npm run format:check
-	@echo ">>> [7/8] Client TS: ESLint + Prettier (check)"
+	@echo ">>> [7/10] Client TS: ESLint + Prettier (check)"
 	docker compose exec node npm run lint
 	docker compose exec node npm run format:check
-	@echo ">>> [9/10] Mobile TS: Type check"
+	@echo ">>> [8/10] Blocks contract"
+	USE_DOCKER=1 bash scripts/check-blocks-contract.sh
+	@echo ">>> [9/10] Mobile TS: Type check + ESLint"
 	npm --prefix mobile run types
-	@echo ">>> [10/10] Mobile TS: ESLint"
 	npm --prefix mobile run lint
-	@echo ">>> [8/8] Tests (Pest parallel)"
+	@echo ">>> [10/10] Tests (Pest parallel)"
 	docker compose exec -e DB_CONNECTION=mysql -e DB_DATABASE=laravel_test php php -d memory_limit=512M vendor/bin/pest --parallel --processes=$(PEST_PARALLEL_PROCESSES)
 	@echo ">>> All checks passed. Safe to push."
 
