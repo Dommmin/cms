@@ -1,8 +1,12 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import type { ComponentType } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { BLOCK_NOT_REGISTERED_WARNING } from '@/components/page-builder/block-registry-config';
+import { BLOCK_CONTRACT_VIOLATION_WARNING } from '@/components/page-builder/block-validation-service';
 import type { PageBlock } from '@/types/api';
 
 vi.mock('next/dynamic', () => ({
@@ -26,34 +30,27 @@ const missingBlock: PageBlock = {
     is_visible: true,
 };
 
-describe('BlockRenderer strict mode', () => {
+const blockRendererPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../components/page-builder/block-renderer.tsx',
+);
+
+describe('BlockRenderer registry-only', () => {
     beforeEach(() => {
         vi.resetModules();
     });
 
     afterEach(() => {
-        vi.unstubAllEnvs();
         vi.restoreAllMocks();
     });
 
-    it('throws when strict mode is enabled and block is missing from registry', async () => {
-        vi.stubEnv('BLOCK_REGISTRY_STRICT_MODE', 'true');
-        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    it('does not use switch-case dispatch (registry-only)', () => {
+        const source = readFileSync(blockRendererPath, 'utf8');
 
-        const { BlockRenderer } =
-            await import('@/components/page-builder/block-renderer');
-
-        expect(() =>
-            renderToStaticMarkup(<BlockRenderer block={missingBlock} />),
-        ).toThrow(`${BLOCK_NOT_REGISTERED_WARNING}: not_registered_block`);
-
-        expect(warnSpy).toHaveBeenCalledWith(BLOCK_NOT_REGISTERED_WARNING, {
-            blockType: 'not_registered_block',
-        });
+        expect(source).not.toMatch(/\bswitch\s*\(/);
     });
 
-    it('falls back without throwing when strict mode is disabled', async () => {
-        vi.stubEnv('BLOCK_REGISTRY_STRICT_MODE', 'false');
+    it('throws when block is missing from registry', async () => {
         const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
         const { BlockRenderer } =
@@ -61,10 +58,13 @@ describe('BlockRenderer strict mode', () => {
 
         expect(() =>
             renderToStaticMarkup(<BlockRenderer block={missingBlock} />),
-        ).not.toThrow();
+        ).toThrow(`${BLOCK_CONTRACT_VIOLATION_WARNING}: not_registered_block`);
 
-        expect(warnSpy).toHaveBeenCalledWith(BLOCK_NOT_REGISTERED_WARNING, {
-            blockType: 'not_registered_block',
-        });
+        expect(warnSpy).toHaveBeenCalledWith(
+            BLOCK_CONTRACT_VIOLATION_WARNING,
+            expect.objectContaining({
+                blockType: 'not_registered_block',
+            }),
+        );
     });
 });

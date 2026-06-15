@@ -1,4 +1,13 @@
 {
+    "__meta": {
+        "context_dependency_keys": [
+            "currentProduct",
+            "currentCategory",
+            "currentCollection",
+            "cartState",
+            "userSegment"
+        ]
+    },
     "accordion": {
         "type": "accordion",
         "schema": {

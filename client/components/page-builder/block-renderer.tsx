@@ -1,34 +1,21 @@
+'use client';
+
 import { blockRegistry } from './block-registry';
 import {
     BLOCK_NOT_REGISTERED_WARNING,
-    isBlockRegistryStrictMode,
     warnBlockNotRegistered,
 } from './block-registry-config';
 import type { BlockRendererProps } from './block-renderer.types';
-
-function UnknownBlockFallback({ blockType }: { blockType: string }) {
-    return (
-        <div className="rounded-lg border border-dashed border-amber-400 bg-amber-50 p-4 text-sm text-amber-700">
-            Unknown block type: <strong>{blockType}</strong>
-        </div>
-    );
-}
+import { usePreRenderBlockValidation } from './use-pre-render-block-validation';
 
 export function BlockRenderer({ block }: BlockRendererProps) {
+    usePreRenderBlockValidation(block.type);
+
     const Component = blockRegistry[block.type as keyof typeof blockRegistry];
 
     if (!Component) {
         warnBlockNotRegistered(block.type);
-
-        if (isBlockRegistryStrictMode()) {
-            throw new Error(`${BLOCK_NOT_REGISTERED_WARNING}: ${block.type}`);
-        }
-
-        if (process.env.NODE_ENV === 'development') {
-            return <UnknownBlockFallback blockType={block.type} />;
-        }
-
-        return null;
+        throw new Error(`${BLOCK_NOT_REGISTERED_WARNING}: ${block.type}`);
     }
 
     return <Component block={block} />;

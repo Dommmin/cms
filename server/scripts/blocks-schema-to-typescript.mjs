@@ -159,20 +159,33 @@ function indent(text, spaces) {
 }
 
 /**
- * @param {Record<string, Record<string, unknown>>} blocks
+ * @param {Record<string, unknown>} schemaPayload
  * @param {string} hint
  * @returns {string}
  */
-function generateSource(blocks, hint) {
+function generateSource(schemaPayload, hint) {
     nestedTypeDefinitions.clear();
 
-    const blockKeys = Object.keys(blocks).sort();
+    const contextDependencyKeys =
+        /** @type {string[] | undefined} */ (
+            schemaPayload.__meta?.context_dependency_keys
+        ) ?? [
+            'currentProduct',
+            'currentCategory',
+            'currentCollection',
+            'cartState',
+            'userSegment',
+        ];
+    const blockEntries = Object.fromEntries(
+        Object.entries(schemaPayload).filter(([key]) => key !== '__meta'),
+    );
+    const blockKeys = Object.keys(blockEntries).sort();
     const configurationTypes = [];
     const configurationMapEntries = [];
 
     for (const blockKey of blockKeys) {
         configurationTypes.push(
-            emitBlockConfigurationType(blockKey, blocks[blockKey]),
+            emitBlockConfigurationType(blockKey, blockEntries[blockKey]),
         );
         configurationMapEntries.push(
             `    ${blockKey}: ${toPascalCase(blockKey)}BlockConfiguration;`,
@@ -181,7 +194,7 @@ function generateSource(blocks, hint) {
 
     const dataStrategies = new Set(
         blockKeys.map(
-            (key) => /** @type {string} */ (blocks[key].data_strategy),
+            (key) => /** @type {string} */ (blockEntries[key].data_strategy),
         ),
     );
     dataStrategies.add('cached');
@@ -195,7 +208,7 @@ function generateSource(blocks, hint) {
     const nestedTypes = [...nestedTypeDefinitions.values()].join('\n\n');
 
     const definitionEntries = blockKeys.map((blockKey) => {
-        const block = blocks[blockKey];
+        const block = blockEntries[blockKey];
         const allowedChildren = block.allowed_children;
         const allowedChildrenType =
             allowedChildren === null
@@ -210,6 +223,24 @@ function generateSource(blocks, hint) {
     };`;
     });
 
+    const contractRuntimeEntries = blockKeys.map((blockKey) => {
+        const block = blockEntries[blockKey];
+        const allowedChildren = block.allowed_children;
+        const allowedChildrenValue =
+            allowedChildren === null
+                ? 'null'
+                : `[${/** @type {string[]} */ (allowedChildren).map((child) => `'${child}'`).join(', ')}]`;
+
+        return `    ${blockKey}: {
+        type: '${blockKey}',
+        data_strategy: '${block.data_strategy}',
+        context_dependencies: ${JSON.stringify(block.context_dependencies ?? [])},
+        allowed_children: ${allowedChildrenValue},
+    },`;
+    });
+
+    const contextDependencyKeysLiteral = JSON.stringify(contextDependencyKeys);
+
     return `/**
  * AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
  *
@@ -223,6 +254,19 @@ export type BlockDataStrategy = ${dataStrategyUnion};
 
 export type BlockDefinitionExport = {
 ${definitionEntries.join('\n')}
+};
+
+export const VALID_BLOCK_CONTEXT_DEPENDENCIES = ${contextDependencyKeysLiteral} as const;
+
+export type BlockContractRuntime = {
+    type: BlockType;
+    data_strategy: BlockDataStrategy;
+    context_dependencies: readonly string[];
+    allowed_children: readonly BlockType[] | null;
+};
+
+export const BLOCK_CONTRACTS: Record<BlockType, BlockContractRuntime> = {
+${contractRuntimeEntries.join('\n')}
 };
 
 ${nestedTypes}${nestedTypes.length > 0 ? '\n\n' : ''}${configurationTypes.join('\n\n')}

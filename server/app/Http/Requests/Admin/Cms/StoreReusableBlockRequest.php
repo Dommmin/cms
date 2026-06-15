@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin\Cms;
 
 use App\Services\PageBuilder\BlockConfigurationValidator;
+use App\Services\PageBuilder\BlockValidationService;
 use App\Services\PageBuilder\PageBuilderSnapshotValidator;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
@@ -47,6 +48,10 @@ class StoreReusableBlockRequest extends FormRequest
     private function validateBlockPayload(Validator $validator): void
     {
         try {
+            $blockType = $this->string('type')->toString();
+
+            resolve(BlockValidationService::class)->validateOrThrow($blockType, 'type');
+
             $configuration = resolve(BlockConfigurationValidator::class)->validateAndSanitize(
                 $this->string('type')->toString(),
                 $this->input('configuration', []),

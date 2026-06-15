@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import type { SlotEntry } from '@/app/layout.types';
 import { BlockRenderer } from '@/components/page-builder/block-renderer';
+import { BlockErrorBoundary } from '@/components/page-builder/error-boundary';
 import type { BlockType } from '@/types/api';
 
 interface SlotRendererProps {
@@ -85,7 +86,9 @@ export function SlotRenderer({ slots, location }: SlotRendererProps) {
 
                 const inner = (
                     <div className="relative w-full">
-                        <BlockRenderer block={mockBlock} />
+                        <BlockErrorBoundary blockName={slot.block_type}>
+                            <BlockRenderer block={mockBlock} />
+                        </BlockErrorBoundary>
                         {isDismissible && (
                             <button
                                 onClick={() => handleDismiss(slot.id)}

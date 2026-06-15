@@ -14,13 +14,7 @@ final class BlockSchemaExportService
     public const string SNAPSHOT_RELATIVE_PATH = 'tests/Unit/PageBuilder/snapshots/blocks.schema.json';
 
     /**
-     * @return array<string, array{
-     *     type: string,
-     *     schema: array<string, mixed>,
-     *     data_strategy: string,
-     *     context_dependencies: list<string>,
-     *     allowed_children: list<string>|null
-     * }>
+     * @return array<string, array<string, mixed>>
      */
     public function export(): array
     {
@@ -29,7 +23,14 @@ final class BlockSchemaExportService
         $types = array_keys($blockTypes);
         sort($types);
 
-        $export = [];
+        /** @var list<string> $contextDependencyKeys */
+        $contextDependencyKeys = config('blocks.context_dependency_keys', []);
+
+        $export = [
+            '__meta' => [
+                'context_dependency_keys' => array_map(strval(...), $contextDependencyKeys),
+            ],
+        ];
 
         foreach ($types as $type) {
             $export[$type] = [

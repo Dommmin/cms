@@ -18,6 +18,7 @@ class PageBuilderSnapshotValidator
 
     public function __construct(
         private readonly BlockConfigurationValidator $configurationValidator,
+        private readonly BlockValidationService $blockValidationService,
     ) {}
 
     /**
@@ -128,6 +129,11 @@ class PageBuilderSnapshotValidator
 
                     continue;
                 }
+
+                $this->mergeErrors(
+                    $errors,
+                    $this->blockValidationService->validateSnapshotBlock($block, $blockAttribute),
+                );
 
                 if ($validateConfiguration) {
                     try {

@@ -37,9 +37,15 @@ echo ">>> [blocks] Generated TS types (storefront)"
 run_in_client "npm run generate:blocks-types:check"
 
 echo ">>> [blocks] PHP contract tests"
-run_in_server "./vendor/bin/pest --compact tests/Unit/PageBuilder/BlockContractTest.php tests/Unit/PageBuilder/BlockSchemaExportTest.php"
+run_in_server "./vendor/bin/pest --compact tests/Unit/PageBuilder/BlockContractTest.php tests/Unit/PageBuilder/BlockSchemaExportTest.php tests/Unit/PageBuilder/BlockValidationServiceTest.php"
 
 echo ">>> [blocks] Storefront registry"
-run_in_client "npm run test:ui -- tests/unit/block-registry.test.ts"
+run_in_client "npm run test:ui -- tests/unit/block-registry.test.ts tests/unit/block-renderer.test.tsx tests/unit/block-validation-service.test.ts"
+
+echo ">>> [blocks] block-renderer registry-only (no switch-case)"
+if grep -qE '\bswitch[[:space:]]*\(' "${CLIENT}/components/page-builder/block-renderer.tsx"; then
+  echo "ERROR: block-renderer.tsx must not use switch-case; use blockRegistry instead." >&2
+  exit 1
+fi
 
 echo ">>> Blocks contract checks passed."

@@ -239,6 +239,216 @@ export type BlockDefinitionExport = {
     };
 };
 
+export const VALID_BLOCK_CONTEXT_DEPENDENCIES = [
+    'currentProduct',
+    'currentCategory',
+    'currentCollection',
+    'cartState',
+    'userSegment',
+] as const;
+
+export type BlockContractRuntime = {
+    type: BlockType;
+    data_strategy: BlockDataStrategy;
+    context_dependencies: readonly string[];
+    allowed_children: readonly BlockType[] | null;
+};
+
+export const BLOCK_CONTRACTS: Record<BlockType, BlockContractRuntime> = {
+    accordion: {
+        type: 'accordion',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    alert_banner: {
+        type: 'alert_banner',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    brands_slider: {
+        type: 'brands_slider',
+        data_strategy: 'server',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    call_to_action: {
+        type: 'call_to_action',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    categories_grid: {
+        type: 'categories_grid',
+        data_strategy: 'server',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    countdown_timer: {
+        type: 'countdown_timer',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    custom_html: {
+        type: 'custom_html',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    featured_posts: {
+        type: 'featured_posts',
+        data_strategy: 'server',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    featured_products: {
+        type: 'featured_products',
+        data_strategy: 'server',
+        context_dependencies: ['currentCategory', 'currentCollection'],
+        allowed_children: null,
+    },
+    form_embed: {
+        type: 'form_embed',
+        data_strategy: 'hybrid',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    hero_banner: {
+        type: 'hero_banner',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    icon_list: {
+        type: 'icon_list',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    image_gallery: {
+        type: 'image_gallery',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    logo_cloud: {
+        type: 'logo_cloud',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    map: {
+        type: 'map',
+        data_strategy: 'client',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    newsletter_signup: {
+        type: 'newsletter_signup',
+        data_strategy: 'hybrid',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    pricing_cards: {
+        type: 'pricing_cards',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    pricing_table: {
+        type: 'pricing_table',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    promotional_banner: {
+        type: 'promotional_banner',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    rich_text: {
+        type: 'rich_text',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    stats_counter: {
+        type: 'stats_counter',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    steps_process: {
+        type: 'steps_process',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    tabs: {
+        type: 'tabs',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    team_members: {
+        type: 'team_members',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    testimonials: {
+        type: 'testimonials',
+        data_strategy: 'server',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    three_columns: {
+        type: 'three_columns',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: [
+            'rich_text',
+            'image_gallery',
+            'trust_badges',
+            'icon_list',
+            'call_to_action',
+        ],
+    },
+    timeline: {
+        type: 'timeline',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    trust_badges: {
+        type: 'trust_badges',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+    two_columns: {
+        type: 'two_columns',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: [
+            'rich_text',
+            'image_gallery',
+            'trust_badges',
+            'icon_list',
+            'call_to_action',
+        ],
+    },
+    video_embed: {
+        type: 'video_embed',
+        data_strategy: 'none',
+        context_dependencies: [],
+        allowed_children: null,
+    },
+};
+
 export type AccordionBlockConfigurationItemsItem = {
     title?: string;
     content?: string;

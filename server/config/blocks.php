@@ -18,6 +18,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 return [
     'custom_html_enabled' => env('CMS_CUSTOM_HTML_ENABLED', true),
 
+    'context_dependency_keys' => [
+        'currentProduct',
+        'currentCategory',
+        'currentCollection',
+        'cartState',
+        'userSegment',
+    ],
+
     'relation_types' => [
         'media.image' => [
             'model' => Media::class,
