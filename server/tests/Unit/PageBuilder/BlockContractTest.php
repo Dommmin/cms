@@ -18,11 +18,26 @@ it('defines schema and data_strategy for every registered block type', function 
     }
 });
 
-it('maps every block type enum value to a valid contract', function (): void {
+it('keeps PageBlockTypeEnum and blocks registry in sync', function (): void {
+    $registryKeys = array_keys(config('blocks.block_types', []));
+    $enumValues = array_map(
+        static fn (PageBlockTypeEnum $case): string => $case->value,
+        PageBlockTypeEnum::cases(),
+    );
+
+    expect($registryKeys)->toEqualCanonicalizing($enumValues);
+});
+
+it('maps every block type enum value to registry entry with schema and data_strategy', function (): void {
+    $registry = config('blocks.block_types');
+
     foreach (PageBlockTypeEnum::cases() as $case) {
-        expect(BlockDefinition::getDataStrategy($case->value))->toBeInstanceOf(BlockDataStrategy::class)
-            ->and(BlockDefinition::getSchema($case->value))->toBeArray()
-            ->and(BlockDefinition::getContextDependencies($case->value))->toBeArray();
+        $type = $case->value;
+
+        expect(array_key_exists($type, $registry))->toBeTrue(sprintf('missing registry entry for [%s]', $type))
+            ->and(BlockDefinition::getSchema($type))->toBeArray()->not->toBeEmpty()
+            ->and(BlockDefinition::getDataStrategy($type))->toBeInstanceOf(BlockDataStrategy::class)
+            ->and(BlockDefinition::getContextDependencies($type))->toBeArray();
     }
 });
 
