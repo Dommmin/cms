@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\BlockDataStrategy;
 use App\Enums\PageBlockTypeEnum;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
@@ -83,6 +84,9 @@ return [
             'icon' => 'layout-template',
             'category' => 'layout',
             'enum' => PageBlockTypeEnum::HeroBanner,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'background' => ['types' => ['media.image', 'media.video'], 'multiple' => false],
                 'overlay_icon' => ['types' => ['media.icon'], 'multiple' => false],
@@ -172,6 +176,9 @@ return [
             'icon' => 'type',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::RichText,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -199,6 +206,9 @@ return [
             'icon' => 'shopping-bag',
             'category' => 'ecommerce',
             'enum' => PageBlockTypeEnum::FeaturedProducts,
+            'data_strategy' => BlockDataStrategy::Server,
+            'context_dependencies' => ['currentCategory', 'currentCollection'],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'products' => ['types' => ['product'], 'multiple' => true],
                 'category_filter' => ['types' => ['category'], 'multiple' => false],
@@ -266,6 +276,9 @@ return [
             'icon' => 'grid',
             'category' => 'ecommerce',
             'enum' => PageBlockTypeEnum::CategoriesGrid,
+            'data_strategy' => BlockDataStrategy::Server,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'categories' => ['types' => ['category'], 'multiple' => true],
             ],
@@ -306,6 +319,9 @@ return [
             'icon' => 'megaphone',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::PromotionalBanner,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'background' => ['types' => ['media.image'], 'multiple' => false],
                 'link_product' => ['types' => ['product'], 'multiple' => false],
@@ -363,6 +379,9 @@ return [
             'icon' => 'mail',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::NewsletterSignup,
+            'data_strategy' => BlockDataStrategy::Hybrid,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -410,6 +429,9 @@ return [
             'icon' => 'message-square',
             'category' => 'social-proof',
             'enum' => PageBlockTypeEnum::Testimonials,
+            'data_strategy' => BlockDataStrategy::Server,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'avatar' => ['types' => ['media.image'], 'multiple' => true],
             ],
@@ -456,6 +478,9 @@ return [
             'icon' => 'image',
             'category' => 'media',
             'enum' => PageBlockTypeEnum::ImageGallery,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'gallery' => ['types' => ['media.image'], 'multiple' => true],
             ],
@@ -500,6 +525,9 @@ return [
             'icon' => 'play-circle',
             'category' => 'media',
             'enum' => PageBlockTypeEnum::VideoEmbed,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'video' => ['types' => ['media.video'], 'multiple' => false],
                 'thumbnail' => ['types' => ['media.image'], 'multiple' => false],
@@ -552,6 +580,9 @@ return [
             'icon' => 'code',
             'category' => 'advanced',
             'enum' => PageBlockTypeEnum::CustomHtml,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -578,6 +609,9 @@ return [
             'icon' => 'columns',
             'category' => 'layout',
             'enum' => PageBlockTypeEnum::TwoColumns,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => ['rich_text', 'image_gallery', 'trust_badges', 'icon_list', 'call_to_action'],
             'allowed_relations' => [
                 'left_image' => ['types' => ['media.image'], 'multiple' => false],
                 'right_image' => ['types' => ['media.image'], 'multiple' => false],
@@ -627,6 +661,9 @@ return [
             'icon' => 'layout',
             'category' => 'layout',
             'enum' => PageBlockTypeEnum::ThreeColumns,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => ['rich_text', 'image_gallery', 'trust_badges', 'icon_list', 'call_to_action'],
             'allowed_relations' => [
                 'column_1_image' => ['types' => ['media.image'], 'multiple' => false],
                 'column_2_image' => ['types' => ['media.image'], 'multiple' => false],
@@ -658,6 +695,9 @@ return [
             'icon' => 'chevrons-down',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::Accordion,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -693,6 +733,9 @@ return [
             'icon' => 'panel-top',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::Tabs,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -718,6 +761,9 @@ return [
             'icon' => 'map-pin',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::Map,
+            'data_strategy' => BlockDataStrategy::Client,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -762,6 +808,9 @@ return [
             'icon' => 'newspaper',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::FeaturedPosts,
+            'data_strategy' => BlockDataStrategy::Server,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'posts' => ['types' => ['blog_post'], 'multiple' => true],
                 'category_filter' => ['types' => ['blog_category'], 'multiple' => false],
@@ -856,6 +905,9 @@ return [
             'icon' => 'bar-chart-2',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::StatsCounter,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -929,6 +981,9 @@ return [
             'icon' => 'mouse-pointer-click',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::CallToAction,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'background' => ['types' => ['media.image'], 'multiple' => false],
             ],
@@ -996,6 +1051,9 @@ return [
             'icon' => 'credit-card',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::PricingTable,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -1048,6 +1106,9 @@ return [
             'icon' => 'badge',
             'category' => 'ecommerce',
             'enum' => PageBlockTypeEnum::BrandsSlider,
+            'data_strategy' => BlockDataStrategy::Server,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'brands' => ['types' => ['brand'], 'multiple' => true],
             ],
@@ -1094,6 +1155,9 @@ return [
             'icon' => 'layout-grid',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::LogoCloud,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'logos' => ['types' => ['media.image'], 'multiple' => true],
             ],
@@ -1135,6 +1199,9 @@ return [
             'icon' => 'timer',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::CountdownTimer,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -1191,6 +1258,9 @@ return [
             'icon' => 'milestone',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::Timeline,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -1233,6 +1303,9 @@ return [
             'icon' => 'users',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::TeamMembers,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -1280,6 +1353,9 @@ return [
             'icon' => 'list',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::IconList,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -1317,6 +1393,9 @@ return [
             'icon' => 'footprints',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::StepsProcess,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -1351,6 +1430,9 @@ return [
             'icon' => 'shield-check',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::TrustBadges,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [],
             'schema' => [
                 'type' => 'object',
@@ -1384,6 +1466,9 @@ return [
             'icon' => 'clipboard-list',
             'category' => 'conversion',
             'enum' => PageBlockTypeEnum::FormEmbed,
+            'data_strategy' => BlockDataStrategy::Hybrid,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'allowed_relations' => [
                 'form' => ['types' => ['form'], 'multiple' => false],
             ],
@@ -1415,6 +1500,9 @@ return [
             'icon' => 'alert-circle',
             'category' => 'layout',
             'enum' => PageBlockTypeEnum::AlertBanner,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'schema' => [
                 'type' => 'object',
                 'properties' => [
@@ -1453,6 +1541,9 @@ return [
             'icon' => 'credit-card',
             'category' => 'marketing',
             'enum' => PageBlockTypeEnum::PricingCards,
+            'data_strategy' => BlockDataStrategy::None,
+            'context_dependencies' => [],
+            'allowed_children' => null,
             'schema' => [
                 'type' => 'object',
                 'properties' => [

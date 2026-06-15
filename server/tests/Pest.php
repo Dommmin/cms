@@ -22,6 +22,9 @@ pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->in('Feature');
 
+pest()->extend(TestCase::class)
+    ->in('Unit/PageBuilder');
+
 pest()->beforeEach(function (): void {
     if (Schema::hasTable('pages')) {
         $systemPages = [
