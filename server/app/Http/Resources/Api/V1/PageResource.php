@@ -32,6 +32,7 @@ class PageResource extends JsonResource
         $resolvedForms = $this->resolveEmbeddedForms($page);
         $relationLookup = $this->resolveBlockRelationLookup($page);
         $autoPostsLookup = $this->resolveAutoSourcePosts($page, $relationLookup);
+        $autoProductsLookup = $this->resolveAutoSourceFeaturedProducts($page, $relationLookup);
         $locale = app()->getLocale();
 
         $seo = $page->getSeoMetadata();
@@ -67,7 +68,12 @@ class PageResource extends JsonResource
                     'configuration' => $this->resolveBlockConfiguration($block, $resolvedForms),
                     'position' => $block->position,
                     'is_active' => (bool) $block->is_active,
-                    'relations' => $this->buildBlockRelations($block, $relationLookup, $autoPostsLookup),
+                    'relations' => $this->buildBlockRelations(
+                        $block,
+                        $relationLookup,
+                        $autoPostsLookup,
+                        $autoProductsLookup,
+                    ),
                     'reusable_block_id' => $block->reusable_block_id,
                 ]) : [],
             ]) : [],
@@ -89,10 +95,15 @@ class PageResource extends JsonResource
      *
      * @param  array<string, array<int, array<string, mixed>>>  $relationLookup
      * @param  array<int, array<int, mixed>>  $autoPostsLookup  [block_id => [{...post data...}]]
+     * @param  array<int, array<int, mixed>>  $autoProductsLookup  [block_id => [{...product data...}]]
      * @return array<int, array<string, mixed>>
      */
-    private function buildBlockRelations(mixed $block, array $relationLookup, array $autoPostsLookup): array
-    {
+    private function buildBlockRelations(
+        mixed $block,
+        array $relationLookup,
+        array $autoPostsLookup,
+        array $autoProductsLookup,
+    ): array {
         $type = $block->type instanceof BackedEnum ? $block->type->value : $block->type;
         $config = $block->configuration ?? [];
 
@@ -108,6 +119,20 @@ class PageResource extends JsonResource
                 'metadata' => null,
                 'data' => $post,
             ], $posts, array_keys($posts));
+        }
+
+        if ($type === 'featured_products' && ($config['filter_mode'] ?? 'manual') === 'featured') {
+            $products = $autoProductsLookup[$block->id] ?? [];
+
+            return array_map(fn ($product, $pos): array => [
+                'id' => 0,
+                'relation_type' => 'product',
+                'relation_id' => $product['id'],
+                'relation_key' => 'products',
+                'position' => $pos,
+                'metadata' => null,
+                'data' => $product,
+            ], $products, array_keys($products));
         }
 
         if (! $block->relationLoaded('relations')) {
@@ -192,6 +217,132 @@ class PageResource extends JsonResource
     }
 
     /**
+     * Pre-fetch products for featured_products blocks with filter_mode=featured.
+     *
+     * Returns [block_id => [product_data, ...]] to avoid N+1 queries.
+     *
+     * @return array<int, array<int, array<string, mixed>>>
+     */
+    private function resolveAutoSourceFeaturedProducts(Page $page, array &$relationLookup): array
+    {
+        if (! config('modules.ecommerce') || ! $page->relationLoaded('sections')) {
+            return [];
+        }
+
+        $autoBlocks = $page->sections
+            ->flatMap(fn ($s) => $s->relationLoaded('blocks') ? $s->blocks : collect())
+            ->filter(function ($b): bool {
+                $type = $b->type instanceof BackedEnum ? $b->type->value : $b->type;
+
+                return $type === 'featured_products'
+                    && ($b->configuration['filter_mode'] ?? 'manual') === 'featured';
+            });
+
+        if ($autoBlocks->isEmpty()) {
+            return [];
+        }
+
+        $maxNeeded = $autoBlocks->max(fn ($b): int => (int) ($b->configuration['max_items'] ?? 8));
+
+        $products = Product::available()
+            ->where('is_featured', true)
+            ->with($this->blockProductEagerLoads())
+            ->orderBy('name')
+            ->limit($maxNeeded)
+            ->get();
+
+        $pathService = resolve(StorefrontPathService::class);
+        $serialized = $products
+            ->map(fn (Product $product): array => $this->serializeProductForBlock($product, $pathService))
+            ->all();
+
+        foreach ($serialized as $productData) {
+            $relationLookup['product'][$productData['id']] = $productData;
+        }
+
+        $result = [];
+        foreach ($autoBlocks as $block) {
+            $limit = (int) ($block->configuration['max_items'] ?? 8);
+            $result[$block->id] = array_slice($serialized, 0, $limit);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function blockProductEagerLoads(): array
+    {
+        return [
+            'thumbnail.media',
+            'brand',
+            'category',
+            'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeProductForBlock(Product $product, StorefrontPathService $pathService): array
+    {
+        $variants = $product->activeVariants;
+        $prices = $variants->pluck('price');
+        $priceMin = $prices->min() ?? 0;
+        $priceMax = $prices->max() ?? 0;
+        $isOnSale = $variants->contains(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price);
+        $maxDiscount = $variants->map(fn ($v): ?int => $v->compare_at_price && $v->price
+            ? (int) round((1 - $v->price / $v->compare_at_price) * 100)
+            : null
+        )->filter()->max();
+        $cheapestOnSale = $variants
+            ->filter(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price)
+            ->sortBy('price')
+            ->first();
+
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'public_url' => $pathService->productPath($product),
+            'short_description' => $product->short_description,
+            'price_min' => $priceMin,
+            'price_max' => $priceMax,
+            'is_active' => $product->is_active,
+            'is_on_sale' => $isOnSale,
+            'discount_percentage' => $maxDiscount ?: null,
+            'compare_at_price_min' => $cheapestOnSale?->compare_at_price,
+            'omnibus_price_min' => null,
+            'variants' => $variants->map(fn ($v): array => [
+                'id' => $v->id,
+                'price' => $v->price,
+                'compare_at_price' => $v->compare_at_price,
+            ])->values()->all(),
+            'thumbnail' => ($thumbnail = $product->thumbnail) && ($media = $thumbnail->media) ? [
+                'url' => $media->getUrl(),
+                'alt' => $media->name ?: $product->name,
+            ] : null,
+            'brand' => $product->brand ? [
+                'id' => $product->brand->id,
+                'name' => $product->brand->name,
+                'slug' => $product->brand->slug,
+                'public_url' => $pathService->brandPath($product->brand),
+            ] : null,
+            'category' => [
+                'id' => $product->category->id,
+                'name' => $product->category->name,
+                'slug' => $product->category->slug,
+                'image_url' => $product->category->image_path,
+                'public_url' => $pathService->categoryPath($product->category),
+            ],
+            'images' => [],
+            'attributes' => [],
+            'created_at' => $product->created_at->toIso8601String(),
+        ];
+    }
+
+    /**
      * Batch-load and resolve all block relations on this page.
      *
      * Returns a lookup indexed by [relation_type][relation_id] => serialized array.
@@ -219,63 +370,11 @@ class PageResource extends JsonResource
             $ids = $relations->pluck('relation_id')->unique()->values()->toArray();
 
             if ($type === 'product' && config('modules.ecommerce')) {
-                $products = Product::with(['thumbnail.media', 'brand', 'category', 'activeVariants:id,product_id,price,compare_at_price,stock_quantity,is_active,backorder_allowed'])
+                $products = Product::with($this->blockProductEagerLoads())
                     ->whereIn('id', $ids)->get();
 
                 foreach ($products as $product) {
-                    $variants = $product->activeVariants;
-                    $prices = $variants->pluck('price');
-                    $priceMin = $prices->min() ?? 0;
-                    $priceMax = $prices->max() ?? 0;
-                    $isOnSale = $variants->some(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price);
-                    $maxDiscount = $variants->map(fn ($v): ?int => $v->compare_at_price && $v->price
-                        ? (int) round((1 - $v->price / $v->compare_at_price) * 100)
-                        : null
-                    )->filter()->max();
-                    $cheapestOnSale = $variants
-                        ->filter(fn ($v): bool => $v->compare_at_price && $v->compare_at_price > $v->price)
-                        ->sortBy('price')
-                        ->first();
-
-                    $lookup[$type][$product->id] = [
-                        'id' => $product->id,
-                        'name' => $product->name,
-                        'slug' => $product->slug,
-                        'public_url' => $pathService->productPath($product),
-                        'short_description' => $product->short_description,
-                        'price_min' => $priceMin,
-                        'price_max' => $priceMax,
-                        'is_active' => $product->is_active,
-                        'is_on_sale' => $isOnSale,
-                        'discount_percentage' => $maxDiscount ?: null,
-                        'compare_at_price_min' => $cheapestOnSale?->compare_at_price,
-                        'omnibus_price_min' => null,
-                        'variants' => $variants->map(fn ($v): array => [
-                            'id' => $v->id,
-                            'price' => $v->price,
-                            'compare_at_price' => $v->compare_at_price,
-                        ])->values()->toArray(),
-                        'thumbnail' => ($thumbnail = $product->thumbnail) && ($media = $thumbnail->media) ? [
-                            'url' => $media->getUrl(),
-                            'alt' => $media->name ?: $product->name,
-                        ] : null,
-                        'brand' => $product->brand ? [
-                            'id' => $product->brand->id,
-                            'name' => $product->brand->name,
-                            'slug' => $product->brand->slug,
-                            'public_url' => $pathService->brandPath($product->brand),
-                        ] : null,
-                        'category' => [
-                            'id' => $product->category->id,
-                            'name' => $product->category->name,
-                            'slug' => $product->category->slug,
-                            'image_url' => $product->category->image_path,
-                            'public_url' => $pathService->categoryPath($product->category),
-                        ],
-                        'images' => [],
-                        'attributes' => [],
-                        'created_at' => $product->created_at->toIso8601String(),
-                    ];
+                    $lookup[$type][$product->id] = $this->serializeProductForBlock($product, $pathService);
                 }
             } elseif ($type === 'blog_post') {
                 $posts = BlogPost::with(['author', 'category'])->whereIn('id', $ids)->get();
