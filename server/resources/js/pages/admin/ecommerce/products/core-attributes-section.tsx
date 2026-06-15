@@ -170,7 +170,9 @@ export function CoreAttributesSection({
                                         <SelectValue placeholder="Not set" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">Not set</SelectItem>
+                                        <SelectItem value="none">
+                                            Not set
+                                        </SelectItem>
                                         <SelectItem value="1">Yes</SelectItem>
                                         <SelectItem value="0">No</SelectItem>
                                     </SelectContent>
@@ -251,10 +253,15 @@ export function CoreAttributesSection({
                         {attribute.type === 'select' && (
                             <>
                                 <Select
-                                    value={currentValue.option_id ? currentValue.option_id.toString() : 'none'}
+                                    value={
+                                        currentValue.option_id
+                                            ? currentValue.option_id.toString()
+                                            : 'none'
+                                    }
                                     onValueChange={(v) =>
                                         updateValue(attribute.attribute_id, {
-                                            option_id: v === 'none' ? null : Number(v),
+                                            option_id:
+                                                v === 'none' ? null : Number(v),
                                         })
                                     }
                                 >
@@ -262,7 +269,9 @@ export function CoreAttributesSection({
                                         <SelectValue placeholder="Select an option" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">Select an option</SelectItem>
+                                        <SelectItem value="none">
+                                            Select an option
+                                        </SelectItem>
                                         {attribute.options.map((option) => (
                                             <SelectItem
                                                 key={option.id}

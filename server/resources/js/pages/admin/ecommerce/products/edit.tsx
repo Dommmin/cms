@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from '@/hooks/use-translation';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
 import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
@@ -52,6 +51,7 @@ import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VersionHistory } from '@/components/version-history';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import { slugify } from '@/lib/slug';
@@ -382,9 +382,14 @@ export default function Edit({
                             >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 <span className="hidden sm:inline">
-                                    {__('products.back_to_list', 'Back to Products')}
+                                    {__(
+                                        'products.back_to_list',
+                                        'Back to Products',
+                                    )}
                                 </span>
-                                <span className="sm:hidden">{__('action.back', 'Back')}</span>
+                                <span className="sm:hidden">
+                                    {__('action.back', 'Back')}
+                                </span>
                             </Link>
                         </Button>
 

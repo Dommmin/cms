@@ -16,7 +16,6 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
@@ -24,6 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -207,15 +207,20 @@ export default function SupportShow({
                                         <Select
                                             value=""
                                             onValueChange={(val) => {
-                                                const cr = canned_responses.find(
-                                                    (c) => String(c.id) === val,
-                                                );
+                                                const cr =
+                                                    canned_responses.find(
+                                                        (c) =>
+                                                            String(c.id) ===
+                                                            val,
+                                                    );
                                                 if (cr) {
-                                                    insertCannedResponse(cr.body);
+                                                    insertCannedResponse(
+                                                        cr.body,
+                                                    );
                                                 }
                                             }}
                                         >
-                                            <SelectTrigger className="ml-auto w-[160px] h-9">
+                                            <SelectTrigger className="ml-auto h-9 w-[160px]">
                                                 <SelectValue placeholder="Quick reply..." />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -224,7 +229,8 @@ export default function SupportShow({
                                                         key={cr.id}
                                                         value={cr.id.toString()}
                                                     >
-                                                        #{cr.shortcut} — {cr.title}
+                                                        #{cr.shortcut} —{' '}
+                                                        {cr.title}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -361,7 +367,10 @@ export default function SupportShow({
                                                             {Number(
                                                                 order.total,
                                                             ).toFixed(2)}{' '}
-                                                            {__('misc.currency_symbol', 'zł')}
+                                                            {__(
+                                                                'misc.currency_symbol',
+                                                                'zł',
+                                                            )}
                                                         </p>
                                                     </Link>
                                                 </li>
@@ -388,7 +397,10 @@ export default function SupportShow({
                                     </SelectTrigger>
                                     <SelectContent>
                                         {statuses.map((s) => (
-                                            <SelectItem key={s.value} value={s.value}>
+                                            <SelectItem
+                                                key={s.value}
+                                                value={s.value}
+                                            >
                                                 {s.label}
                                             </SelectItem>
                                         ))}
@@ -401,16 +413,28 @@ export default function SupportShow({
                                     Assign to
                                 </Label>
                                 <Select
-                                    value={conversation.assigned_to?.id?.toString() ?? 'unassigned'}
-                                    onValueChange={(val) => handleAssign(val === 'unassigned' ? '' : val)}
+                                    value={
+                                        conversation.assigned_to?.id?.toString() ??
+                                        'unassigned'
+                                    }
+                                    onValueChange={(val) =>
+                                        handleAssign(
+                                            val === 'unassigned' ? '' : val,
+                                        )
+                                    }
                                 >
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select agent" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                                        <SelectItem value="unassigned">
+                                            Unassigned
+                                        </SelectItem>
                                         {agents.map((a) => (
-                                            <SelectItem key={a.id} value={a.id.toString()}>
+                                            <SelectItem
+                                                key={a.id}
+                                                value={a.id.toString()}
+                                            >
                                                 {a.name}
                                             </SelectItem>
                                         ))}

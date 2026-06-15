@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useState } from 'react';
 import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -138,7 +138,11 @@ export default function Edit({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="type" value={selectedType} />
+                                <input
+                                    type="hidden"
+                                    name="type"
+                                    value={selectedType}
+                                />
                                 <InputError message={errors.type} />
                             </div>
 

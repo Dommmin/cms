@@ -97,10 +97,17 @@ export default function EditMetafieldDefinition({
             data,
             {
                 onSuccess: () =>
-                    toast.success(__('metafields.definition_updated', 'Metafield definition updated successfully')),
+                    toast.success(
+                        __(
+                            'metafields.definition_updated',
+                            'Metafield definition updated successfully',
+                        ),
+                    ),
                 onError: (errs) => {
                     setErrors(errs);
-                    toast.error(__('common.fix_errors', 'Please fix the errors below'));
+                    toast.error(
+                        __('common.fix_errors', 'Please fix the errors below'),
+                    );
                 },
                 onFinish: () => setProcessing(false),
             },
@@ -113,7 +120,10 @@ export default function EditMetafieldDefinition({
             <Wrapper>
                 <PageHeader
                     title={`${__('action.edit', 'Edit')}: ${definition.name}`}
-                    description={__('metafields.edit_description', 'Update this metafield definition')}
+                    description={__(
+                        'metafields.edit_description',
+                        'Update this metafield definition',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
@@ -131,7 +141,12 @@ export default function EditMetafieldDefinition({
 
                 <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="owner_type">{__('metafields.owner_type_required', 'Owner Type *')}</Label>
+                        <Label htmlFor="owner_type">
+                            {__(
+                                'metafields.owner_type_required',
+                                'Owner Type *',
+                            )}
+                        </Label>
                         <Select
                             value={data.owner_type}
                             onValueChange={(val) =>
@@ -147,7 +162,9 @@ export default function EditMetafieldDefinition({
                             <SelectContent>
                                 {ownerTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {OWNER_TYPE_LABELS[type] ? __(OWNER_TYPE_LABELS[type]) : type}
+                                        {OWNER_TYPE_LABELS[type]
+                                            ? __(OWNER_TYPE_LABELS[type])
+                                            : type}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -159,7 +176,12 @@ export default function EditMetafieldDefinition({
                         <Label htmlFor="namespace">
                             {__('metafields.namespace_required', 'Namespace *')}{' '}
                             <span className="text-xs text-muted-foreground">
-                                ({__('metafields.lowercase_underscores_only', 'lowercase, underscores only')})
+                                (
+                                {__(
+                                    'metafields.lowercase_underscores_only',
+                                    'lowercase, underscores only',
+                                )}
+                                )
                             </span>
                         </Label>
                         <Input
@@ -180,7 +202,12 @@ export default function EditMetafieldDefinition({
                         <Label htmlFor="key">
                             {__('metafields.key_required', 'Key *')}{' '}
                             <span className="text-xs text-muted-foreground">
-                                ({__('metafields.lowercase_underscores_only', 'lowercase, underscores only')})
+                                (
+                                {__(
+                                    'metafields.lowercase_underscores_only',
+                                    'lowercase, underscores only',
+                                )}
+                                )
                             </span>
                         </Label>
                         <Input
@@ -198,7 +225,9 @@ export default function EditMetafieldDefinition({
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="name">{__('metafields.name_required', 'Name *')}</Label>
+                        <Label htmlFor="name">
+                            {__('metafields.name_required', 'Name *')}
+                        </Label>
                         <Input
                             id="name"
                             value={data.name}
@@ -215,7 +244,9 @@ export default function EditMetafieldDefinition({
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="type">{__('metafields.type_required', 'Type *')}</Label>
+                        <Label htmlFor="type">
+                            {__('metafields.type_required', 'Type *')}
+                        </Label>
                         <Select
                             value={data.type}
                             onValueChange={(val) =>
@@ -245,7 +276,12 @@ export default function EditMetafieldDefinition({
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="visibility">{__('metafields.visibility_required', 'Visibility *')}</Label>
+                        <Label htmlFor="visibility">
+                            {__(
+                                'metafields.visibility_required',
+                                'Visibility *',
+                            )}
+                        </Label>
                         <Select
                             value={data.visibility}
                             onValueChange={(val) =>
@@ -259,12 +295,23 @@ export default function EditMetafieldDefinition({
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="private">{__('metafields.visibility_private', 'Private')}</SelectItem>
+                                <SelectItem value="private">
+                                    {__(
+                                        'metafields.visibility_private',
+                                        'Private',
+                                    )}
+                                </SelectItem>
                                 <SelectItem value="admin_only">
-                                    {__('metafields.visibility_admin_only', 'Admin only')}
+                                    {__(
+                                        'metafields.visibility_admin_only',
+                                        'Admin only',
+                                    )}
                                 </SelectItem>
                                 <SelectItem value="storefront">
-                                    {__('metafields.visibility_storefront', 'Storefront')}
+                                    {__(
+                                        'metafields.visibility_storefront',
+                                        'Storefront',
+                                    )}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -286,12 +333,17 @@ export default function EditMetafieldDefinition({
                             htmlFor="storefront_exposed"
                             className="font-normal"
                         >
-                            {__('metafields.expose_storefront', 'Expose on storefront API')}
+                            {__(
+                                'metafields.expose_storefront',
+                                'Expose on storefront API',
+                            )}
                         </Label>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="description">{__('metafields.description', 'Description')}</Label>
+                        <Label htmlFor="description">
+                            {__('metafields.description', 'Description')}
+                        </Label>
                         <Textarea
                             id="description"
                             value={data.description}
@@ -307,7 +359,9 @@ export default function EditMetafieldDefinition({
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="position">{__('metafields.position', 'Position')}</Label>
+                        <Label htmlFor="position">
+                            {__('metafields.position', 'Position')}
+                        </Label>
                         <Input
                             id="position"
                             type="number"
@@ -335,7 +389,10 @@ export default function EditMetafieldDefinition({
                             }
                         />
                         <Label htmlFor="pinned" className="font-normal">
-                            {__('metafields.pinned_description', 'Pinned (show at the top of the metafields list)')}
+                            {__(
+                                'metafields.pinned_description',
+                                'Pinned (show at the top of the metafields list)',
+                            )}
                         </Label>
                     </div>
 
@@ -347,7 +404,10 @@ export default function EditMetafieldDefinition({
                         >
                             {processing
                                 ? __('common.saving', 'Saving...')
-                                : __('metafields.save_button', 'Save Metafield Definition')}
+                                : __(
+                                      'metafields.save_button',
+                                      'Save Metafield Definition',
+                                  )}
                         </Button>
                     </div>
                 </form>

@@ -230,7 +230,11 @@ export default function Create() {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            <input type="hidden" name={`rules[${index}][field]`} value={rule.field} />
+                                            <input
+                                                type="hidden"
+                                                name={`rules[${index}][field]`}
+                                                value={rule.field}
+                                            />
                                         </div>
                                         <div>
                                             <Label className="mb-1 text-xs">
@@ -250,17 +254,23 @@ export default function Create() {
                                                     <SelectValue placeholder="Select operator" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {RULE_OPERATORS.map((op) => (
-                                                        <SelectItem
-                                                            key={op.value}
-                                                            value={op.value}
-                                                        >
-                                                            {op.label}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {RULE_OPERATORS.map(
+                                                        (op) => (
+                                                            <SelectItem
+                                                                key={op.value}
+                                                                value={op.value}
+                                                            >
+                                                                {op.label}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
-                                            <input type="hidden" name={`rules[${index}][operator]`} value={rule.operator} />
+                                            <input
+                                                type="hidden"
+                                                name={`rules[${index}][operator]`}
+                                                value={rule.operator}
+                                            />
                                         </div>
                                         <div>
                                             <Label className="mb-1 text-xs">

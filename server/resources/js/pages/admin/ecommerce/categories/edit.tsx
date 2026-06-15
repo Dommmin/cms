@@ -12,6 +12,7 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LocalizedField } from '@/components/ui/localized-field';
 import {
     Select,
     SelectContent,
@@ -19,7 +20,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { LocalizedField } from '@/components/ui/localized-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VersionHistory } from '@/components/version-history';
 import Wrapper from '@/components/wrapper';
@@ -58,7 +58,9 @@ export default function Edit({
     const [isSlugManual, setIsSlugManual] = useState(
         category.slug !== slugify(category.name?.[defaultLocale] ?? ''),
     );
-    const [parentId, setParentId] = useState(category.parent_id ? category.parent_id.toString() : '');
+    const [parentId, setParentId] = useState(
+        category.parent_id ? category.parent_id.toString() : '',
+    );
     const [collectionType, setCollectionType] = useState<'manual' | 'smart'>(
         category.collection_type ?? 'manual',
     );
@@ -248,14 +250,24 @@ export default function Edit({
                                 <Label htmlFor="parent_id">
                                     {__('label.category', 'Parent Category')}
                                 </Label>
-                                <Select value={parentId || 'none'} onValueChange={(v) => setParentId(v === 'none' ? '' : v)}>
+                                <Select
+                                    value={parentId || 'none'}
+                                    onValueChange={(v) =>
+                                        setParentId(v === 'none' ? '' : v)
+                                    }
+                                >
                                     <SelectTrigger id="parent_id">
                                         <SelectValue placeholder="None (Top level)" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">None (Top level)</SelectItem>
+                                        <SelectItem value="none">
+                                            None (Top level)
+                                        </SelectItem>
                                         {parentCategories.map((cat) => (
-                                            <SelectItem key={cat.id} value={cat.id.toString()}>
+                                            <SelectItem
+                                                key={cat.id}
+                                                value={cat.id.toString()}
+                                            >
                                                 {cat.name}
                                             </SelectItem>
                                         ))}

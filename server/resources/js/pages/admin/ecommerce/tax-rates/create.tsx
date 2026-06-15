@@ -152,12 +152,19 @@ export default function Create({
                                 <Label htmlFor="country_code">
                                     {__('label.country', 'Country (optional)')}
                                 </Label>
-                                <Select value={countryCode || 'all'} onValueChange={(v) => setCountryCode(v === 'all' ? '' : v)}>
+                                <Select
+                                    value={countryCode || 'all'}
+                                    onValueChange={(v) =>
+                                        setCountryCode(v === 'all' ? '' : v)
+                                    }
+                                >
                                     <SelectTrigger id="country_code">
                                         <SelectValue placeholder="All countries" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All countries</SelectItem>
+                                        <SelectItem value="all">
+                                            All countries
+                                        </SelectItem>
                                         {COMMON_COUNTRIES.map((country) => (
                                             <SelectItem
                                                 key={country.code}
@@ -168,7 +175,11 @@ export default function Create({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="country_code" value={countryCode} />
+                                <input
+                                    type="hidden"
+                                    name="country_code"
+                                    value={countryCode}
+                                />
                                 <InputError message={errors.country_code} />
                             </div>
 

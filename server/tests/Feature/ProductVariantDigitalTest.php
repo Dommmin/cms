@@ -288,7 +288,7 @@ describe('VIES VAT Validation', function (): void {
 
         $rule->validate('vat_id', 'DE123456789', $fail);
 
-        expect($failMsg)->toBe('Podany numer VAT UE jest nieaktywny lub niepoprawny w bazie VIES.');
+        expect($failMsg)->toBe(__('validation.vat_id.inactive_vat', [], 'en'));
     });
 
     it('falls back to local format check if VIES API times out or fails', function (): void {

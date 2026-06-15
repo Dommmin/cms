@@ -56,14 +56,6 @@ const TYPE_OPTIONS = [
     },
 ];
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Metafield Definitions',
-        href: MetafieldDefinitionController.index.url(),
-    },
-    { title: 'Create', href: MetafieldDefinitionController.create.url() },
-];
-
 export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
     const __ = useTranslation();
     const breadcrumbs: BreadcrumbItem[] = [
@@ -71,7 +63,10 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
             title: __('metafields.definitions_title', 'Metafield Definitions'),
             href: MetafieldDefinitionController.index.url(),
         },
-        { title: __('action.create', 'Create'), href: MetafieldDefinitionController.create.url() },
+        {
+            title: __('action.create', 'Create'),
+            href: MetafieldDefinitionController.create.url(),
+        },
     ];
 
     const [data, setData] = useState({
@@ -96,10 +91,17 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
 
         router.post(MetafieldDefinitionController.store.url(), data, {
             onSuccess: () =>
-                toast.success(__('metafields.definition_created', 'Metafield definition created successfully')),
+                toast.success(
+                    __(
+                        'metafields.definition_created',
+                        'Metafield definition created successfully',
+                    ),
+                ),
             onError: (errs) => {
                 setErrors(errs);
-                toast.error(__('common.fix_errors', 'Please fix the errors below'));
+                toast.error(
+                    __('common.fix_errors', 'Please fix the errors below'),
+                );
             },
             onFinish: () => setProcessing(false),
         });
@@ -107,11 +109,22 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={__('metafields.create_title', 'Create Metafield Definition')} />
+            <Head
+                title={__(
+                    'metafields.create_title',
+                    'Create Metafield Definition',
+                )}
+            />
             <Wrapper>
                 <PageHeader
-                    title={__('metafields.create_title', 'Create Metafield Definition')}
-                    description={__('metafields.create_description', 'Add a new metafield definition for a content type')}
+                    title={__(
+                        'metafields.create_title',
+                        'Create Metafield Definition',
+                    )}
+                    description={__(
+                        'metafields.create_description',
+                        'Add a new metafield definition for a content type',
+                    )}
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
@@ -129,7 +142,12 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
 
                 <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="owner_type">{__('metafields.owner_type_required', 'Owner Type *')}</Label>
+                        <Label htmlFor="owner_type">
+                            {__(
+                                'metafields.owner_type_required',
+                                'Owner Type *',
+                            )}
+                        </Label>
                         <Select
                             value={data.owner_type}
                             onValueChange={(val) =>
@@ -140,12 +158,19 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                             }
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={__('metafields.select_content_type', 'Select content type')} />
+                                <SelectValue
+                                    placeholder={__(
+                                        'metafields.select_content_type',
+                                        'Select content type',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 {ownerTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {OWNER_TYPE_LABELS[type] ? __(OWNER_TYPE_LABELS[type]) : type}
+                                        {OWNER_TYPE_LABELS[type]
+                                            ? __(OWNER_TYPE_LABELS[type])
+                                            : type}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -157,7 +182,12 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                         <Label htmlFor="namespace">
                             {__('metafields.namespace_required', 'Namespace *')}{' '}
                             <span className="text-xs text-muted-foreground">
-                                ({__('metafields.lowercase_underscores_only', 'lowercase, underscores only')})
+                                (
+                                {__(
+                                    'metafields.lowercase_underscores_only',
+                                    'lowercase, underscores only',
+                                )}
+                                )
                             </span>
                         </Label>
                         <Input
@@ -179,7 +209,12 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                         <Label htmlFor="key">
                             {__('metafields.key_required', 'Key *')}{' '}
                             <span className="text-xs text-muted-foreground">
-                                ({__('metafields.lowercase_underscores_only', 'lowercase, underscores only')})
+                                (
+                                {__(
+                                    'metafields.lowercase_underscores_only',
+                                    'lowercase, underscores only',
+                                )}
+                                )
                             </span>
                         </Label>
                         <Input
@@ -198,7 +233,9 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="name">{__('metafields.name_required', 'Name *')}</Label>
+                        <Label htmlFor="name">
+                            {__('metafields.name_required', 'Name *')}
+                        </Label>
                         <Input
                             id="name"
                             value={data.name}
@@ -208,7 +245,10 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                                     name: e.target.value,
                                 }))
                             }
-                            placeholder={__('metafields.name_placeholder', 'Human-readable label')}
+                            placeholder={__(
+                                'metafields.name_placeholder',
+                                'Human-readable label',
+                            )}
                             required
                             autoFocus
                         />
@@ -216,7 +256,9 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="type">{__('metafields.type_required', 'Type *')}</Label>
+                        <Label htmlFor="type">
+                            {__('metafields.type_required', 'Type *')}
+                        </Label>
                         <Select
                             value={data.type}
                             onValueChange={(val) =>
@@ -246,7 +288,12 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="visibility">{__('metafields.visibility_required', 'Visibility *')}</Label>
+                        <Label htmlFor="visibility">
+                            {__(
+                                'metafields.visibility_required',
+                                'Visibility *',
+                            )}
+                        </Label>
                         <Select
                             value={data.visibility}
                             onValueChange={(val) =>
@@ -260,12 +307,23 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="private">{__('metafields.visibility_private', 'Private')}</SelectItem>
+                                <SelectItem value="private">
+                                    {__(
+                                        'metafields.visibility_private',
+                                        'Private',
+                                    )}
+                                </SelectItem>
                                 <SelectItem value="admin_only">
-                                    {__('metafields.visibility_admin_only', 'Admin only')}
+                                    {__(
+                                        'metafields.visibility_admin_only',
+                                        'Admin only',
+                                    )}
                                 </SelectItem>
                                 <SelectItem value="storefront">
-                                    {__('metafields.visibility_storefront', 'Storefront')}
+                                    {__(
+                                        'metafields.visibility_storefront',
+                                        'Storefront',
+                                    )}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -287,12 +345,17 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                             htmlFor="storefront_exposed"
                             className="font-normal"
                         >
-                            {__('metafields.expose_storefront', 'Expose on storefront API')}
+                            {__(
+                                'metafields.expose_storefront',
+                                'Expose on storefront API',
+                            )}
                         </Label>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="description">{__('metafields.description', 'Description')}</Label>
+                        <Label htmlFor="description">
+                            {__('metafields.description', 'Description')}
+                        </Label>
                         <Textarea
                             id="description"
                             value={data.description}
@@ -302,14 +365,19 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                                     description: e.target.value,
                                 }))
                             }
-                            placeholder={__('metafields.description_placeholder', 'Brief description of this metafield')}
+                            placeholder={__(
+                                'metafields.description_placeholder',
+                                'Brief description of this metafield',
+                            )}
                             rows={3}
                         />
                         <InputError message={errors.description} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="position">{__('metafields.position', 'Position')}</Label>
+                        <Label htmlFor="position">
+                            {__('metafields.position', 'Position')}
+                        </Label>
                         <Input
                             id="position"
                             type="number"
@@ -337,7 +405,10 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                             }
                         />
                         <Label htmlFor="pinned" className="font-normal">
-                            {__('metafields.pinned_description', 'Pinned (show at the top of the metafields list)')}
+                            {__(
+                                'metafields.pinned_description',
+                                'Pinned (show at the top of the metafields list)',
+                            )}
                         </Label>
                     </div>
 
@@ -349,7 +420,10 @@ export default function CreateMetafieldDefinition({ ownerTypes }: CreateProps) {
                         >
                             {processing
                                 ? __('common.creating', 'Creating...')
-                                : __('metafields.create_button', 'Create Metafield Definition')}
+                                : __(
+                                      'metafields.create_button',
+                                      'Create Metafield Definition',
+                                  )}
                         </Button>
                     </div>
                 </form>

@@ -115,7 +115,10 @@ export default function CreateStore() {
                                     address: e.target.value,
                                 }))
                             }
-                            placeholder={__('stores.address_placeholder', 'e.g. 123 Main St')}
+                            placeholder={__(
+                                'stores.address_placeholder',
+                                'e.g. 123 Main St',
+                            )}
                             required
                         />
                         <InputError message={errors.address} />

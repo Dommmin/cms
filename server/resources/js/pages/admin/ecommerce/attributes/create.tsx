@@ -219,7 +219,10 @@ export default function CreateAttribute() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {ATTRIBUTE_TYPES.map((type) => (
-                                        <SelectItem key={type.value} value={type.value}>
+                                        <SelectItem
+                                            key={type.value}
+                                            value={type.value}
+                                        >
                                             {type.label}
                                         </SelectItem>
                                     ))}

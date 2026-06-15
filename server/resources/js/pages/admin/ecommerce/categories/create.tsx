@@ -9,6 +9,7 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LocalizedField } from '@/components/ui/localized-field';
 import {
     Select,
     SelectContent,
@@ -16,7 +17,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { LocalizedField } from '@/components/ui/localized-field';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -174,20 +174,34 @@ export default function Create({
                         <Label htmlFor="parent_id">
                             {__('label.category', 'Parent Category')}
                         </Label>
-                        <Select value={parentId || 'none'} onValueChange={(v) => setParentId(v === 'none' ? '' : v)}>
+                        <Select
+                            value={parentId || 'none'}
+                            onValueChange={(v) =>
+                                setParentId(v === 'none' ? '' : v)
+                            }
+                        >
                             <SelectTrigger id="parent_id">
                                 <SelectValue placeholder="None (Top level)" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="none">None (Top level)</SelectItem>
+                                <SelectItem value="none">
+                                    None (Top level)
+                                </SelectItem>
                                 {normalizedCategories.map((cat) => (
-                                    <SelectItem key={cat.id} value={cat.id.toString()}>
+                                    <SelectItem
+                                        key={cat.id}
+                                        value={cat.id.toString()}
+                                    >
                                         {cat.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <input type="hidden" name="parent_id" value={parentId} />
+                        <input
+                            type="hidden"
+                            name="parent_id"
+                            value={parentId}
+                        />
                         <InputError message={errors.parent_id} />
                     </div>
 

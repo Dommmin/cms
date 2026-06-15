@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useState } from 'react';
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -90,7 +90,11 @@ export default function CreateNotification({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="customer_id" value={selectedCustomer} />
+                                <input
+                                    type="hidden"
+                                    name="customer_id"
+                                    value={selectedCustomer}
+                                />
                                 <InputError message={errors.customer_id} />
                             </div>
 
@@ -114,7 +118,11 @@ export default function CreateNotification({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="type" value={selectedType} />
+                                <input
+                                    type="hidden"
+                                    name="type"
+                                    value={selectedType}
+                                />
                                 <InputError message={errors.type} />
                             </div>
 
@@ -138,7 +146,11 @@ export default function CreateNotification({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="channel" value={selectedChannel} />
+                                <input
+                                    type="hidden"
+                                    name="channel"
+                                    value={selectedChannel}
+                                />
                                 <InputError message={errors.channel} />
                             </div>
 

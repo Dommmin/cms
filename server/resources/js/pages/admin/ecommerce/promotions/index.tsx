@@ -44,7 +44,10 @@ export default function Index({
     const __ = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: __('promotions.title', 'Promotions'), href: PromotionController.index.url() },
+        {
+            title: __('promotions.title', 'Promotions'),
+            href: PromotionController.index.url(),
+        },
     ];
 
     const promotionTypes = {
@@ -56,8 +59,14 @@ export default function Index({
 
     const applyToTypes = {
         all: __('promotions.apply_to.all', 'All products'),
-        specific_products: __('promotions.apply_to.specific_products', 'Selected products'),
-        specific_categories: __('promotions.apply_to.specific_categories', 'Selected categories'),
+        specific_products: __(
+            'promotions.apply_to.specific_products',
+            'Selected products',
+        ),
+        specific_categories: __(
+            'promotions.apply_to.specific_categories',
+            'Selected categories',
+        ),
     };
 
     const activeFilterCount = [
@@ -99,7 +108,14 @@ export default function Index({
     };
 
     const deletePromotion = (id: number) => {
-        if (confirm(__('promotions.delete_confirm', 'Are you sure you want to delete this promotion?'))) {
+        if (
+            confirm(
+                __(
+                    'promotions.delete_confirm',
+                    'Are you sure you want to delete this promotion?',
+                ),
+            )
+        ) {
             router.delete(PromotionController.destroy.url(id), {
                 preserveScroll: true,
             });
@@ -113,7 +129,10 @@ export default function Index({
             <Wrapper>
                 <PageHeader
                     title={__('promotions.title_heading', 'Product Promotions')}
-                    description={__('promotions.description', 'Manage promotions on products and categories')}
+                    description={__(
+                        'promotions.description',
+                        'Manage promotions on products and categories',
+                    )}
                 >
                     <PageHeaderActions compact>
                         <Button asChild>
@@ -127,16 +146,24 @@ export default function Index({
 
                 <ListFilters
                     activeCount={activeFilterCount}
-                    description={__('promotions.filter_description', 'Filter promotions by name, status, and type.')}
+                    description={__(
+                        'promotions.filter_description',
+                        'Filter promotions by name, status, and type.',
+                    )}
                     contentClassName="sm:grid sm:grid-cols-3 sm:items-end sm:gap-4"
                 >
                     <div className="space-y-2">
-                        <Label htmlFor="search">{__('promotions.search', 'Search')}</Label>
+                        <Label htmlFor="search">
+                            {__('promotions.search', 'Search')}
+                        </Label>
                         <div className="relative">
                             <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                             <Input
                                 id="search"
-                                placeholder={__('promotions.search_placeholder', 'Search promotions...')}
+                                placeholder={__(
+                                    'promotions.search_placeholder',
+                                    'Search promotions...',
+                                )}
                                 value={filters.search || ''}
                                 onChange={(e) => handleSearch(e.target.value)}
                                 className="pl-10"
@@ -144,7 +171,9 @@ export default function Index({
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="is_active">{__('promotions.status', 'Status')}</Label>
+                        <Label htmlFor="is_active">
+                            {__('promotions.status', 'Status')}
+                        </Label>
                         <Select
                             value={filters.is_active || 'all'}
                             onValueChange={(value) =>
@@ -155,17 +184,30 @@ export default function Index({
                             }
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={__('promotions.select_status', 'Select status')} />
+                                <SelectValue
+                                    placeholder={__(
+                                        'promotions.select_status',
+                                        'Select status',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">{__('promotions.all', 'All')}</SelectItem>
-                                <SelectItem value="1">{__('promotions.active', 'Active')}</SelectItem>
-                                <SelectItem value="0">{__('promotions.inactive', 'Inactive')}</SelectItem>
+                                <SelectItem value="all">
+                                    {__('promotions.all', 'All')}
+                                </SelectItem>
+                                <SelectItem value="1">
+                                    {__('promotions.active', 'Active')}
+                                </SelectItem>
+                                <SelectItem value="0">
+                                    {__('promotions.inactive', 'Inactive')}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="type">{__('promotions.type', 'Type')}</Label>
+                        <Label htmlFor="type">
+                            {__('promotions.type', 'Type')}
+                        </Label>
                         <Select
                             value={filters.type || 'all'}
                             onValueChange={(value) =>
@@ -176,10 +218,17 @@ export default function Index({
                             }
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={__('promotions.select_type', 'Select type')} />
+                                <SelectValue
+                                    placeholder={__(
+                                        'promotions.select_type',
+                                        'Select type',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">{__('promotions.all', 'All')}</SelectItem>
+                                <SelectItem value="all">
+                                    {__('promotions.all', 'All')}
+                                </SelectItem>
                                 {Object.entries(promotionTypes).map(
                                     ([key, label]) => (
                                         <SelectItem key={key} value={key}>
@@ -212,7 +261,10 @@ export default function Index({
                                         <dl className="space-y-2 text-sm">
                                             <div className="space-y-1">
                                                 <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                                    {__('promotions.type', 'Type')}
+                                                    {__(
+                                                        'promotions.type',
+                                                        'Type',
+                                                    )}
                                                 </dt>
                                                 <dd>
                                                     <Badge variant="outline">
@@ -226,7 +278,10 @@ export default function Index({
                                             </div>
                                             <div className="space-y-1">
                                                 <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                                    {__('promotions.apply_to', 'Apply to')}
+                                                    {__(
+                                                        'promotions.apply_to',
+                                                        'Apply to',
+                                                    )}
                                                 </dt>
                                                 <dd>
                                                     <Badge variant="secondary">
@@ -241,13 +296,19 @@ export default function Index({
                                             </div>
                                             <div className="space-y-1">
                                                 <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                                    {__('promotions.value', 'Value')}
+                                                    {__(
+                                                        'promotions.value',
+                                                        'Value',
+                                                    )}
                                                 </dt>
                                                 <dd>
                                                     {promotion.type ===
                                                     'free_shipping' ? (
                                                         <span>
-                                                            {__('promotions.free_shipping', 'Free shipping')}
+                                                            {__(
+                                                                'promotions.free_shipping',
+                                                                'Free shipping',
+                                                            )}
                                                         </span>
                                                     ) : promotion.type ===
                                                       'percentage' ? (
@@ -256,14 +317,21 @@ export default function Index({
                                                         </span>
                                                     ) : (
                                                         <span>
-                                                            {promotion.value} {__('promotions.currency_symbol', 'zł')}
+                                                            {promotion.value}{' '}
+                                                            {__(
+                                                                'promotions.currency_symbol',
+                                                                'zł',
+                                                            )}
                                                         </span>
                                                     )}
                                                 </dd>
                                             </div>
                                             <div className="space-y-1">
                                                 <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                                    {__('promotions.status', 'Status')}
+                                                    {__(
+                                                        'promotions.status',
+                                                        'Status',
+                                                    )}
                                                 </dt>
                                                 <dd>
                                                     <Badge
@@ -274,14 +342,23 @@ export default function Index({
                                                         }
                                                     >
                                                         {promotion.is_active
-                                                            ? __('promotions.active', 'Active')
-                                                            : __('promotions.inactive', 'Inactive')}
+                                                            ? __(
+                                                                  'promotions.active',
+                                                                  'Active',
+                                                              )
+                                                            : __(
+                                                                  'promotions.inactive',
+                                                                  'Inactive',
+                                                              )}
                                                     </Badge>
                                                 </dd>
                                             </div>
                                             <div className="space-y-1">
                                                 <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                                    {__('promotions.priority', 'Priority')}
+                                                    {__(
+                                                        'promotions.priority',
+                                                        'Priority',
+                                                    )}
                                                 </dt>
                                                 <dd>{promotion.priority}</dd>
                                             </div>
@@ -289,12 +366,18 @@ export default function Index({
                                                 promotion.ends_at) && (
                                                 <div className="space-y-1">
                                                     <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                                        {__('promotions.dates', 'Dates')}
+                                                        {__(
+                                                            'promotions.dates',
+                                                            'Dates',
+                                                        )}
                                                     </dt>
                                                     <dd className="space-y-1">
                                                         {promotion.starts_at && (
                                                             <div>
-                                                                {__('promotions.date_from', 'From:')}{' '}
+                                                                {__(
+                                                                    'promotions.date_from',
+                                                                    'From:',
+                                                                )}{' '}
                                                                 {new Date(
                                                                     promotion.starts_at,
                                                                 ).toLocaleDateString()}
@@ -302,7 +385,10 @@ export default function Index({
                                                         )}
                                                         {promotion.ends_at && (
                                                             <div>
-                                                                {__('promotions.date_to', 'To:')}{' '}
+                                                                {__(
+                                                                    'promotions.date_to',
+                                                                    'To:',
+                                                                )}{' '}
                                                                 {new Date(
                                                                     promotion.ends_at,
                                                                 ).toLocaleDateString()}
@@ -372,7 +458,10 @@ export default function Index({
                                             {__('promotions.type', 'Type')}
                                         </th>
                                         <th className="p-4 text-left font-medium">
-                                            {__('promotions.apply_to', 'Apply to')}
+                                            {__(
+                                                'promotions.apply_to',
+                                                'Apply to',
+                                            )}
                                         </th>
                                         <th className="p-4 text-left font-medium">
                                             {__('promotions.value', 'Value')}
@@ -381,13 +470,19 @@ export default function Index({
                                             {__('promotions.status', 'Status')}
                                         </th>
                                         <th className="p-4 text-left font-medium">
-                                            {__('promotions.priority', 'Priority')}
+                                            {__(
+                                                'promotions.priority',
+                                                'Priority',
+                                            )}
                                         </th>
                                         <th className="p-4 text-left font-medium">
                                             {__('promotions.date', 'Date')}
                                         </th>
                                         <th className="p-4 text-right font-medium">
-                                            {__('promotions.actions', 'Actions')}
+                                            {__(
+                                                'promotions.actions',
+                                                'Actions',
+                                            )}
                                         </th>
                                     </tr>
                                 </thead>
@@ -432,7 +527,12 @@ export default function Index({
                                             <td className="p-4">
                                                 {promotion.type ===
                                                 'free_shipping' ? (
-                                                    <span>{__('promotions.free_shipping', 'Free shipping')}</span>
+                                                    <span>
+                                                        {__(
+                                                            'promotions.free_shipping',
+                                                            'Free shipping',
+                                                        )}
+                                                    </span>
                                                 ) : promotion.type ===
                                                   'percentage' ? (
                                                     <span>
@@ -440,7 +540,11 @@ export default function Index({
                                                     </span>
                                                 ) : (
                                                     <span>
-                                                        {promotion.value} {__('promotions.currency_symbol', 'zł')}
+                                                        {promotion.value}{' '}
+                                                        {__(
+                                                            'promotions.currency_symbol',
+                                                            'zł',
+                                                        )}
                                                     </span>
                                                 )}
                                             </td>
@@ -453,8 +557,14 @@ export default function Index({
                                                     }
                                                 >
                                                     {promotion.is_active
-                                                        ? __('promotions.active', 'Active')
-                                                        : __('promotions.inactive', 'Inactive')}
+                                                        ? __(
+                                                              'promotions.active',
+                                                              'Active',
+                                                          )
+                                                        : __(
+                                                              'promotions.inactive',
+                                                              'Inactive',
+                                                          )}
                                                 </Badge>
                                             </td>
                                             <td className="p-4">
@@ -464,7 +574,10 @@ export default function Index({
                                                 <div className="text-sm">
                                                     {promotion.starts_at && (
                                                         <div>
-                                                            {__('promotions.date_from', 'From:')}{' '}
+                                                            {__(
+                                                                'promotions.date_from',
+                                                                'From:',
+                                                            )}{' '}
                                                             {new Date(
                                                                 promotion.starts_at,
                                                             ).toLocaleDateString()}
@@ -472,7 +585,10 @@ export default function Index({
                                                     )}
                                                     {promotion.ends_at && (
                                                         <div>
-                                                            {__('promotions.date_to', 'To:')}{' '}
+                                                            {__(
+                                                                'promotions.date_to',
+                                                                'To:',
+                                                            )}{' '}
                                                             {new Date(
                                                                 promotion.ends_at,
                                                             ).toLocaleDateString()}
@@ -536,11 +652,15 @@ export default function Index({
                 {promotions.links && promotions.meta && (
                     <div className="flex items-center justify-between">
                         <div className="text-sm text-muted-foreground">
-                            {__('promotions.pagination_showing', {
-                                from: promotions.meta.from,
-                                to: promotions.meta.to,
-                                total: promotions.meta.total,
-                            }, 'Showing :from to :to of :total promotions')}
+                            {__(
+                                'promotions.pagination_showing',
+                                {
+                                    from: promotions.meta.from ?? 0,
+                                    to: promotions.meta.to ?? 0,
+                                    total: promotions.meta.total,
+                                },
+                                'Showing :from to :to of :total promotions',
+                            )}
                         </div>
                         <div className="flex gap-2">
                             {promotions.links.map((link, index: number) => (

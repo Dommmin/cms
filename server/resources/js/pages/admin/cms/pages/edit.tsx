@@ -774,14 +774,17 @@ export default function Edit({
                                             </Label>
                                             <Select
                                                 value={selectedRobots}
-                                                onValueChange={setSelectedRobots}
+                                                onValueChange={
+                                                    setSelectedRobots
+                                                }
                                             >
                                                 <SelectTrigger id="meta_robots">
                                                     <SelectValue placeholder="Select robots rule" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="index, follow">
-                                                        Index &amp; Follow (Recommended)
+                                                        Index &amp; Follow
+                                                        (Recommended)
                                                     </SelectItem>
                                                     <SelectItem value="noindex, follow">
                                                         No Index, Follow
@@ -794,7 +797,11 @@ export default function Edit({
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            <input type="hidden" name="meta_robots" value={selectedRobots} />
+                                            <input
+                                                type="hidden"
+                                                name="meta_robots"
+                                                value={selectedRobots}
+                                            />
                                             <InputError
                                                 message={errors.meta_robots}
                                             />

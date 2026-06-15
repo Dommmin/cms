@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useState } from 'react';
 import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -42,7 +42,9 @@ export default function Create({
 }) {
     const __ = useTranslation();
     const isEditing = !!discount;
-    const [selectedType, setSelectedType] = useState(discount?.type ?? 'percentage');
+    const [selectedType, setSelectedType] = useState(
+        discount?.type ?? 'percentage',
+    );
     const formId = isEditing ? 'discount-edit-form' : 'discount-create-form';
     const breadcrumbs: BreadcrumbItem[] = isEditing
         ? [
@@ -157,7 +159,11 @@ export default function Create({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="type" value={selectedType} />
+                                <input
+                                    type="hidden"
+                                    name="type"
+                                    value={selectedType}
+                                />
                                 <InputError message={errors.type} />
                             </div>
 

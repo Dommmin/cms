@@ -92,7 +92,9 @@ export default function MetafieldDefinitionsIndex({
             header: __('column.owner_type', 'Owner Type'),
             cell: ({ row }) => (
                 <Badge variant="outline">
-                    {OWNER_TYPE_LABELS[row.original.owner_type] ? __(OWNER_TYPE_LABELS[row.original.owner_type]) : row.original.owner_type}
+                    {OWNER_TYPE_LABELS[row.original.owner_type]
+                        ? __(OWNER_TYPE_LABELS[row.original.owner_type])
+                        : row.original.owner_type}
                 </Badge>
             ),
         },
@@ -119,7 +121,9 @@ export default function MetafieldDefinitionsIndex({
             header: __('column.type', 'Type'),
             cell: ({ row }) => (
                 <Badge variant="secondary">
-                    {TYPE_LABELS[row.original.type] ? __(TYPE_LABELS[row.original.type]) : row.original.type}
+                    {TYPE_LABELS[row.original.type]
+                        ? __(TYPE_LABELS[row.original.type])
+                        : row.original.type}
                 </Badge>
             ),
         },
@@ -128,7 +132,9 @@ export default function MetafieldDefinitionsIndex({
             header: __('column.pinned', 'Pinned'),
             cell: ({ row }) => (
                 <Badge variant={row.original.pinned ? 'default' : 'outline'}>
-                    {row.original.pinned ? __('common.yes', 'Yes') : __('common.no', 'No')}
+                    {row.original.pinned
+                        ? __('common.yes', 'Yes')
+                        : __('common.no', 'No')}
                 </Badge>
             ),
         },
@@ -170,7 +176,12 @@ export default function MetafieldDefinitionsIndex({
                                 ),
                                 {
                                     onSuccess: () =>
-                                        toast.success(__('metafields.definition_deleted', 'Definition deleted')),
+                                        toast.success(
+                                            __(
+                                                'metafields.definition_deleted',
+                                                'Definition deleted',
+                                            ),
+                                        ),
                                 },
                             );
                         }}
@@ -185,17 +196,31 @@ export default function MetafieldDefinitionsIndex({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={__('metafields.definitions_title', 'Metafield Definitions')} />
+            <Head
+                title={__(
+                    'metafields.definitions_title',
+                    'Metafield Definitions',
+                )}
+            />
             <Wrapper>
                 <PageHeader
-                    title={__('metafields.definitions_title', 'Metafield Definitions')}
-                    description={__('metafields.definitions_description', 'Define custom metafields for your content types')}
+                    title={__(
+                        'metafields.definitions_title',
+                        'Metafield Definitions',
+                    )}
+                    description={__(
+                        'metafields.definitions_description',
+                        'Define custom metafields for your content types',
+                    )}
                 >
                     <PageHeaderActions compact>
                         <Link href={MetafieldDefinitionController.create.url()}>
                             <Button variant="outline">
                                 <PlusIcon className="mr-2 h-4 w-4" />
-                                {__('metafields.new_definition', 'New Definition')}
+                                {__(
+                                    'metafields.new_definition',
+                                    'New Definition',
+                                )}
                             </Button>
                         </Link>
                     </PageHeaderActions>
@@ -209,13 +234,25 @@ export default function MetafieldDefinitionsIndex({
                         }
                     >
                         <SelectTrigger className="w-48">
-                            <SelectValue placeholder={__('metafields.all_owner_types', 'All owner types')} />
+                            <SelectValue
+                                placeholder={__(
+                                    'metafields.all_owner_types',
+                                    'All owner types',
+                                )}
+                            />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{__('metafields.all_owner_types', 'All owner types')}</SelectItem>
+                            <SelectItem value="all">
+                                {__(
+                                    'metafields.all_owner_types',
+                                    'All owner types',
+                                )}
+                            </SelectItem>
                             {ownerTypes.map((type) => (
                                 <SelectItem key={type} value={type}>
-                                    {OWNER_TYPE_LABELS[type] ? __(OWNER_TYPE_LABELS[type]) : type}
+                                    {OWNER_TYPE_LABELS[type]
+                                        ? __(OWNER_TYPE_LABELS[type])
+                                        : type}
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -238,7 +275,10 @@ export default function MetafieldDefinitionsIndex({
                         next_page_url: definitions.next_page_url ?? null,
                     }}
                     searchable
-                    searchPlaceholder={__('metafields.search_definitions_placeholder', 'Search definitions...')}
+                    searchPlaceholder={__(
+                        'metafields.search_definitions_placeholder',
+                        'Search definitions...',
+                    )}
                     searchValue={filters.search ?? ''}
                     baseUrl={MetafieldDefinitionController.index.url()}
                 />

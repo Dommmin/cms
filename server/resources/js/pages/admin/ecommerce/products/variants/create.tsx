@@ -37,7 +37,9 @@ export default function CreateVariant({
     const productName = resolveLocalizedText(product.name);
     const [stockStatus, setStockStatus] = useState('in_stock');
     const [taxRateId, setTaxRateId] = useState('');
-    const [selectedAttributes, setSelectedAttributes] = useState<Record<number, string>>({});
+    const [selectedAttributes, setSelectedAttributes] = useState<
+        Record<number, string>
+    >({});
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Products', href: ProductController.index.url() },
@@ -214,12 +216,21 @@ export default function CreateVariant({
                                     <Label htmlFor="tax_rate_id">
                                         {__('label.tax_rate', 'Tax Rate')}
                                     </Label>
-                                    <Select value={taxRateId || 'default'} onValueChange={(v) => setTaxRateId(v === 'default' ? '' : v)}>
+                                    <Select
+                                        value={taxRateId || 'default'}
+                                        onValueChange={(v) =>
+                                            setTaxRateId(
+                                                v === 'default' ? '' : v,
+                                            )
+                                        }
+                                    >
                                         <SelectTrigger id="tax_rate_id">
                                             <SelectValue placeholder="Default" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="default">Default</SelectItem>
+                                            <SelectItem value="default">
+                                                Default
+                                            </SelectItem>
                                             {taxRates.map((rate) => (
                                                 <SelectItem
                                                     key={rate.id}
@@ -230,7 +241,11 @@ export default function CreateVariant({
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <input type="hidden" name="tax_rate_id" value={taxRateId} />
+                                    <input
+                                        type="hidden"
+                                        name="tax_rate_id"
+                                        value={taxRateId}
+                                    />
                                     <InputError message={errors.tax_rate_id} />
                                 </div>
                             </div>
@@ -263,35 +278,64 @@ export default function CreateVariant({
                                                         : ''}
                                                 </Label>
                                                 <Select
-                                                    value={selectedAttributes[attribute.id] || 'none'}
+                                                    value={
+                                                        selectedAttributes[
+                                                            attribute.id
+                                                        ] || 'none'
+                                                    }
                                                     onValueChange={(v) =>
-                                                        setSelectedAttributes((prev) => ({
-                                                            ...prev,
-                                                            [attribute.id]: v === 'none' ? '' : v,
-                                                        }))
+                                                        setSelectedAttributes(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                [attribute.id]:
+                                                                    v === 'none'
+                                                                        ? ''
+                                                                        : v,
+                                                            }),
+                                                        )
                                                     }
                                                 >
-                                                    <SelectTrigger id={`attribute-${attribute.id}`}>
-                                                        <SelectValue placeholder={__('placeholder.select_value', 'Select value')} />
+                                                    <SelectTrigger
+                                                        id={`attribute-${attribute.id}`}
+                                                    >
+                                                        <SelectValue
+                                                            placeholder={__(
+                                                                'placeholder.select_value',
+                                                                'Select value',
+                                                            )}
+                                                        />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value="none">
-                                                            {__('placeholder.select_value', 'Select value')}
+                                                            {__(
+                                                                'placeholder.select_value',
+                                                                'Select value',
+                                                            )}
                                                         </SelectItem>
-                                                        {attribute.values.map((value) => (
-                                                            <SelectItem
-                                                                key={value.id}
-                                                                value={value.id.toString()}
-                                                            >
-                                                                {value.value}
-                                                            </SelectItem>
-                                                        ))}
+                                                        {attribute.values.map(
+                                                            (value) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        value.id
+                                                                    }
+                                                                    value={value.id.toString()}
+                                                                >
+                                                                    {
+                                                                        value.value
+                                                                    }
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
                                                     </SelectContent>
                                                 </Select>
                                                 <input
                                                     type="hidden"
                                                     name="attribute_values[]"
-                                                    value={selectedAttributes[attribute.id] || ''}
+                                                    value={
+                                                        selectedAttributes[
+                                                            attribute.id
+                                                        ] || ''
+                                                    }
                                                 />
                                             </div>
                                         ))}
@@ -334,18 +378,33 @@ export default function CreateVariant({
                                     <Label htmlFor="stock_status">
                                         Stock Status Override
                                     </Label>
-                                    <Select value={stockStatus} onValueChange={setStockStatus}>
+                                    <Select
+                                        value={stockStatus}
+                                        onValueChange={setStockStatus}
+                                    >
                                         <SelectTrigger id="stock_status">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="in_stock">In Stock</SelectItem>
-                                            <SelectItem value="out_of_stock">Out of Stock</SelectItem>
-                                            <SelectItem value="backorder">Backorder</SelectItem>
-                                            <SelectItem value="pre_order">Pre-Order</SelectItem>
+                                            <SelectItem value="in_stock">
+                                                In Stock
+                                            </SelectItem>
+                                            <SelectItem value="out_of_stock">
+                                                Out of Stock
+                                            </SelectItem>
+                                            <SelectItem value="backorder">
+                                                Backorder
+                                            </SelectItem>
+                                            <SelectItem value="pre_order">
+                                                Pre-Order
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <input type="hidden" name="stock_status" value={stockStatus} />
+                                    <input
+                                        type="hidden"
+                                        name="stock_status"
+                                        value={stockStatus}
+                                    />
                                     <InputError message={errors.stock_status} />
                                 </div>
 

@@ -132,21 +132,27 @@ export default function EditVariant({
         },
     ];
 
-    const selectedAttributeValues = new Set(
-        (variant.attribute_values ?? []).map((item) => item.attribute_value_id),
-    );
-
-    const initialSelectedAttributes = (variant.attribute_values ?? []).reduce<Record<number, string>>((acc, item) => {
-        const attr = attributes.find((a) => a.values.some((v) => v.id === item.attribute_value_id));
+    const initialSelectedAttributes = (variant.attribute_values ?? []).reduce<
+        Record<number, string>
+    >((acc, item) => {
+        const attr = attributes.find((a) =>
+            a.values.some((v) => v.id === item.attribute_value_id),
+        );
         if (attr) {
             acc[attr.id] = item.attribute_value_id.toString();
         }
         return acc;
     }, {});
 
-    const [stockStatus, setStockStatus] = useState(variant.stock_status || 'in_stock');
-    const [taxRateId, setTaxRateId] = useState(variant.tax_rate_id ? variant.tax_rate_id.toString() : '');
-    const [selectedAttributes, setSelectedAttributes] = useState<Record<number, string>>(initialSelectedAttributes);
+    const [stockStatus, setStockStatus] = useState(
+        variant.stock_status || 'in_stock',
+    );
+    const [taxRateId, setTaxRateId] = useState(
+        variant.tax_rate_id ? variant.tax_rate_id.toString() : '',
+    );
+    const [selectedAttributes, setSelectedAttributes] = useState<
+        Record<number, string>
+    >(initialSelectedAttributes);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -342,12 +348,21 @@ export default function EditVariant({
                                     <Label htmlFor="tax_rate_id">
                                         {__('label.tax_rate', 'Tax Rate')}
                                     </Label>
-                                    <Select value={taxRateId || 'default'} onValueChange={(v) => setTaxRateId(v === 'default' ? '' : v)}>
+                                    <Select
+                                        value={taxRateId || 'default'}
+                                        onValueChange={(v) =>
+                                            setTaxRateId(
+                                                v === 'default' ? '' : v,
+                                            )
+                                        }
+                                    >
                                         <SelectTrigger id="tax_rate_id">
                                             <SelectValue placeholder="Default" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="default">Default</SelectItem>
+                                            <SelectItem value="default">
+                                                Default
+                                            </SelectItem>
                                             {taxRates.map((rate) => (
                                                 <SelectItem
                                                     key={rate.id}
@@ -358,7 +373,11 @@ export default function EditVariant({
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <input type="hidden" name="tax_rate_id" value={taxRateId} />
+                                    <input
+                                        type="hidden"
+                                        name="tax_rate_id"
+                                        value={taxRateId}
+                                    />
                                     <InputError message={errors.tax_rate_id} />
                                 </div>
                             </div>
@@ -378,13 +397,6 @@ export default function EditVariant({
                                     />
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         {attributes.map((attribute) => {
-                                            const currentValue =
-                                                attribute.values.find((value) =>
-                                                    selectedAttributeValues.has(
-                                                        value.id,
-                                                    ),
-                                                )?.id ?? '';
-
                                             return (
                                                 <div
                                                     key={attribute.id}
@@ -398,37 +410,67 @@ export default function EditVariant({
                                                             ? ' *'
                                                             : ''}
                                                     </Label>
-                                                <Select
-                                                    value={selectedAttributes[attribute.id] || 'none'}
-                                                    onValueChange={(v) =>
-                                                        setSelectedAttributes((prev) => ({
-                                                            ...prev,
-                                                            [attribute.id]: v === 'none' ? '' : v,
-                                                        }))
-                                                    }
-                                                >
-                                                    <SelectTrigger id={`attribute-${attribute.id}`}>
-                                                        <SelectValue placeholder={__('placeholder.select_value', 'Select value')} />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="none">
-                                                            {__('placeholder.select_value', 'Select value')}
-                                                        </SelectItem>
-                                                        {attribute.values.map((value) => (
-                                                            <SelectItem
-                                                                key={value.id}
-                                                                value={value.id.toString()}
-                                                            >
-                                                                {value.value}
+                                                    <Select
+                                                        value={
+                                                            selectedAttributes[
+                                                                attribute.id
+                                                            ] || 'none'
+                                                        }
+                                                        onValueChange={(v) =>
+                                                            setSelectedAttributes(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    [attribute.id]:
+                                                                        v ===
+                                                                        'none'
+                                                                            ? ''
+                                                                            : v,
+                                                                }),
+                                                            )
+                                                        }
+                                                    >
+                                                        <SelectTrigger
+                                                            id={`attribute-${attribute.id}`}
+                                                        >
+                                                            <SelectValue
+                                                                placeholder={__(
+                                                                    'placeholder.select_value',
+                                                                    'Select value',
+                                                                )}
+                                                            />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="none">
+                                                                {__(
+                                                                    'placeholder.select_value',
+                                                                    'Select value',
+                                                                )}
                                                             </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <input
-                                                    type="hidden"
-                                                    name="attribute_values[]"
-                                                    value={selectedAttributes[attribute.id] || ''}
-                                                />
+                                                            {attribute.values.map(
+                                                                (value) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            value.id
+                                                                        }
+                                                                        value={value.id.toString()}
+                                                                    >
+                                                                        {
+                                                                            value.value
+                                                                        }
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <input
+                                                        type="hidden"
+                                                        name="attribute_values[]"
+                                                        value={
+                                                            selectedAttributes[
+                                                                attribute.id
+                                                            ] || ''
+                                                        }
+                                                    />
                                                 </div>
                                             );
                                         })}
@@ -474,18 +516,33 @@ export default function EditVariant({
                                     <Label htmlFor="stock_status">
                                         Stock Status Override
                                     </Label>
-                                    <Select value={stockStatus} onValueChange={setStockStatus}>
+                                    <Select
+                                        value={stockStatus}
+                                        onValueChange={setStockStatus}
+                                    >
                                         <SelectTrigger id="stock_status">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="in_stock">In Stock</SelectItem>
-                                            <SelectItem value="out_of_stock">Out of Stock</SelectItem>
-                                            <SelectItem value="backorder">Backorder</SelectItem>
-                                            <SelectItem value="pre_order">Pre-Order</SelectItem>
+                                            <SelectItem value="in_stock">
+                                                In Stock
+                                            </SelectItem>
+                                            <SelectItem value="out_of_stock">
+                                                Out of Stock
+                                            </SelectItem>
+                                            <SelectItem value="backorder">
+                                                Backorder
+                                            </SelectItem>
+                                            <SelectItem value="pre_order">
+                                                Pre-Order
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <input type="hidden" name="stock_status" value={stockStatus} />
+                                    <input
+                                        type="hidden"
+                                        name="stock_status"
+                                        value={stockStatus}
+                                    />
                                     <InputError message={errors.stock_status} />
                                 </div>
 

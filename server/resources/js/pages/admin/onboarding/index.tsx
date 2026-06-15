@@ -148,13 +148,19 @@ export default function Onboarding({
             id: 'payments',
             label: __('onboarding.step.payments', 'Payments'),
             icon: CreditCard,
-            desc: __('onboarding.step.payments_desc', 'Stripe, PayU, P24, Bank'),
+            desc: __(
+                'onboarding.step.payments_desc',
+                'Stripe, PayU, P24, Bank',
+            ),
         },
         {
             id: 'shipping',
             label: __('onboarding.step.shipping', 'Shipping'),
             icon: Truck,
-            desc: __('onboarding.step.shipping_desc', 'Costs and shipping methods'),
+            desc: __(
+                'onboarding.step.shipping_desc',
+                'Costs and shipping methods',
+            ),
         },
         {
             id: 'taxes',
@@ -166,7 +172,10 @@ export default function Onboarding({
             id: 'homepage',
             label: __('onboarding.step.homepage', 'Homepage'),
             icon: Layout,
-            desc: __('onboarding.step.homepage_desc', 'Hero banner and content'),
+            desc: __(
+                'onboarding.step.homepage_desc',
+                'Hero banner and content',
+            ),
         },
         {
             id: 'menu',
@@ -178,13 +187,19 @@ export default function Onboarding({
             id: 'seo',
             label: __('onboarding.step.seo', 'SEO Basics'),
             icon: Sparkles,
-            desc: __('onboarding.step.seo_desc', 'Title, description, indexing'),
+            desc: __(
+                'onboarding.step.seo_desc',
+                'Title, description, indexing',
+            ),
         },
         {
             id: 'legal',
             label: __('onboarding.step.legal', 'Legal Policies'),
             icon: Shield,
-            desc: __('onboarding.step.legal_desc', 'Terms and privacy policies'),
+            desc: __(
+                'onboarding.step.legal_desc',
+                'Terms and privacy policies',
+            ),
         },
     ];
 
@@ -221,7 +236,10 @@ export default function Onboarding({
             if (uploadedFile && uploadedFile.url) {
                 forms.brand.setData(field, uploadedFile.url);
                 toast.success(
-                    __('onboarding.upload_success', 'File uploaded successfully'),
+                    __(
+                        'onboarding.upload_success',
+                        'File uploaded successfully',
+                    ),
                 );
             }
         } catch {
@@ -747,7 +765,10 @@ export default function Onboarding({
                                                 )
                                             }
                                             required
-                                            placeholder={__('onboarding.domain.placeholder', 'https://yourstore.com')}
+                                            placeholder={__(
+                                                'onboarding.domain.placeholder',
+                                                'https://yourstore.com',
+                                            )}
                                         />
                                         <p className="text-xs text-muted-foreground">
                                             {__(
@@ -1771,7 +1792,10 @@ export default function Onboarding({
                                                     >
                                                         <div className="space-y-1">
                                                             <Label className="text-xs">
-                                                                {__('onboarding.menu.label_pl', 'Label (PL)')}
+                                                                {__(
+                                                                    'onboarding.menu.label_pl',
+                                                                    'Label (PL)',
+                                                                )}
                                                             </Label>
                                                             <Input
                                                                 value={
@@ -1809,7 +1833,10 @@ export default function Onboarding({
                                                         </div>
                                                         <div className="space-y-1">
                                                             <Label className="text-xs">
-                                                                {__('onboarding.menu.label_en', 'Label (EN)')}
+                                                                {__(
+                                                                    'onboarding.menu.label_en',
+                                                                    'Label (EN)',
+                                                                )}
                                                             </Label>
                                                             <Input
                                                                 value={
@@ -1847,7 +1874,10 @@ export default function Onboarding({
                                                         </div>
                                                         <div className="space-y-1">
                                                             <Label className="text-xs">
-                                                                {__('onboarding.menu.url_path', 'URL / Path')}
+                                                                {__(
+                                                                    'onboarding.menu.url_path',
+                                                                    'URL / Path',
+                                                                )}
                                                             </Label>
                                                             <Input
                                                                 value={
@@ -1879,7 +1909,10 @@ export default function Onboarding({
                                                         <div className="flex items-center justify-between gap-2 pb-1 sm:justify-end">
                                                             <div className="flex-1 space-y-1">
                                                                 <Label className="block text-[10px]">
-                                                                    {__('onboarding.menu.target', 'Target')}
+                                                                    {__(
+                                                                        'onboarding.menu.target',
+                                                                        'Target',
+                                                                    )}
                                                                 </Label>
                                                                 <select
                                                                     value={
@@ -1908,10 +1941,16 @@ export default function Onboarding({
                                                                     className="w-full rounded-md border p-1 text-xs"
                                                                 >
                                                                     <option value="_self">
-                                                                        {__('onboarding.menu.target_self', 'Current tab')}
+                                                                        {__(
+                                                                            'onboarding.menu.target_self',
+                                                                            'Current tab',
+                                                                        )}
                                                                     </option>
                                                                     <option value="_blank">
-                                                                        {__('onboarding.menu.target_blank', 'New tab')}
+                                                                        {__(
+                                                                            'onboarding.menu.target_blank',
+                                                                            'New tab',
+                                                                        )}
                                                                     </option>
                                                                 </select>
                                                             </div>

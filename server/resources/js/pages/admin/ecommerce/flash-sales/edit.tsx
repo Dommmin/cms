@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useState } from 'react';
 import * as FlashSaleController from '@/actions/App/Http/Controllers/Admin/Ecommerce/FlashSaleController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -23,7 +23,9 @@ import type { FormPageProps } from './form.types';
 
 export default function Edit({ flashSale, products }: Required<FormPageProps>) {
     const __ = useTranslation();
-    const [selectedProduct, setSelectedProduct] = useState(flashSale.product_id?.toString() ?? '');
+    const [selectedProduct, setSelectedProduct] = useState(
+        flashSale.product_id?.toString() ?? '',
+    );
     const formId = 'flash-sale-edit-form';
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -92,13 +94,20 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {products.map((p) => (
-                                            <SelectItem key={p.id} value={p.id.toString()}>
+                                            <SelectItem
+                                                key={p.id}
+                                                value={p.id.toString()}
+                                            >
                                                 {p.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="product_id" value={selectedProduct} />
+                                <input
+                                    type="hidden"
+                                    name="product_id"
+                                    value={selectedProduct}
+                                />
                                 <InputError message={errors.product_id} />
                             </div>
 

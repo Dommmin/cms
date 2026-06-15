@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useState } from 'react';
 import * as NewsletterCampaignController from '@/actions/App/Http/Controllers/Admin/NewsletterCampaignController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -78,24 +78,34 @@ export default function Create({ segments }: CreateProps) {
                                         <InputError message={errors.name} />
                                     </div>
 
-                                     <div className="grid gap-2">
-                                         <Label htmlFor="type">Type *</Label>
-                                         <Select
-                                             value={selectedType}
-                                             onValueChange={setSelectedType}
-                                         >
-                                             <SelectTrigger id="type">
-                                                 <SelectValue placeholder="Select type" />
-                                             </SelectTrigger>
-                                             <SelectContent>
-                                                 <SelectItem value="regular">Regular</SelectItem>
-                                                 <SelectItem value="automated">Automated</SelectItem>
-                                                 <SelectItem value="ab_test">A/B Test</SelectItem>
-                                             </SelectContent>
-                                         </Select>
-                                         <input type="hidden" name="type" value={selectedType} />
-                                         <InputError message={errors.type} />
-                                     </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="type">Type *</Label>
+                                        <Select
+                                            value={selectedType}
+                                            onValueChange={setSelectedType}
+                                        >
+                                            <SelectTrigger id="type">
+                                                <SelectValue placeholder="Select type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="regular">
+                                                    Regular
+                                                </SelectItem>
+                                                <SelectItem value="automated">
+                                                    Automated
+                                                </SelectItem>
+                                                <SelectItem value="ab_test">
+                                                    A/B Test
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <input
+                                            type="hidden"
+                                            name="type"
+                                            value={selectedType}
+                                        />
+                                        <InputError message={errors.type} />
+                                    </div>
                                 </div>
                             </div>
 
@@ -198,58 +208,74 @@ export default function Create({ segments }: CreateProps) {
                             <div className="rounded-lg border bg-card p-6">
                                 <h3 className="mb-4 font-medium">Audience</h3>
                                 <div className="space-y-4">
-                                     <div className="grid gap-2">
-                                         <Label htmlFor="audience_type">
-                                             Send To *
-                                         </Label>
-                                         <Select
-                                             value={selectedAudienceType}
-                                             onValueChange={setSelectedAudienceType}
-                                         >
-                                             <SelectTrigger id="audience_type">
-                                                 <SelectValue placeholder="Select audience type" />
-                                             </SelectTrigger>
-                                             <SelectContent>
-                                                 <SelectItem value="all">All Subscribers</SelectItem>
-                                                 <SelectItem value="segment">Specific Segment</SelectItem>
-                                             </SelectContent>
-                                         </Select>
-                                         <input type="hidden" name="audience_type" value={selectedAudienceType} />
-                                         <InputError
-                                             message={errors.audience_type}
-                                         />
-                                     </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="audience_type">
+                                            Send To *
+                                        </Label>
+                                        <Select
+                                            value={selectedAudienceType}
+                                            onValueChange={
+                                                setSelectedAudienceType
+                                            }
+                                        >
+                                            <SelectTrigger id="audience_type">
+                                                <SelectValue placeholder="Select audience type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">
+                                                    All Subscribers
+                                                </SelectItem>
+                                                <SelectItem value="segment">
+                                                    Specific Segment
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <input
+                                            type="hidden"
+                                            name="audience_type"
+                                            value={selectedAudienceType}
+                                        />
+                                        <InputError
+                                            message={errors.audience_type}
+                                        />
+                                    </div>
 
                                     {segments.length > 0 && (
-                                         <div className="grid gap-2">
-                                             <Label htmlFor="newsletter_segment_id">
-                                                 Segment
-                                             </Label>
-                                             <Select
-                                                 value={selectedSegmentId}
-                                                 onValueChange={setSelectedSegmentId}
-                                             >
-                                                 <SelectTrigger id="newsletter_segment_id">
-                                                     <SelectValue placeholder="— No segment —" />
-                                                 </SelectTrigger>
-                                                 <SelectContent>
-                                                     {segments.map((s) => (
-                                                         <SelectItem
-                                                             key={s.id}
-                                                             value={s.id.toString()}
-                                                         >
-                                                             {s.name}
-                                                         </SelectItem>
-                                                     ))}
-                                                 </SelectContent>
-                                             </Select>
-                                             <input type="hidden" name="newsletter_segment_id" value={selectedSegmentId} />
-                                             <InputError
-                                                 message={
-                                                     errors.newsletter_segment_id
-                                                 }
-                                             />
-                                         </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="newsletter_segment_id">
+                                                Segment
+                                            </Label>
+                                            <Select
+                                                value={selectedSegmentId}
+                                                onValueChange={
+                                                    setSelectedSegmentId
+                                                }
+                                            >
+                                                <SelectTrigger id="newsletter_segment_id">
+                                                    <SelectValue placeholder="— No segment —" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {segments.map((s) => (
+                                                        <SelectItem
+                                                            key={s.id}
+                                                            value={s.id.toString()}
+                                                        >
+                                                            {s.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <input
+                                                type="hidden"
+                                                name="newsletter_segment_id"
+                                                value={selectedSegmentId}
+                                            />
+                                            <InputError
+                                                message={
+                                                    errors.newsletter_segment_id
+                                                }
+                                            />
+                                        </div>
                                     )}
                                 </div>
                             </div>

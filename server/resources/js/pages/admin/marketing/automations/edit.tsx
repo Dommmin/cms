@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon, Trash2Icon } from 'lucide-react';
+import { useState } from 'react';
 
 import * as AutomationController from '@/actions/App/Http/Controllers/Admin/Marketing/AutomationController';
 import InputError from '@/components/input-error';
@@ -24,8 +24,12 @@ import type { EditPageProps } from './form.types';
 
 export default function Edit({ automation, triggers }: EditPageProps) {
     const __ = useTranslation();
-    const [selectedTrigger, setSelectedTrigger] = useState(automation.trigger ?? '');
-    const [selectedStatus, setSelectedStatus] = useState(automation.status ?? 'draft');
+    const [selectedTrigger, setSelectedTrigger] = useState(
+        automation.trigger ?? '',
+    );
+    const [selectedStatus, setSelectedStatus] = useState(
+        automation.status ?? 'draft',
+    );
     const formId = 'automation-edit-form';
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -115,13 +119,20 @@ export default function Edit({ automation, triggers }: EditPageProps) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {triggers.map((t) => (
-                                            <SelectItem key={t.value} value={t.value}>
+                                            <SelectItem
+                                                key={t.value}
+                                                value={t.value}
+                                            >
                                                 {t.label}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="trigger" value={selectedTrigger} />
+                                <input
+                                    type="hidden"
+                                    name="trigger"
+                                    value={selectedTrigger}
+                                />
                                 <InputError message={errors.trigger} />
                             </div>
 
@@ -159,11 +170,19 @@ export default function Edit({ automation, triggers }: EditPageProps) {
                                         <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="draft">Draft</SelectItem>
-                                        <SelectItem value="ready">Ready</SelectItem>
+                                        <SelectItem value="draft">
+                                            Draft
+                                        </SelectItem>
+                                        <SelectItem value="ready">
+                                            Ready
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <input type="hidden" name="status" value={selectedStatus} />
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value={selectedStatus}
+                                />
                                 <InputError message={errors.status} />
                             </div>
 

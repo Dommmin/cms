@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from '@/hooks/use-translation';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import InputError from '@/components/input-error';
 import {
@@ -41,6 +40,7 @@ import {
 import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { resolveLocalizedText } from '@/lib/localized-text';
 import { slugify } from '@/lib/slug';
@@ -310,7 +310,10 @@ export default function Create({
                         <Button asChild variant="outline">
                             <Link href={ProductController.index.url()}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                {__('products.back_to_list', 'Back to Products')}
+                                {__(
+                                    'products.back_to_list',
+                                    'Back to Products',
+                                )}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -324,7 +327,10 @@ export default function Create({
                     onError={(errors) => {
                         setActiveTab(tabForErrors(errors as FormErrors));
                         toast.error(
-                            __('products.form_errors', 'The form contains errors. Please check the highlighted tab.'),
+                            __(
+                                'products.form_errors',
+                                'The form contains errors. Please check the highlighted tab.',
+                            ),
                         );
                     }}
                 >

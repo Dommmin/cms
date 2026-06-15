@@ -2,7 +2,6 @@ import { PlusIcon, TrashIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useTranslation } from '@/hooks/use-translation';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +13,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from '@/hooks/use-translation';
 import type {
     MetafieldDefinitionEntry,
     MetafieldEditorProps,
@@ -249,7 +249,10 @@ export default function MetafieldEditor({
         <div className="space-y-4">
             {Object.keys(grouped).length === 0 && (
                 <p className="text-sm text-muted-foreground">
-                    {__('metafields.no_metafields_yet', 'No metafields yet. Click "Add Metafield" to get started.')}
+                    {__(
+                        'metafields.no_metafields_yet',
+                        'No metafields yet. Click "Add Metafield" to get started.',
+                    )}
                 </p>
             )}
 
@@ -263,7 +266,7 @@ export default function MetafieldEditor({
                             const def = findDefinition(
                                 field.namespace,
                                 field.key,
-                              );
+                            );
                             const originalIndex = getOriginalIndex(
                                 field.namespace,
                                 field.key,
@@ -289,7 +292,10 @@ export default function MetafieldEditor({
                                                     variant="secondary"
                                                     className="text-xs"
                                                 >
-                                                    {__('metafields.custom', 'custom')}
+                                                    {__(
+                                                        'metafields.custom',
+                                                        'custom',
+                                                    )}
                                                 </Badge>
                                             )}
                                         </div>
@@ -335,11 +341,19 @@ export default function MetafieldEditor({
                         {availableDefinitions.length > 0 && (
                             <div className="grid gap-1">
                                 <Label className="text-xs">
-                                    {__('metafields.from_definition', 'From definition')}
+                                    {__(
+                                        'metafields.from_definition',
+                                        'From definition',
+                                    )}
                                 </Label>
                                 <Select onValueChange={handleDefinitionSelect}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder={__('metafields.select_definition_placeholder', 'Select a definition...')} />
+                                        <SelectValue
+                                            placeholder={__(
+                                                'metafields.select_definition_placeholder',
+                                                'Select a definition...',
+                                            )}
+                                        />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {availableDefinitions.map((def) => (
@@ -359,7 +373,10 @@ export default function MetafieldEditor({
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="grid gap-1">
                                     <Label className="text-xs">
-                                        {__('metafields.namespace_required', 'Namespace *')}
+                                        {__(
+                                            'metafields.namespace_required',
+                                            'Namespace *',
+                                        )}
                                     </Label>
                                     <Input
                                         value={newField.namespace}
@@ -374,7 +391,9 @@ export default function MetafieldEditor({
                                     />
                                 </div>
                                 <div className="grid gap-1">
-                                    <Label className="text-xs">{__('metafields.key_required', 'Key *')}</Label>
+                                    <Label className="text-xs">
+                                        {__('metafields.key_required', 'Key *')}
+                                    </Label>
                                     <Input
                                         value={newField.key}
                                         onChange={(e) =>
@@ -388,7 +407,9 @@ export default function MetafieldEditor({
                                     />
                                 </div>
                                 <div className="grid gap-1">
-                                    <Label className="text-xs">{__('metafields.type', 'Type')}</Label>
+                                    <Label className="text-xs">
+                                        {__('metafields.type', 'Type')}
+                                    </Label>
                                     <Select
                                         value={newField.type}
                                         onValueChange={(val) =>
@@ -414,7 +435,10 @@ export default function MetafieldEditor({
                         )}
                         <div className="grid gap-1">
                             <Label className="text-xs">
-                                {__('metafields.initial_value_optional', 'Initial value (optional)')}
+                                {__(
+                                    'metafields.initial_value_optional',
+                                    'Initial value (optional)',
+                                )}
                             </Label>
                             <Input
                                 value={newField.value}
@@ -469,11 +493,17 @@ export default function MetafieldEditor({
                         <PlusIcon className="mr-2 h-4 w-4" />
                         {allowCustomFields
                             ? __('metafields.add_metafield', 'Add Metafield')
-                            : __('metafields.add_defined_metafield', 'Add Defined Metafield')}
+                            : __(
+                                  'metafields.add_defined_metafield',
+                                  'Add Defined Metafield',
+                              )}
                     </Button>
                 ) : (
                     <p className="text-sm text-muted-foreground">
-                        {__('metafields.no_definitions_available', 'No metafield definitions available for this content type yet.')}
+                        {__(
+                            'metafields.no_definitions_available',
+                            'No metafield definitions available for this content type yet.',
+                        )}
                     </p>
                 ))}
         </div>
