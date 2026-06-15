@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
     compress: true,
     reactStrictMode: true,
 
+    env: {
+        BLOCK_REGISTRY_STRICT_MODE:
+            process.env.BLOCK_REGISTRY_STRICT_MODE ?? 'false',
+    },
+
     experimental: {
         optimizePackageImports: [
             '@headlessui/react',

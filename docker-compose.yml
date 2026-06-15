@@ -91,6 +91,7 @@ services:
     environment:
       API_URL: http://nginx/api/v1
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost/api/v1}
+      BLOCK_REGISTRY_STRICT_MODE: ${BLOCK_REGISTRY_STRICT_MODE:-false}
       NODE_OPTIONS: --max-old-space-size=2048
       NEXT_TELEMETRY_DISABLED: "1"
     ports:
