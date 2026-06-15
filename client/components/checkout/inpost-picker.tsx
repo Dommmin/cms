@@ -1,6 +1,7 @@
 'use client';
 
 import { usePublicSettings } from '@/hooks/use-cms';
+import { useTranslation } from '@/hooks/use-translation';
 import { useEffect, useRef } from 'react';
 import type { InPostPoint, InpostPickerProps } from './inpost-picker.types';
 
@@ -25,6 +26,7 @@ function InpostWidget({
     language,
     token,
 }: InpostPickerProps & { token: string }) {
+    const { t } = useTranslation();
     const containerRef = useRef<HTMLDivElement>(null);
     const widgetRef = useRef<Element | null>(null);
     const onChangeRef = useRef(onChange);
@@ -84,7 +86,10 @@ function InpostWidget({
             {value && (
                 <div className="border-primary/40 bg-primary/5 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
                     <span className="text-primary font-medium">
-                        Wybrany paczkomat:
+                        {t(
+                            'checkout.inpost_selected_locker',
+                            'Selected locker:',
+                        )}
                     </span>
                     <span className="font-mono font-semibold">{value}</span>
                     <button
@@ -97,7 +102,7 @@ function InpostWidget({
                         }
                         className="text-muted-foreground hover:text-foreground ml-auto text-xs underline"
                     >
-                        Zmień
+                        {t('common.change', 'Change')}
                     </button>
                 </div>
             )}
@@ -117,6 +122,7 @@ export function InpostPicker({
     onChange,
     language = 'pl',
 }: InpostPickerProps) {
+    const { t } = useTranslation();
     const { data: publicSettings, isLoading } = usePublicSettings();
     const token =
         publicSettings?.settings.shipping?.inpost_geowidget_token ||
@@ -126,7 +132,10 @@ export function InpostPicker({
     if (isLoading) {
         return (
             <div className="text-muted-foreground mt-3 text-sm">
-                Loading map widget settings...
+                {t(
+                    'checkout.loading_map_settings',
+                    'Loading map widget settings...',
+                )}
             </div>
         );
     }
@@ -135,11 +144,16 @@ export function InpostPicker({
         return (
             <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm dark:border-amber-800 dark:bg-amber-950">
                 <p className="font-medium text-amber-800 dark:text-amber-200">
-                    InPost Paczkomat picker unavailable — missing token
+                    {t(
+                        'checkout.inpost_missing_token',
+                        'InPost Paczkomat picker unavailable — missing token',
+                    )}
                 </p>
                 <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-                    Please configure the token in settings panel: Settings →
-                    Shipping → InPost Geowidget Token
+                    {t(
+                        'checkout.inpost_configure_token_hint',
+                        'Please configure the token in settings panel: Settings → Shipping → InPost Geowidget Token',
+                    )}
                 </p>
             </div>
         );

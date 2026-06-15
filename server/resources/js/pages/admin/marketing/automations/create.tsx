@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 
@@ -8,6 +9,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -21,6 +29,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Create({ triggers }: CreatePageProps) {
     const __ = useTranslation();
+    const [selectedTrigger, setSelectedTrigger] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('draft');
     const formId = 'automation-create-form';
 
     return (
@@ -64,21 +74,22 @@ export default function Create({ triggers }: CreatePageProps) {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="trigger">Trigger</Label>
-                                <select
-                                    id="trigger"
-                                    name="trigger"
-                                    required
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                <Select
+                                    value={selectedTrigger}
+                                    onValueChange={setSelectedTrigger}
                                 >
-                                    <option value="">
-                                        — Select a trigger —
-                                    </option>
-                                    {triggers.map((t) => (
-                                        <option key={t.value} value={t.value}>
-                                            {t.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger id="trigger">
+                                        <SelectValue placeholder="— Select a trigger —" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {triggers.map((t) => (
+                                            <SelectItem key={t.value} value={t.value}>
+                                                {t.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="trigger" value={selectedTrigger} />
                                 <InputError message={errors.trigger} />
                             </div>
 
@@ -108,15 +119,19 @@ export default function Create({ triggers }: CreatePageProps) {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="status">Status</Label>
-                                <select
-                                    id="status"
-                                    name="status"
-                                    defaultValue="draft"
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                <Select
+                                    value={selectedStatus}
+                                    onValueChange={setSelectedStatus}
                                 >
-                                    <option value="draft">Draft</option>
-                                    <option value="ready">Ready</option>
-                                </select>
+                                    <SelectTrigger id="status">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="draft">Draft</SelectItem>
+                                        <SelectItem value="ready">Ready</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="status" value={selectedStatus} />
                                 <InputError message={errors.status} />
                             </div>
 

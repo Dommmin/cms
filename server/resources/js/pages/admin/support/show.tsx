@@ -17,7 +17,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { ShowProps } from './show.types';
@@ -40,6 +48,7 @@ export default function SupportShow({
     canned_responses,
     statuses,
 }: ShowProps) {
+    const __ = useTranslation();
     const [isInternal, setIsInternal] = useState(false);
 
     // Refresh conversation every 5 seconds to pick up new customer messages
@@ -195,36 +204,31 @@ export default function SupportShow({
                                     </div>
 
                                     {canned_responses.length > 0 && (
-                                        <select
-                                            className="ml-auto rounded-md border bg-background px-2 py-1.5 text-sm"
-                                            defaultValue=""
-                                            onChange={(e) => {
-                                                const cr =
-                                                    canned_responses.find(
-                                                        (c) =>
-                                                            String(c.id) ===
-                                                            e.target.value,
-                                                    );
+                                        <Select
+                                            value=""
+                                            onValueChange={(val) => {
+                                                const cr = canned_responses.find(
+                                                    (c) => String(c.id) === val,
+                                                );
                                                 if (cr) {
-                                                    insertCannedResponse(
-                                                        cr.body,
-                                                    );
+                                                    insertCannedResponse(cr.body);
                                                 }
-                                                e.target.value = '';
                                             }}
                                         >
-                                            <option value="" disabled>
-                                                Quick reply...
-                                            </option>
-                                            {canned_responses.map((cr) => (
-                                                <option
-                                                    key={cr.id}
-                                                    value={cr.id}
-                                                >
-                                                    #{cr.shortcut} — {cr.title}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            <SelectTrigger className="ml-auto w-[160px] h-9">
+                                                <SelectValue placeholder="Quick reply..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {canned_responses.map((cr) => (
+                                                    <SelectItem
+                                                        key={cr.id}
+                                                        value={cr.id.toString()}
+                                                    >
+                                                        #{cr.shortcut} — {cr.title}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     )}
                                 </div>
 
@@ -357,7 +361,7 @@ export default function SupportShow({
                                                             {Number(
                                                                 order.total,
                                                             ).toFixed(2)}{' '}
-                                                            zł
+                                                            {__('misc.currency_symbol', 'zł')}
                                                         </p>
                                                     </Link>
                                                 </li>
@@ -375,39 +379,43 @@ export default function SupportShow({
                                 <Label className="text-xs text-muted-foreground">
                                     Status
                                 </Label>
-                                <select
-                                    className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                                <Select
                                     value={conversation.status}
-                                    onChange={(e) =>
-                                        handleStatusChange(e.target.value)
-                                    }
+                                    onValueChange={handleStatusChange}
                                 >
-                                    {statuses.map((s) => (
-                                        <option key={s.value} value={s.value}>
-                                            {s.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {statuses.map((s) => (
+                                            <SelectItem key={s.value} value={s.value}>
+                                                {s.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="space-y-1.5">
                                 <Label className="text-xs text-muted-foreground">
                                     Assign to
                                 </Label>
-                                <select
-                                    className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-                                    value={conversation.assigned_to?.id ?? ''}
-                                    onChange={(e) =>
-                                        handleAssign(e.target.value)
-                                    }
+                                <Select
+                                    value={conversation.assigned_to?.id?.toString() ?? 'unassigned'}
+                                    onValueChange={(val) => handleAssign(val === 'unassigned' ? '' : val)}
                                 >
-                                    <option value="">Unassigned</option>
-                                    {agents.map((a) => (
-                                        <option key={a.id} value={a.id}>
-                                            {a.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select agent" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                                        {agents.map((a) => (
+                                            <SelectItem key={a.id} value={a.id.toString()}>
+                                                {a.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="border-t pt-3">

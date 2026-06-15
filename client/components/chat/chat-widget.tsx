@@ -10,6 +10,7 @@ import {
     useSendMessage,
     useStartConversation,
 } from '@/hooks/use-chat';
+import { useTranslation } from '@/hooks/use-translation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MessageCircleIcon, XIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -26,6 +27,7 @@ export function ChatWidget({
     userName,
     userEmail,
 }: ChatWidgetProps) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(() => {
         if (typeof window === 'undefined') return false;
         return localStorage.getItem(OPEN_KEY) === 'true';
@@ -80,7 +82,10 @@ export function ChatWidget({
             const lastMsg = visibleMessages[count - 1];
             if (lastMsg.sender_type === 'agent') {
                 toast.info(
-                    `Nowa wiadomość od wsparcia: ${lastMsg.sender_name}`,
+                    t(
+                        'chat.new_message_notification',
+                        'New message from support: :name',
+                    ).replace(':name', lastMsg.sender_name ?? ''),
                 );
             }
         }
@@ -130,17 +135,23 @@ export function ChatWidget({
                         <div className="bg-primary flex items-center justify-between border-b px-4 py-3">
                             <div>
                                 <p className="text-primary-foreground text-sm font-semibold">
-                                    Wsparcie klienta
+                                    {t('chat.header_title', 'Customer Support')}
                                 </p>
                                 <p className="text-primary-foreground/70 text-[11px]">
-                                    Odpiszemy tak szybko jak to możliwe
+                                    {t(
+                                        'chat.header_subtitle',
+                                        'We will respond as soon as possible',
+                                    )}
                                 </p>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(false)}
                                 className="text-primary-foreground/80 hover:text-primary-foreground rounded-md p-1"
-                                aria-label="Zamknij"
+                                aria-label={t(
+                                    'chat.close_button_aria',
+                                    'Close',
+                                )}
                             >
                                 <XIcon className="h-4 w-4" />
                             </button>
@@ -180,7 +191,11 @@ export function ChatWidget({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-primary text-primary-foreground hover:bg-primary/90 relative flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-colors"
-                aria-label={isOpen ? 'Zamknij czat' : 'Otwórz czat'}
+                aria-label={
+                    isOpen
+                        ? t('chat.toggle_button_aria_close', 'Close Chat')
+                        : t('chat.toggle_button_aria_open', 'Open Chat')
+                }
             >
                 <AnimatePresence mode="wait">
                     {isOpen ? (

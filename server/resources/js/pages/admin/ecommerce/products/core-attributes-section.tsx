@@ -2,6 +2,13 @@ import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import type {
     CoreAttributeSchemaItem,
     ProductAttributeFormValue,
@@ -151,19 +158,23 @@ export function CoreAttributesSection({
 
                         {attribute.type === 'boolean' && (
                             <>
-                                <select
-                                    value={currentValue.value}
-                                    onChange={(event) =>
+                                <Select
+                                    value={currentValue.value || 'none'}
+                                    onValueChange={(v) =>
                                         updateValue(attribute.attribute_id, {
-                                            value: event.target.value,
+                                            value: v === 'none' ? '' : v,
                                         })
                                     }
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                 >
-                                    <option value="">Not set</option>
-                                    <option value="1">Yes</option>
-                                    <option value="0">No</option>
-                                </select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Not set" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">Not set</SelectItem>
+                                        <SelectItem value="1">Yes</SelectItem>
+                                        <SelectItem value="0">No</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <input
                                     type="hidden"
                                     name={`attribute_values[${index}][value]`}
@@ -239,30 +250,29 @@ export function CoreAttributesSection({
 
                         {attribute.type === 'select' && (
                             <>
-                                <select
-                                    value={currentValue.option_id ?? ''}
-                                    onChange={(event) =>
+                                <Select
+                                    value={currentValue.option_id ? currentValue.option_id.toString() : 'none'}
+                                    onValueChange={(v) =>
                                         updateValue(attribute.attribute_id, {
-                                            option_id:
-                                                event.target.value === ''
-                                                    ? null
-                                                    : Number(
-                                                          event.target.value,
-                                                      ),
+                                            option_id: v === 'none' ? null : Number(v),
                                         })
                                     }
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                 >
-                                    <option value="">Select an option</option>
-                                    {attribute.options.map((option) => (
-                                        <option
-                                            key={option.id}
-                                            value={option.id}
-                                        >
-                                            {option.value}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select an option" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">Select an option</SelectItem>
+                                        {attribute.options.map((option) => (
+                                            <SelectItem
+                                                key={option.id}
+                                                value={option.id.toString()}
+                                            >
+                                                {option.value}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                                 <input
                                     type="hidden"
                                     name={`attribute_values[${index}][option_id]`}

@@ -26,6 +26,13 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useLocalePath } from '@/hooks/use-locale';
 import { useProducts } from '@/hooks/use-products';
@@ -367,26 +374,44 @@ export default function ProductsClient({
                         >
                             {t('shop.brand', 'Brand')}
                         </label>
-                        <select
-                            id={`${idPrefix}-brand`}
-                            value={pending.brand}
-                            onChange={(e) =>
+                        <Select
+                            value={pending.brand || 'all'}
+                            onValueChange={(v) =>
                                 setPending((prev) => ({
                                     ...prev,
-                                    brand: e.target.value,
+                                    brand: v === 'all' ? '' : v,
                                 }))
                             }
-                            className="border-input bg-background focus:ring-ring min-h-11 w-full rounded-[var(--store-control-radius)] border px-3 text-sm focus:ring-2 focus:outline-none"
                         >
-                            <option value="">
-                                {t('shop.all_brands', 'All brands')}
-                            </option>
-                            {availableFilters.brands.map((brand) => (
-                                <option key={brand.id} value={String(brand.id)}>
-                                    {brand.label} ({brand.count})
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger
+                                id={`${idPrefix}-brand`}
+                                className="border-input bg-background focus:ring-ring min-h-11 w-full rounded-[var(--store-control-radius)] focus:ring-2 focus:outline-none"
+                            >
+                                <SelectValue
+                                    placeholder={t(
+                                        'shop.all_brands',
+                                        'All brands',
+                                    )}
+                                />
+                            </SelectTrigger>
+                            <SelectContent
+                                position="popper"
+                                align="start"
+                                className="w-[var(--radix-select-trigger-width)]"
+                            >
+                                <SelectItem value="all">
+                                    {t('shop.all_brands', 'All brands')}
+                                </SelectItem>
+                                {availableFilters.brands.map((brand) => (
+                                    <SelectItem
+                                        key={brand.id}
+                                        value={String(brand.id)}
+                                    >
+                                        {brand.label} ({brand.count})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -612,18 +637,35 @@ export default function ProductsClient({
                     <label htmlFor="products-sort" className="sr-only">
                         {t('shop.sort_label', 'Sort products')}
                     </label>
-                    <select
-                        id="products-sort"
-                        value={appliedFilters.sort ?? ''}
-                        onChange={(e) => setParam('sort', e.target.value)}
-                        className="border-input bg-background focus:ring-ring min-h-11 rounded-[var(--store-control-radius)] border px-3 text-sm focus:ring-2 focus:outline-none"
+                    <Select
+                        value={appliedFilters.sort || 'default'}
+                        onValueChange={(v) =>
+                            setParam('sort', v === 'default' ? '' : v)
+                        }
                     >
-                        {SORT_OPTIONS.map((o) => (
-                            <option key={o.value} value={o.value}>
-                                {o.label}
-                            </option>
-                        ))}
-                    </select>
+                        <SelectTrigger
+                            id="products-sort"
+                            className="border-input bg-background focus:ring-ring min-h-11 rounded-[var(--store-control-radius)] focus:ring-2 focus:outline-none"
+                        >
+                            <SelectValue
+                                placeholder={t('shop.sort_default', 'Default')}
+                            />
+                        </SelectTrigger>
+                        <SelectContent
+                            position="popper"
+                            align="end"
+                            className="min-w-[180px]"
+                        >
+                            {SORT_OPTIONS.map((o) => (
+                                <SelectItem
+                                    key={o.value || 'default'}
+                                    value={o.value || 'default'}
+                                >
+                                    {o.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
                     <div
                         role="group"

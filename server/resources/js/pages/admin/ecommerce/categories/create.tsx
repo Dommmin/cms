@@ -9,6 +9,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { LocalizedField } from '@/components/ui/localized-field';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
@@ -40,6 +47,7 @@ export default function Create({
     const [descValues, setDescValues] = useState<Record<string, string>>({});
     const [slug, setSlug] = useState('');
     const [isSlugManual, setIsSlugManual] = useState(false);
+    const [parentId, setParentId] = useState('');
     const [metafields, setMetafields] = useState(initialMetafields ?? []);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
@@ -166,19 +174,20 @@ export default function Create({
                         <Label htmlFor="parent_id">
                             {__('label.category', 'Parent Category')}
                         </Label>
-                        <select
-                            id="parent_id"
-                            name="parent_id"
-                            defaultValue=""
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <option value="">None (Top level)</option>
-                            {normalizedCategories.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
+                        <Select value={parentId || 'none'} onValueChange={(v) => setParentId(v === 'none' ? '' : v)}>
+                            <SelectTrigger id="parent_id">
+                                <SelectValue placeholder="None (Top level)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">None (Top level)</SelectItem>
+                                {normalizedCategories.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.id.toString()}>
+                                        {cat.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <input type="hidden" name="parent_id" value={parentId} />
                         <InputError message={errors.parent_id} />
                     </div>
 

@@ -8,6 +8,13 @@ import { createPortal } from 'react-dom';
 
 import { searchProducts } from '@/api/search';
 import type { SearchFilters, SearchResult } from '@/api/search.types';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCategories } from '@/hooks/use-cms';
 import { useLocalePath } from '@/hooks/use-locale';
@@ -473,18 +480,35 @@ export function SearchClient() {
                     <label htmlFor="search-sort" className="sr-only">
                         {t('shop.sort_label', 'Sort by')}
                     </label>
-                    <select
-                        id="search-sort"
-                        value={sortParam ?? ''}
-                        onChange={(e) => setParam('sort', e.target.value)}
-                        className="border-input bg-background focus:ring-ring rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                    <Select
+                        value={sortParam || 'default'}
+                        onValueChange={(v) =>
+                            setParam('sort', v === 'default' ? '' : v)
+                        }
                     >
-                        {SORT_OPTIONS.map((o) => (
-                            <option key={o.value} value={o.value}>
-                                {o.label}
-                            </option>
-                        ))}
-                    </select>
+                        <SelectTrigger
+                            id="search-sort"
+                            className="border-input bg-background focus:ring-ring min-h-11 rounded-xl focus:ring-2 focus:outline-none"
+                        >
+                            <SelectValue
+                                placeholder={t('shop.sort_default', 'Default')}
+                            />
+                        </SelectTrigger>
+                        <SelectContent
+                            position="popper"
+                            align="end"
+                            className="min-w-[180px]"
+                        >
+                            {SORT_OPTIONS.map((o) => (
+                                <SelectItem
+                                    key={o.value || 'default'}
+                                    value={o.value || 'default'}
+                                >
+                                    {o.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     <button
                         onClick={() => setSidebarOpen((v) => !v)}
                         aria-expanded={sidebarOpen}

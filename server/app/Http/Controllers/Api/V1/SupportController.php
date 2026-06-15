@@ -38,7 +38,7 @@ class SupportController extends ApiController
         SupportMessage::query()->create([
             'conversation_id' => $conversation->id,
             'sender_type' => 'customer',
-            'sender_name' => $name ?? $email ?? 'Gość',
+            'sender_name' => $name ?? $email ?? __('support.guest', [], 'Guest'),
             'body' => $data['body'],
             'is_internal' => false,
         ]);
@@ -69,7 +69,7 @@ class SupportController extends ApiController
 
         $user = $request->user();
         $customer = $user?->customer;
-        $name = $customer ? ($customer->first_name.' '.$customer->last_name) : ($conversation->name ?? $conversation->email ?? 'Gość');
+        $name = $customer ? ($customer->first_name.' '.$customer->last_name) : ($conversation->name ?? $conversation->email ?? __('support.guest', [], 'Guest'));
 
         $message = SupportMessage::query()->create([
             'conversation_id' => $conversation->id,

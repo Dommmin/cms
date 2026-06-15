@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from '@/hooks/use-translation';
 import { useEffect, useRef } from 'react';
 import type { BlikInputProps } from './blik-input.types';
 
@@ -8,6 +9,7 @@ export function BlikInput({
     onChange,
     autoFocus = true,
 }: BlikInputProps) {
+    const { t } = useTranslation();
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -26,7 +28,7 @@ export function BlikInput({
     return (
         <div className="mt-3">
             <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                Kod BLIK (6 cyfr)
+                {t('checkout.blik_code', 'BLIK Code (6 digits)')}
             </label>
             <input
                 ref={inputRef}
@@ -46,7 +48,10 @@ export function BlikInput({
             />
             {value.length > 0 && !isValid && (
                 <p className="text-destructive mt-1 text-xs">
-                    Wprowadź 6-cyfrowy kod BLIK
+                    {t(
+                        'checkout.blik_invalid',
+                        'Please enter a 6-digit BLIK code',
+                    )}
                 </p>
             )}
         </div>

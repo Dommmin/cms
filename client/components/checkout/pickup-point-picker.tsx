@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
 import { usePickupPoints } from '@/hooks/use-pickup-points';
+import { useTranslation } from '@/hooks/use-translation';
 import type { PickupPoint } from '@/types/api';
 import type { PickupPointPickerProps } from './pickup-point-picker.types';
 
@@ -30,6 +31,7 @@ export function PickupPointPicker({
     value,
     onChange,
 }: PickupPointPickerProps) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState(postalCode);
     const [selected, setSelected] = useState<PickupPoint | null>(null);
@@ -104,7 +106,7 @@ export function PickupPointPicker({
                         onClick={() => setOpen(true)}
                         className="text-primary shrink-0 text-xs underline-offset-2 hover:underline"
                     >
-                        Zmień
+                        {t('common.change', 'Change')}
                     </button>
                 </div>
             ) : (
@@ -114,7 +116,10 @@ export function PickupPointPicker({
                     className="border-border text-muted-foreground hover:border-primary/60 hover:text-primary flex w-full items-center gap-2 rounded-xl border border-dashed px-4 py-3 text-sm transition-colors"
                 >
                     <MapPin className="h-4 w-4" />
-                    Wybierz punkt odbioru na mapie
+                    {t(
+                        'checkout.select_pickup_point',
+                        'Select pickup point on map',
+                    )}
                 </button>
             )}
 
@@ -131,7 +136,10 @@ export function PickupPointPicker({
                         <div className="border-border flex shrink-0 items-center gap-3 border-b px-4 py-3">
                             <MapPin className="text-primary h-5 w-5" />
                             <span className="font-semibold">
-                                Wybierz punkt odbioru
+                                {t(
+                                    'checkout.choose_pickup_point',
+                                    'Choose pickup point',
+                                )}
                             </span>
 
                             <div className="relative ml-auto">
@@ -140,7 +148,10 @@ export function PickupPointPicker({
                                     autoFocus
                                     type="text"
                                     inputMode="numeric"
-                                    placeholder="Kod pocztowy, np. 30-001"
+                                    placeholder={t(
+                                        'checkout.postal_code_placeholder',
+                                        'Postal code, e.g. 12-345',
+                                    )}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="border-input focus:border-primary h-8 w-52 rounded-lg border bg-transparent pr-3 pl-8 text-sm outline-none"
@@ -175,9 +186,10 @@ export function PickupPointPicker({
                                     <div className="text-muted-foreground flex flex-col items-center gap-2 px-4 py-12 text-center text-sm">
                                         <MapPin className="h-8 w-8 opacity-40" />
                                         <p>
-                                            Wpisz kod pocztowy,
-                                            <br />
-                                            żeby zobaczyć najbliższe punkty.
+                                            {t(
+                                                'checkout.enter_postal_code_to_see_points',
+                                                'Enter a postal code to see nearby points.',
+                                            )}
                                         </p>
                                     </div>
                                 ) : (

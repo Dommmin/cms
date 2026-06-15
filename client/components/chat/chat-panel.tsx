@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from '@/hooks/use-translation';
 import { Loader2Icon, SendIcon, Trash2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { ChatPanelProps } from './chat-panel.types';
@@ -19,6 +20,7 @@ export function ChatPanel({
     onReset,
     isClosed,
 }: ChatPanelProps) {
+    const { t } = useTranslation();
     const [text, setText] = useState('');
     const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +49,10 @@ export function ChatPanel({
             <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
                 {messages.filter((m) => !m.is_internal).length === 0 && (
                     <p className="text-muted-foreground py-8 text-center text-xs">
-                        Twoja konwersacja zostanie tutaj wyświetlona.
+                        {t(
+                            'chat.conversation_will_appear_here',
+                            'Your conversation will be displayed here.',
+                        )}
                     </p>
                 )}
 
@@ -88,7 +93,10 @@ export function ChatPanel({
             {isClosed ? (
                 <div className="border-t px-4 py-3 text-center">
                     <p className="text-muted-foreground mb-2 text-xs">
-                        Ta konwersacja jest zamknięta.
+                        {t(
+                            'chat.conversation_closed',
+                            'This conversation is closed.',
+                        )}
                     </p>
                     <button
                         type="button"
@@ -96,7 +104,10 @@ export function ChatPanel({
                         className="text-destructive mx-auto flex items-center gap-1.5 text-xs hover:underline"
                     >
                         <Trash2Icon className="h-3 w-3" />
-                        Usuń historię i zacznij nową rozmowę
+                        {t(
+                            'chat.clear_history_start_new',
+                            'Clear history and start a new conversation',
+                        )}
                     </button>
                 </div>
             ) : (
@@ -107,7 +118,10 @@ export function ChatPanel({
                     <textarea
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        placeholder="Napisz wiadomość..."
+                        placeholder={t(
+                            'chat.write_message_placeholder',
+                            'Type a message...',
+                        )}
                         rows={2}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
@@ -121,7 +135,7 @@ export function ChatPanel({
                         type="submit"
                         disabled={isSending || !text.trim()}
                         className="bg-primary text-primary-foreground hover:bg-primary/90 flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                        aria-label="Wyślij"
+                        aria-label={t('chat.send_button_aria', 'Send')}
                     >
                         {isSending ? (
                             <Loader2Icon className="h-4 w-4 animate-spin" />

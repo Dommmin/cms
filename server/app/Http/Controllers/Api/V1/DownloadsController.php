@@ -25,11 +25,11 @@ class DownloadsController extends ApiController
             ->where('token', $token)
             ->first();
 
-        abort_unless($link instanceof ProductDownloadLink, 404, 'Podany token pobierania jest niepoprawny.');
+        abort_unless($link instanceof ProductDownloadLink, 404, __('downloads.invalid_token', [], 'The provided download token is invalid.'));
 
-        abort_if($link->isExpired(), 403, 'Ten link do pobrania wygasł.');
+        abort_if($link->isExpired(), 403, __('downloads.link_expired', [], 'This download link has expired.'));
 
-        abort_if($link->isDownloadLimitReached(), 403, 'Przekroczono limit pobrań dla tego linku.');
+        abort_if($link->isDownloadLimitReached(), 403, __('downloads.limit_exceeded', [], 'The download limit for this link has been exceeded.'));
 
         $variant = $link->variant;
         /** @var Collection<int, ProductDownload> $downloads */
@@ -66,11 +66,11 @@ class DownloadsController extends ApiController
             ->where('token', $token)
             ->first();
 
-        abort_unless($link instanceof ProductDownloadLink, 404, 'Podany token pobierania jest niepoprawny.');
+        abort_unless($link instanceof ProductDownloadLink, 404, __('downloads.invalid_token', [], 'The provided download token is invalid.'));
 
-        abort_if($link->isExpired(), 403, 'Ten link do pobrania wygasł.');
+        abort_if($link->isExpired(), 403, __('downloads.link_expired', [], 'This download link has expired.'));
 
-        abort_if($link->isDownloadLimitReached(), 403, 'Przekroczono limit pobrań dla tego linku.');
+        abort_if($link->isDownloadLimitReached(), 403, __('downloads.limit_exceeded', [], 'The download limit for this link has been exceeded.'));
 
         /** @var ProductDownload|null $download */
         $download = ProductDownload::query()
@@ -78,7 +78,7 @@ class DownloadsController extends ApiController
             ->where('product_variant_id', $link->product_variant_id)
             ->first();
 
-        abort_unless($download instanceof ProductDownload, 404, 'Plik nie istnieje lub nie należy do tego produktu.');
+        abort_unless($download instanceof ProductDownload, 404, __('downloads.file_not_found_for_product', [], 'The file does not exist or does not belong to this product.'));
 
         // Increment download count
         $link->incrementDownloadCount();
@@ -96,7 +96,7 @@ class DownloadsController extends ApiController
             return redirect()->away($download->file_path);
         }
 
-        abort_unless(Storage::exists($download->file_path), 404, 'Plik nie został znaleziony na serwerze.');
+        abort_unless(Storage::exists($download->file_path), 404, __('downloads.file_not_on_server', [], 'The file was not found on the server.'));
 
         $headers = [];
         if ($download->mime_type) {

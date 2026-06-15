@@ -8,6 +8,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -177,45 +184,47 @@ export default function CreateAttribute() {
                             <Label htmlFor="type">
                                 {__('label.type', 'Type')}
                             </Label>
-                            <select
-                                id="type"
+                            <Select
                                 value={data.type}
-                                onChange={(event) =>
+                                onValueChange={(val) =>
                                     setData((prev) => ({
                                         ...prev,
-                                        type: event.target
-                                            .value as AttributeFormData['type'],
+                                        type: val as AttributeFormData['type'],
                                         values: [
                                             'select',
                                             'multiselect',
                                             'color',
-                                        ].includes(event.target.value)
+                                        ].includes(val)
                                             ? prev.values
                                             : [],
                                         is_filterable: [
                                             'select',
                                             'multiselect',
                                             'color',
-                                        ].includes(event.target.value)
+                                        ].includes(val)
                                             ? prev.is_filterable
                                             : false,
                                         is_variant_selection: [
                                             'select',
                                             'multiselect',
                                             'color',
-                                        ].includes(event.target.value)
+                                        ].includes(val)
                                             ? prev.is_variant_selection
                                             : false,
                                     }))
                                 }
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                             >
-                                {ATTRIBUTE_TYPES.map((type) => (
-                                    <option key={type.value} value={type.value}>
-                                        {type.label}
-                                    </option>
-                                ))}
-                            </select>
+                                <SelectTrigger id="type">
+                                    <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {ATTRIBUTE_TYPES.map((type) => (
+                                        <SelectItem key={type.value} value={type.value}>
+                                            {type.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                             <InputError message={errors.type} />
                         </div>
 

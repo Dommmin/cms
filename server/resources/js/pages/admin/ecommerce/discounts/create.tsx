@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import * as DiscountController from '@/actions/App/Http/Controllers/Admin/Ecommerce/DiscountController';
@@ -7,6 +8,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -34,6 +42,7 @@ export default function Create({
 }) {
     const __ = useTranslation();
     const isEditing = !!discount;
+    const [selectedType, setSelectedType] = useState(discount?.type ?? 'percentage');
     const formId = isEditing ? 'discount-edit-form' : 'discount-create-form';
     const breadcrumbs: BreadcrumbItem[] = isEditing
         ? [
@@ -130,23 +139,25 @@ export default function Create({
                                 <Label htmlFor="type">
                                     {__('label.type', 'Discount Type')}
                                 </Label>
-                                <select
-                                    id="type"
-                                    name="type"
-                                    defaultValue={
-                                        discount?.type ?? 'percentage'
-                                    }
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                <Select
+                                    value={selectedType}
+                                    onValueChange={setSelectedType}
                                 >
-                                    {DISCOUNT_TYPES.map((type) => (
-                                        <option
-                                            key={type.value}
-                                            value={type.value}
-                                        >
-                                            {type.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger id="type">
+                                        <SelectValue placeholder="Select discount type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {DISCOUNT_TYPES.map((type) => (
+                                            <SelectItem
+                                                key={type.value}
+                                                value={type.value}
+                                            >
+                                                {type.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="type" value={selectedType} />
                                 <InputError message={errors.type} />
                             </div>
 

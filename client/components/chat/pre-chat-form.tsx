@@ -1,15 +1,16 @@
 'use client';
 
+import { useTranslation } from '@/hooks/use-translation';
 import { Loader2Icon, SendIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { PreChatFormProps } from './pre-chat-form.types';
 
 const SUBJECTS = [
-    'Pytanie o zamówienie',
-    'Problem z produktem',
-    'Zwrot / Reklamacja',
-    'Pytanie o dostawę',
-    'Inne',
+    { key: 'order_question', fallback: 'Order question' },
+    { key: 'product_issue', fallback: 'Product issue' },
+    { key: 'return_complaint', fallback: 'Return / Complaint' },
+    { key: 'shipping_question', fallback: 'Shipping question' },
+    { key: 'other', fallback: 'Other' },
 ];
 
 export function PreChatForm({
@@ -19,9 +20,10 @@ export function PreChatForm({
     onSubmit,
     isLoading,
 }: PreChatFormProps) {
+    const { t } = useTranslation();
     const [name, setName] = useState(userName ?? '');
     const [email, setEmail] = useState(userEmail ?? '');
-    const [subject, setSubject] = useState(SUBJECTS[0]);
+    const [subject, setSubject] = useState(SUBJECTS[0].key);
     const [body, setBody] = useState('');
 
     function handleSubmit(e: React.FormEvent) {
@@ -32,33 +34,39 @@ export function PreChatForm({
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 p-4">
             <p className="text-muted-foreground text-sm">
-                Opisz swój problem — odpiszemy tak szybko jak to możliwe.
+                {t(
+                    'chat.pre_chat_desc',
+                    'Describe your problem — we will respond as soon as possible.',
+                )}
             </p>
 
             {!isAuthenticated && (
                 <>
                     <div>
                         <label className="mb-1 block text-xs font-medium">
-                            Imię *
+                            {t('chat.name_label', 'Name *')}
                         </label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="Jan Kowalski"
+                            placeholder={t(
+                                'chat.name_placeholder',
+                                'e.g. John Doe',
+                            )}
                             required
                             className="bg-background ring-offset-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
                         />
                     </div>
                     <div>
                         <label className="mb-1 block text-xs font-medium">
-                            Email *
+                            {t('chat.email_label', 'Email *')}
                         </label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="jan@example.com"
+                            placeholder="john@example.com"
                             required
                             className="bg-background ring-offset-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
                         />
@@ -68,7 +76,7 @@ export function PreChatForm({
 
             <div>
                 <label className="mb-1 block text-xs font-medium">
-                    Temat *
+                    {t('chat.subject_label', 'Subject *')}
                 </label>
                 <select
                     value={subject}
@@ -77,8 +85,8 @@ export function PreChatForm({
                     className="bg-background ring-offset-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
                 >
                     {SUBJECTS.map((s) => (
-                        <option key={s} value={s}>
-                            {s}
+                        <option key={s.key} value={s.key}>
+                            {t(`chat.subject.${s.key}`, s.fallback)}
                         </option>
                     ))}
                 </select>
@@ -86,12 +94,15 @@ export function PreChatForm({
 
             <div>
                 <label className="mb-1 block text-xs font-medium">
-                    Wiadomość *
+                    {t('chat.message_label', 'Message *')}
                 </label>
                 <textarea
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
-                    placeholder="Opisz swój problem..."
+                    placeholder={t(
+                        'chat.message_placeholder',
+                        'Describe your problem...',
+                    )}
                     required
                     rows={4}
                     className="bg-background ring-offset-background focus:ring-ring w-full resize-none rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
@@ -108,7 +119,7 @@ export function PreChatForm({
                 ) : (
                     <SendIcon className="h-4 w-4" />
                 )}
-                Rozpocznij czat
+                {t('chat.start_chat', 'Start Chat')}
             </button>
         </form>
     );

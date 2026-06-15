@@ -19,7 +19,7 @@ class VatId implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
-            $fail('Numer VAT/NIP musi być ciągiem znaków.');
+            $fail(__('validation.vat_id.must_be_string', [], 'The VAT/NIP number must be a string.'));
 
             return;
         }
@@ -28,7 +28,7 @@ class VatId implements ValidationRule
         $clean = preg_replace('/[^A-Za-z0-9]/', '', $value);
 
         if (empty($clean)) {
-            $fail('Numer VAT/NIP nie może być pusty.');
+            $fail(__('validation.vat_id.empty', [], 'The VAT/NIP number cannot be empty.'));
 
             return;
         }
@@ -37,7 +37,7 @@ class VatId implements ValidationRule
         if (preg_match('/^(PL)?\d{10}$/i', $clean)) {
             $nip = preg_replace('/^PL/i', '', $clean);
             if (! $this->validatePolishNip($nip)) {
-                $fail('Podany numer NIP jest niepoprawny.');
+                $fail(__('validation.vat_id.invalid_nip', [], 'The provided NIP number is invalid.'));
             }
 
             return;
@@ -56,7 +56,7 @@ class VatId implements ValidationRule
             ];
 
             if (! in_array($countryPrefix, $euCountries, true)) {
-                $fail('Niepoprawny prefiks kraju dla numeru VAT UE.');
+                $fail(__('validation.vat_id.invalid_country_prefix', [], 'Invalid country prefix for EU VAT number.'));
 
                 return;
             }
@@ -65,13 +65,13 @@ class VatId implements ValidationRule
             $isValid = $viesService->validateVat($countryPrefix, $vatNumber);
 
             if ($isValid === false) {
-                $fail('Podany numer VAT UE jest nieaktywny lub niepoprawny w bazie VIES.');
+                $fail(__('validation.vat_id.inactive_vat', [], 'The provided EU VAT number is inactive or invalid in the VIES database.'));
             }
 
             return;
         }
 
-        $fail('Niepoprawny format numeru NIP lub VAT UE.');
+        $fail(__('validation.vat_id.invalid_format', [], 'Invalid NIP or EU VAT number format.'));
     }
 
     private function validatePolishNip(string $nip): bool

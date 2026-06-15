@@ -1,5 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useState } from 'react';
 import * as TaxRateController from '@/actions/App/Http/Controllers/Admin/Ecommerce/TaxRateController';
 import InputError from '@/components/input-error';
 import { PageHeader, PageHeaderActions } from '@/components/page-header';
@@ -7,6 +8,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -38,6 +46,7 @@ export default function Edit({
     const __ = useTranslation();
     const formId = 'tax-rate-edit-form';
 
+    const [countryCode, setCountryCode] = useState(taxRate.country_code ?? '');
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Tax Rates',
@@ -115,22 +124,23 @@ export default function Edit({
                                 <Label htmlFor="country_code">
                                     Country (optional)
                                 </Label>
-                                <select
-                                    id="country_code"
-                                    name="country_code"
-                                    defaultValue={taxRate.country_code ?? ''}
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <option value="">All countries</option>
-                                    {COMMON_COUNTRIES.map((country) => (
-                                        <option
-                                            key={country.code}
-                                            value={country.code}
-                                        >
-                                            {country.name} ({country.code})
-                                        </option>
-                                    ))}
-                                </select>
+                                <Select value={countryCode || 'all'} onValueChange={(v) => setCountryCode(v === 'all' ? '' : v)}>
+                                    <SelectTrigger id="country_code">
+                                        <SelectValue placeholder="All countries" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All countries</SelectItem>
+                                        {COMMON_COUNTRIES.map((country) => (
+                                            <SelectItem
+                                                key={country.code}
+                                                value={country.code}
+                                            >
+                                                {country.name} ({country.code})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="country_code" value={countryCode} />
                                 <InputError message={errors.country_code} />
                             </div>
 

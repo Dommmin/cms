@@ -183,4 +183,24 @@ return [
         'blik_code' => 'kod BLIK',
     ],
 
+    // Section / page-builder field validation
+    'section' => [
+        'required' => "Pole ':label' jest wymagane.",
+        'min' => "Pole ':label' musi mieć co najmniej :min znaków.",
+        'max' => "Pole ':label' może mieć maksymalnie :max znaków.",
+        'mimes' => "Pole ':label' musi być plikiem jednego z typów: :values.",
+        'dimensions' => "Pole ':label' ma nieprawidłowe wymiary.",
+        'field_required' => "Pole ':field' jest wymagane dla tego typu sekcji.",
+    ],
+
+    // VAT / NIP rule
+    'vat_id' => [
+        'must_be_string' => 'Numer VAT/NIP musi być ciągiem znaków.',
+        'empty' => 'Numer VAT/NIP nie może być pusty.',
+        'invalid_nip' => 'Podany numer NIP jest niepoprawny.',
+        'invalid_country_prefix' => 'Niepoprawny prefiks kraju dla numeru VAT UE.',
+        'inactive_vat' => 'Podany numer VAT UE jest nieaktywny lub niepoprawny w bazie VIES.',
+        'invalid_format' => 'Niepoprawny format numeru NIP lub VAT UE.',
+    ],
+
 ];

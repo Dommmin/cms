@@ -12,6 +12,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { LocalizedField } from '@/components/ui/localized-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VersionHistory } from '@/components/version-history';
@@ -51,6 +58,7 @@ export default function Edit({
     const [isSlugManual, setIsSlugManual] = useState(
         category.slug !== slugify(category.name?.[defaultLocale] ?? ''),
     );
+    const [parentId, setParentId] = useState(category.parent_id ? category.parent_id.toString() : '');
     const [collectionType, setCollectionType] = useState<'manual' | 'smart'>(
         category.collection_type ?? 'manual',
     );
@@ -86,9 +94,7 @@ export default function Edit({
         setErrors({});
 
         const form = e.currentTarget;
-        const parentId =
-            (form.elements.namedItem('parent_id') as HTMLSelectElement)
-                ?.value || null;
+        const parentIdValue = parentId ? Number(parentId) : null;
         const isActive = (
             form.elements.namedItem('is_active') as HTMLInputElement
         )?.checked;
@@ -99,7 +105,7 @@ export default function Edit({
                 name: nameValues,
                 description: descValues,
                 slug,
-                parent_id: parentId,
+                parent_id: parentIdValue,
                 is_active: isActive,
                 collection_type: collectionType,
                 rules: collectionType === 'smart' ? rules : [],
@@ -242,19 +248,19 @@ export default function Edit({
                                 <Label htmlFor="parent_id">
                                     {__('label.category', 'Parent Category')}
                                 </Label>
-                                <select
-                                    id="parent_id"
-                                    name="parent_id"
-                                    defaultValue={category.parent_id ?? ''}
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <option value="">None (Top level)</option>
-                                    {parentCategories.map((cat) => (
-                                        <option key={cat.id} value={cat.id}>
-                                            {cat.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                <Select value={parentId || 'none'} onValueChange={(v) => setParentId(v === 'none' ? '' : v)}>
+                                    <SelectTrigger id="parent_id">
+                                        <SelectValue placeholder="None (Top level)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">None (Top level)</SelectItem>
+                                        {parentCategories.map((cat) => (
+                                            <SelectItem key={cat.id} value={cat.id.toString()}>
+                                                {cat.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                                 <InputError message={errors.parent_id} />
                             </div>
 

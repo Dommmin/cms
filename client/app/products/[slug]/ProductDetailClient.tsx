@@ -371,23 +371,20 @@ export default function ProductDetailClient({
                         unavailable: t('product.unavailable', 'Unavailable'),
                         notifyWhenAvailable: t(
                             'product.notify_when_available',
-                            'Przypomnij jak będzie dostępny',
+                            'Notify when available',
                         ),
                         notifyEmailPlaceholder: t(
                             'product.notify_email_placeholder',
-                            'Wpisz swój adres e-mail',
+                            'Enter your email address',
                         ),
-                        notifySubmit: t(
-                            'product.notify_submit',
-                            'Powiadom mnie',
-                        ),
+                        notifySubmit: t('product.notify_submit', 'Notify me'),
                         notifySuccess: t(
                             'product.notify_success',
-                            'Zostaniesz powiadomiony, gdy produkt pojawi się na stanie!',
+                            'You will be notified when this product is back in stock!',
                         ),
                         notifyAlreadySubscribed: t(
                             'product.notify_already_subscribed',
-                            'Już zapisałeś się na powiadomienia o tym produkcie.',
+                            'You are already subscribed to notifications for this product.',
                         ),
                     }}
                 />

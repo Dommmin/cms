@@ -127,11 +127,11 @@ class SectionValidationService
         $messages = [];
         $label = $field['label'] ?? $field['name'];
 
-        $messages[$fieldName.'.required'] = sprintf("Pole '%s' jest wymagane.", $label);
-        $messages[$fieldName.'.min'] = sprintf("Pole '%s' musi mieć minimum :min znaków.", $label);
-        $messages[$fieldName.'.max'] = sprintf("Pole '%s' może mieć maksimum :max znaków.", $label);
-        $messages[$fieldName.'.mimes'] = sprintf("Pole '%s' musi być plikiem typu: :values.", $label);
-        $messages[$fieldName.'.dimensions'] = sprintf("Pole '%s' ma nieprawidłowe wymiary.", $label);
+        $messages[$fieldName.'.required'] = __('validation.section.required', ['label' => $label]);
+        $messages[$fieldName.'.min'] = __('validation.section.min', ['label' => $label]);
+        $messages[$fieldName.'.max'] = __('validation.section.max', ['label' => $label]);
+        $messages[$fieldName.'.mimes'] = __('validation.section.mimes', ['label' => $label]);
+        $messages[$fieldName.'.dimensions'] = __('validation.section.dimensions', ['label' => $label]);
 
         return $messages;
     }
@@ -162,7 +162,7 @@ class SectionValidationService
         if (isset($businessRules['required_fields'])) {
             foreach ($businessRules['required_fields'] as $requiredField) {
                 if (! isset($data['configuration'][$requiredField]) || empty($data['configuration'][$requiredField])) {
-                    $errors['configuration.'.$requiredField] = [sprintf("Pole '%s' jest wymagane dla tego typu sekcji.", $requiredField)];
+                    $errors['configuration.'.$requiredField] = [__('validation.section.field_required', ['field' => $requiredField])];
                 }
             }
         }

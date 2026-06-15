@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { MapPicker } from '@/components/ui/map-picker';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { FormData } from './create.types';
@@ -21,6 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CreateStore() {
+    const __ = useTranslation();
     const [data, setData] = useState<FormData>({
         name: '',
         slug: '',
@@ -113,7 +115,7 @@ export default function CreateStore() {
                                     address: e.target.value,
                                 }))
                             }
-                            placeholder="ul. Marszałkowska 1"
+                            placeholder={__('stores.address_placeholder', 'e.g. 123 Main St')}
                             required
                         />
                         <InputError message={errors.address} />

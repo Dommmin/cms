@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import * as FlashSaleController from '@/actions/App/Http/Controllers/Admin/Ecommerce/FlashSaleController';
@@ -7,6 +8,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -15,6 +23,7 @@ import type { FormPageProps } from './form.types';
 
 export default function Edit({ flashSale, products }: Required<FormPageProps>) {
     const __ = useTranslation();
+    const [selectedProduct, setSelectedProduct] = useState(flashSale.product_id?.toString() ?? '');
     const formId = 'flash-sale-edit-form';
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -74,22 +83,22 @@ export default function Edit({ flashSale, products }: Required<FormPageProps>) {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="product_id">Product</Label>
-                                <select
-                                    id="product_id"
-                                    name="product_id"
-                                    required
-                                    defaultValue={flashSale.product_id}
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                <Select
+                                    value={selectedProduct}
+                                    onValueChange={setSelectedProduct}
                                 >
-                                    <option value="">
-                                        — Select a product —
-                                    </option>
-                                    {products.map((p) => (
-                                        <option key={p.id} value={p.id}>
-                                            {p.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger id="product_id">
+                                        <SelectValue placeholder="— Select a product —" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {products.map((p) => (
+                                            <SelectItem key={p.id} value={p.id.toString()}>
+                                                {p.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="product_id" value={selectedProduct} />
                                 <InputError message={errors.product_id} />
                             </div>
 

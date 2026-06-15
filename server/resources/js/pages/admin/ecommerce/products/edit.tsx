@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import * as ProductVariantController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductVariantController';
 import PreviewController from '@/actions/App/Http/Controllers/Admin/PreviewController';
@@ -40,6 +41,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LocalizedField } from '@/components/ui/localized-field';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VersionHistory } from '@/components/version-history';
@@ -167,6 +175,7 @@ export default function Edit({
     price_history,
     metafield_definitions,
 }: EditProps) {
+    const __ = useTranslation();
     const { frontendUrl, locales } = usePage().props as {
         frontendUrl: string;
         locales: SharedLocale[];
@@ -373,9 +382,9 @@ export default function Edit({
                             >
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                                 <span className="hidden sm:inline">
-                                    Back to Products
+                                    {__('products.back_to_list', 'Back to Products')}
                                 </span>
-                                <span className="sm:hidden">Back</span>
+                                <span className="sm:hidden">{__('action.back', 'Back')}</span>
                             </Link>
                         </Button>
 
@@ -387,7 +396,7 @@ export default function Edit({
                                     rel="noopener noreferrer"
                                 >
                                     <ExternalLink className="mr-2 h-4 w-4" />
-                                    View on Site
+                                    {__('action.view_on_site', 'View on Site')}
                                 </a>
                             </Button>
                             <Button variant="outline" asChild>
@@ -927,43 +936,51 @@ export default function Edit({
                                                             <Label htmlFor="brand_id">
                                                                 Brand
                                                             </Label>
-                                                            <select
-                                                                id="brand_id"
-                                                                name="brand_id"
+                                                            <Select
                                                                 value={
-                                                                    formData.brand_id ??
-                                                                    ''
+                                                                    formData.brand_id
+                                                                        ? formData.brand_id.toString()
+                                                                        : 'none'
                                                                 }
-                                                                onChange={(e) =>
+                                                                onValueChange={(
+                                                                    v,
+                                                                ) =>
                                                                     handleFormChange(
                                                                         'brand_id',
-                                                                        e.target
-                                                                            .value ||
-                                                                            null,
+                                                                        v ===
+                                                                            'none'
+                                                                            ? null
+                                                                            : Number(
+                                                                                  v,
+                                                                              ),
                                                                     )
                                                                 }
-                                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                                             >
-                                                                <option value="">
-                                                                    No brand
-                                                                </option>
-                                                                {brandOptions.map(
-                                                                    (brand) => (
-                                                                        <option
-                                                                            key={
-                                                                                brand.value
-                                                                            }
-                                                                            value={
-                                                                                brand.value
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                brand.label
-                                                                            }
-                                                                        </option>
-                                                                    ),
-                                                                )}
-                                                            </select>
+                                                                <SelectTrigger id="brand_id">
+                                                                    <SelectValue placeholder="No brand" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="none">
+                                                                        No brand
+                                                                    </SelectItem>
+                                                                    {brandOptions.map(
+                                                                        (
+                                                                            brand,
+                                                                        ) => (
+                                                                            <SelectItem
+                                                                                key={
+                                                                                    brand.value
+                                                                                }
+                                                                                value={brand.value.toString()}
+                                                                            >
+                                                                                {
+                                                                                    brand.label
+                                                                                }
+                                                                            </SelectItem>
+                                                                        ),
+                                                                    )}
+                                                                </SelectContent>
+                                                            </Select>
                                                             <InputError
                                                                 message={
                                                                     errors.brand_id

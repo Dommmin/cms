@@ -139,14 +139,14 @@ class PromotionService
         if (! $discount) {
             return [
                 'success' => false,
-                'message' => 'Nieprawidłowy kod rabatowy',
+                'message' => __('promotions.invalid_code', [], 'Invalid discount code'),
             ];
         }
 
         if (! $discount->isValid()) {
             return [
                 'success' => false,
-                'message' => 'Kod rabatowy jest nieaktywny lub wygasł',
+                'message' => __('promotions.code_expired', [], 'The discount code is inactive or has expired'),
             ];
         }
 
@@ -155,7 +155,7 @@ class PromotionService
         if ($discount->min_order_value && $cartTotal < $discount->min_order_value) {
             return [
                 'success' => false,
-                'message' => sprintf('Minimalna wartość zamówienia to %s zł', $discount->min_order_value),
+                'message' => __('promotions.min_order_value', ['value' => $discount->min_order_value], 'Minimum order value is :value'),
             ];
         }
 
@@ -169,7 +169,7 @@ class PromotionService
                 'name' => $discount->name,
                 'type' => $discount->type,
                 'value' => $discount->value,
-                'discount_amount' => $discountAmount / 100, // Convert back to zł
+                'discount_amount' => $discountAmount / 100, // Convert back to base currency unit
             ],
         ];
     }

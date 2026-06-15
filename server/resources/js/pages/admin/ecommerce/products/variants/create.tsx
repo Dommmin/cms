@@ -9,6 +9,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
@@ -29,6 +36,8 @@ export default function CreateVariant({
     const formId = 'product-variant-create-form';
     const productName = resolveLocalizedText(product.name);
     const [stockStatus, setStockStatus] = useState('in_stock');
+    const [taxRateId, setTaxRateId] = useState('');
+    const [selectedAttributes, setSelectedAttributes] = useState<Record<number, string>>({});
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Products', href: ProductController.index.url() },
@@ -205,22 +214,23 @@ export default function CreateVariant({
                                     <Label htmlFor="tax_rate_id">
                                         {__('label.tax_rate', 'Tax Rate')}
                                     </Label>
-                                    <select
-                                        id="tax_rate_id"
-                                        name="tax_rate_id"
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                        defaultValue=""
-                                    >
-                                        <option value="">Default</option>
-                                        {taxRates.map((rate) => (
-                                            <option
-                                                key={rate.id}
-                                                value={rate.id}
-                                            >
-                                                {rate.name} ({rate.rate}%)
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <Select value={taxRateId || 'default'} onValueChange={(v) => setTaxRateId(v === 'default' ? '' : v)}>
+                                        <SelectTrigger id="tax_rate_id">
+                                            <SelectValue placeholder="Default" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="default">Default</SelectItem>
+                                            {taxRates.map((rate) => (
+                                                <SelectItem
+                                                    key={rate.id}
+                                                    value={rate.id.toString()}
+                                                >
+                                                    {rate.name} ({rate.rate}%)
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <input type="hidden" name="tax_rate_id" value={taxRateId} />
                                     <InputError message={errors.tax_rate_id} />
                                 </div>
                             </div>
@@ -252,32 +262,37 @@ export default function CreateVariant({
                                                         ? ' *'
                                                         : ''}
                                                 </Label>
-                                                <select
-                                                    id={`attribute-${attribute.id}`}
-                                                    name="attribute_values[]"
-                                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                                    defaultValue=""
-                                                    required={
-                                                        attribute.is_required
+                                                <Select
+                                                    value={selectedAttributes[attribute.id] || 'none'}
+                                                    onValueChange={(v) =>
+                                                        setSelectedAttributes((prev) => ({
+                                                            ...prev,
+                                                            [attribute.id]: v === 'none' ? '' : v,
+                                                        }))
                                                     }
                                                 >
-                                                    <option value="">
-                                                        {__(
-                                                            'placeholder.select_value',
-                                                            'Select value',
-                                                        )}
-                                                    </option>
-                                                    {attribute.values.map(
-                                                        (value) => (
-                                                            <option
+                                                    <SelectTrigger id={`attribute-${attribute.id}`}>
+                                                        <SelectValue placeholder={__('placeholder.select_value', 'Select value')} />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="none">
+                                                            {__('placeholder.select_value', 'Select value')}
+                                                        </SelectItem>
+                                                        {attribute.values.map((value) => (
+                                                            <SelectItem
                                                                 key={value.id}
-                                                                value={value.id}
+                                                                value={value.id.toString()}
                                                             >
                                                                 {value.value}
-                                                            </option>
-                                                        ),
-                                                    )}
-                                                </select>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <input
+                                                    type="hidden"
+                                                    name="attribute_values[]"
+                                                    value={selectedAttributes[attribute.id] || ''}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -319,28 +334,18 @@ export default function CreateVariant({
                                     <Label htmlFor="stock_status">
                                         Stock Status Override
                                     </Label>
-                                    <select
-                                        id="stock_status"
-                                        name="stock_status"
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                        value={stockStatus}
-                                        onChange={(e) =>
-                                            setStockStatus(e.target.value)
-                                        }
-                                    >
-                                        <option value="in_stock">
-                                            In Stock
-                                        </option>
-                                        <option value="out_of_stock">
-                                            Out of Stock
-                                        </option>
-                                        <option value="backorder">
-                                            Backorder
-                                        </option>
-                                        <option value="pre_order">
-                                            Pre-Order
-                                        </option>
-                                    </select>
+                                    <Select value={stockStatus} onValueChange={setStockStatus}>
+                                        <SelectTrigger id="stock_status">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="in_stock">In Stock</SelectItem>
+                                            <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                                            <SelectItem value="backorder">Backorder</SelectItem>
+                                            <SelectItem value="pre_order">Pre-Order</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <input type="hidden" name="stock_status" value={stockStatus} />
                                     <InputError message={errors.stock_status} />
                                 </div>
 

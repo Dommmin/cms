@@ -74,21 +74,48 @@ function validatePostalCode(value: string, country: string): boolean {
     return p.pattern.test(value);
 }
 
-// ── Zod schema ─────────────────────────────────────────────────────────────
+// ── Zod schema & validation ───────────────────────────────────────────────────
 
-const addressSchema = z.object({
-    first_name: z.string().min(1, 'Imię jest wymagane'),
-    last_name: z.string().min(1, 'Nazwisko jest wymagane'),
-    company_name: z.string().optional(),
-    street: z.string().min(3, 'Ulica jest wymagana'),
-    street2: z.string().optional(),
-    city: z.string().min(2, 'Miasto jest wymagane'),
-    postal_code: z.string().min(1, 'Kod pocztowy jest wymagany'),
-    country_code: z.string().min(2),
-    phone: z.string().min(7, 'Numer telefonu jest wymagany'),
-});
+function validateAddress(
+    value: AddressPayload,
+    t: (key: string, fallback?: string) => string,
+): AddressErrors {
+    const addressSchema = z.object({
+        first_name: z
+            .string()
+            .min(
+                1,
+                t('validation.first_name_required', 'First name is required'),
+            ),
+        last_name: z
+            .string()
+            .min(
+                1,
+                t('validation.last_name_required', 'Last name is required'),
+            ),
+        company_name: z.string().optional(),
+        street: z
+            .string()
+            .min(
+                3,
+                t('validation.street_required', 'Street address is required'),
+            ),
+        street2: z.string().optional(),
+        city: z
+            .string()
+            .min(2, t('validation.city_required', 'City is required')),
+        postal_code: z
+            .string()
+            .min(
+                1,
+                t('validation.postal_code_required', 'Postal code is required'),
+            ),
+        country_code: z.string().min(2),
+        phone: z
+            .string()
+            .min(7, t('validation.phone_required', 'Phone number is required')),
+    });
 
-function validateAddress(value: AddressPayload): AddressErrors {
     const result = addressSchema.safeParse(value);
     const errors: AddressErrors = {};
     if (!result.success) {
@@ -101,7 +128,7 @@ function validateAddress(value: AddressPayload): AddressErrors {
         value.postal_code &&
         !validatePostalCode(value.postal_code, value.country_code)
     ) {
-        errors.postal_code = `Nieprawidłowy format kodu pocztowego (${POSTAL_PATTERNS[value.country_code]?.placeholder ?? 'sprawdź format'})`;
+        errors.postal_code = `${t('validation.postal_code_invalid_format', 'Invalid postal code format')} (${POSTAL_PATTERNS[value.country_code]?.placeholder ?? t('validation.check_format', 'check format')})`;
     }
     return errors;
 }
@@ -259,7 +286,7 @@ export function AddressFieldset({
         debounce: 300,
     });
 
-    const errors = validateAddress(value);
+    const errors = validateAddress(value, t);
 
     const set = useCallback(
         (field: keyof AddressPayload, val: string) =>
@@ -448,7 +475,10 @@ export function AddressFieldset({
                                 }
                                 aria-invalid={!!err('street')}
                                 className={inputCls(err('street'))}
-                                placeholder="np. ul. Marszałkowska 1"
+                                placeholder={t(
+                                    'checkout.street_placeholder',
+                                    'e.g. 123 Main St',
+                                )}
                                 disabled={
                                     !ready &&
                                     !!process.env

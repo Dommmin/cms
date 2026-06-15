@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import * as ProductController from '@/actions/App/Http/Controllers/Admin/Ecommerce/ProductController';
 import InputError from '@/components/input-error';
 import {
@@ -30,6 +31,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LocalizedField } from '@/components/ui/localized-field';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { SlugField } from '@/components/ui/slug-field';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Wrapper from '@/components/wrapper';
@@ -156,6 +164,7 @@ export default function Create({
     flags,
     metafield_definitions,
 }: CreateProps) {
+    const __ = useTranslation();
     const { locales } = usePage().props as { locales: SharedLocale[] };
     const defaultLocale = locales.find((l) => l.is_default)?.code ?? 'en';
     const [activeTab, setActiveTab] = useState('general');
@@ -299,13 +308,9 @@ export default function Create({
                 >
                     <PageHeaderActions>
                         <Button asChild variant="outline">
-                            <Link
-                                href={ProductController.index.url()}
-                                prefetch
-                                cacheFor={30}
-                            >
+                            <Link href={ProductController.index.url()}>
                                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                                Back to Products
+                                {__('products.back_to_list', 'Back to Products')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -319,7 +324,7 @@ export default function Create({
                     onError={(errors) => {
                         setActiveTab(tabForErrors(errors as FormErrors));
                         toast.error(
-                            'Formularz zawiera błędy. Sprawdź zaznaczoną zakładkę.',
+                            __('products.form_errors', 'The form contains errors. Please check the highlighted tab.'),
                         );
                     }}
                 >
@@ -703,43 +708,44 @@ export default function Create({
                                                     <Label htmlFor="brand_id">
                                                         Brand
                                                     </Label>
-                                                    <select
-                                                        id="brand_id"
-                                                        name="brand_id"
+                                                    <Select
                                                         value={
-                                                            formData.brand_id ??
-                                                            ''
+                                                            formData.brand_id
+                                                                ? formData.brand_id.toString()
+                                                                : 'none'
                                                         }
-                                                        onChange={(e) =>
+                                                        onValueChange={(v) =>
                                                             handleFormChange(
                                                                 'brand_id',
-                                                                e.target
-                                                                    .value ||
-                                                                    null,
+                                                                v === 'none'
+                                                                    ? null
+                                                                    : Number(v),
                                                             )
                                                         }
-                                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                                     >
-                                                        <option value="">
-                                                            No brand
-                                                        </option>
-                                                        {brandOptions.map(
-                                                            (brand) => (
-                                                                <option
-                                                                    key={
-                                                                        brand.value
-                                                                    }
-                                                                    value={
-                                                                        brand.value
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        brand.label
-                                                                    }
-                                                                </option>
-                                                            ),
-                                                        )}
-                                                    </select>
+                                                        <SelectTrigger id="brand_id">
+                                                            <SelectValue placeholder="No brand" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="none">
+                                                                No brand
+                                                            </SelectItem>
+                                                            {brandOptions.map(
+                                                                (brand) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            brand.value
+                                                                        }
+                                                                        value={brand.value.toString()}
+                                                                    >
+                                                                        {
+                                                                            brand.label
+                                                                        }
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
                                                     <InputError
                                                         message={
                                                             errors.brand_id

@@ -199,4 +199,24 @@ return [
 
     'attributes' => [],
 
+    // Section / page-builder field validation
+    'section' => [
+        'required' => "The ':label' field is required.",
+        'min' => "The ':label' field must be at least :min characters.",
+        'max' => "The ':label' field must not exceed :max characters.",
+        'mimes' => "The ':label' field must be a file of type: :values.",
+        'dimensions' => "The ':label' field has invalid image dimensions.",
+        'field_required' => "The ':field' field is required for this section type.",
+    ],
+
+    // VAT / NIP rule
+    'vat_id' => [
+        'must_be_string' => 'The VAT/NIP number must be a string.',
+        'empty' => 'The VAT/NIP number cannot be empty.',
+        'invalid_nip' => 'The provided NIP number is invalid.',
+        'invalid_country_prefix' => 'Invalid country prefix for EU VAT number.',
+        'inactive_vat' => 'The provided EU VAT number is inactive or invalid in the VIES database.',
+        'invalid_format' => 'Invalid NIP or EU VAT number format.',
+    ],
+
 ];

@@ -53,6 +53,9 @@ export default function Edit({
     );
 
     const __ = useTranslation();
+    const [selectedRobots, setSelectedRobots] = useState<string>(
+        page.meta_robots ?? 'index, follow',
+    );
     const [layout] = useState<string>(page.layout ?? 'default');
     const [pageType, setPageType] = useState<string>(
         page.page_type ?? 'blocks',
@@ -769,29 +772,29 @@ export default function Edit({
                                                     'Meta Robots',
                                                 )}
                                             </Label>
-                                            <select
-                                                id="meta_robots"
-                                                name="meta_robots"
-                                                defaultValue={
-                                                    page.meta_robots ??
-                                                    'index, follow'
-                                                }
-                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                            <Select
+                                                value={selectedRobots}
+                                                onValueChange={setSelectedRobots}
                                             >
-                                                <option value="index, follow">
-                                                    Index &amp; Follow
-                                                    (Recommended)
-                                                </option>
-                                                <option value="noindex, follow">
-                                                    No Index, Follow
-                                                </option>
-                                                <option value="index, nofollow">
-                                                    Index, No Follow
-                                                </option>
-                                                <option value="noindex, nofollow">
-                                                    No Index, No Follow
-                                                </option>
-                                            </select>
+                                                <SelectTrigger id="meta_robots">
+                                                    <SelectValue placeholder="Select robots rule" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="index, follow">
+                                                        Index &amp; Follow (Recommended)
+                                                    </SelectItem>
+                                                    <SelectItem value="noindex, follow">
+                                                        No Index, Follow
+                                                    </SelectItem>
+                                                    <SelectItem value="index, nofollow">
+                                                        Index, No Follow
+                                                    </SelectItem>
+                                                    <SelectItem value="noindex, nofollow">
+                                                        No Index, No Follow
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <input type="hidden" name="meta_robots" value={selectedRobots} />
                                             <InputError
                                                 message={errors.meta_robots}
                                             />

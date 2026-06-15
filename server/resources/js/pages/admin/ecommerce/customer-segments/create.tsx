@@ -7,6 +7,13 @@ import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import Wrapper from '@/components/wrapper';
@@ -145,25 +152,25 @@ export default function Create() {
 
                     <div className="grid gap-2">
                         <Label htmlFor="type">{__('label.type', 'Type')}</Label>
-                        <select
-                            id="type"
-                            name="type"
+                        <Select
                             value={data.type}
-                            onChange={(e) =>
-                                setData(
-                                    'type',
-                                    e.target.value as 'manual' | 'dynamic',
-                                )
+                            onValueChange={(val) =>
+                                setData('type', val as 'manual' | 'dynamic')
                             }
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                            <option value="manual">
-                                Manual — assign customers manually
-                            </option>
-                            <option value="dynamic">
-                                Dynamic — auto-match by rules
-                            </option>
-                        </select>
+                            <SelectTrigger id="type">
+                                <SelectValue placeholder="Select segment type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="manual">
+                                    Manual — assign customers manually
+                                </SelectItem>
+                                <SelectItem value="dynamic">
+                                    Dynamic — auto-match by rules
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <input type="hidden" name="type" value={data.type} />
                         <InputError message={errors.type} />
                     </div>
 
@@ -199,51 +206,61 @@ export default function Create() {
                                             <Label className="mb-1 text-xs">
                                                 Field
                                             </Label>
-                                            <select
+                                            <Select
                                                 value={rule.field}
-                                                onChange={(e) =>
+                                                onValueChange={(val) =>
                                                     updateRule(
                                                         index,
                                                         'field',
-                                                        e.target.value,
+                                                        val,
                                                     )
                                                 }
-                                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                             >
-                                                {RULE_FIELDS.map((f) => (
-                                                    <option
-                                                        key={f.value}
-                                                        value={f.value}
-                                                    >
-                                                        {f.label}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                <SelectTrigger className="h-9">
+                                                    <SelectValue placeholder="Select field" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {RULE_FIELDS.map((f) => (
+                                                        <SelectItem
+                                                            key={f.value}
+                                                            value={f.value}
+                                                        >
+                                                            {f.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <input type="hidden" name={`rules[${index}][field]`} value={rule.field} />
                                         </div>
                                         <div>
                                             <Label className="mb-1 text-xs">
                                                 Operator
                                             </Label>
-                                            <select
+                                            <Select
                                                 value={rule.operator}
-                                                onChange={(e) =>
+                                                onValueChange={(val) =>
                                                     updateRule(
                                                         index,
                                                         'operator',
-                                                        e.target.value,
+                                                        val,
                                                     )
                                                 }
-                                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                             >
-                                                {RULE_OPERATORS.map((op) => (
-                                                    <option
-                                                        key={op.value}
-                                                        value={op.value}
-                                                    >
-                                                        {op.label}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                <SelectTrigger className="h-9">
+                                                    <SelectValue placeholder="Select operator" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {RULE_OPERATORS.map((op) => (
+                                                        <SelectItem
+                                                            key={op.value}
+                                                            value={op.value}
+                                                        >
+                                                            {op.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <input type="hidden" name={`rules[${index}][operator]`} value={rule.operator} />
                                         </div>
                                         <div>
                                             <Label className="mb-1 text-xs">

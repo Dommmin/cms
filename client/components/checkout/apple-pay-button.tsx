@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from '@/hooks/use-translation';
 import { api } from '@/lib/axios';
 import { useEffect, useState } from 'react';
 import type {
@@ -12,6 +13,7 @@ export function ApplePayButton({
     currency,
     onToken,
 }: ApplePayButtonProps) {
+    const { t } = useTranslation();
     const [isAvailable, setIsAvailable] = useState(false);
 
     useEffect(() => {
@@ -32,7 +34,7 @@ export function ApplePayButton({
             supportedNetworks: ['visa', 'masterCard'],
             merchantCapabilities: ['supports3DS'],
             total: {
-                label: 'Zamówienie',
+                label: t('checkout.order', 'Order'),
                 amount: (amount / 100).toFixed(2),
             },
         };

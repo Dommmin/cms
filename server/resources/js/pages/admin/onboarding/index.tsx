@@ -134,57 +134,57 @@ export default function Onboarding({
     const steps = [
         {
             id: 'brand',
-            label: __('onboarding.step.brand', 'Marka i podstawy'),
+            label: __('onboarding.step.brand', 'Brand & Basics'),
             icon: Settings,
-            desc: 'Nazwa, logo, kontakt',
+            desc: __('onboarding.step.brand_desc', 'Name, logo, contact'),
         },
         {
             id: 'domain',
-            label: __('onboarding.step.domain', 'Domena i status'),
+            label: __('onboarding.step.domain', 'Domain & Status'),
             icon: Globe,
-            desc: 'URL i tryb konserwacji',
+            desc: __('onboarding.step.domain_desc', 'URL and maintenance mode'),
         },
         {
             id: 'payments',
-            label: __('onboarding.step.payments', 'Płatności'),
+            label: __('onboarding.step.payments', 'Payments'),
             icon: CreditCard,
-            desc: 'Stripe, PayU, P24, Bank',
+            desc: __('onboarding.step.payments_desc', 'Stripe, PayU, P24, Bank'),
         },
         {
             id: 'shipping',
-            label: __('onboarding.step.shipping', 'Dostawy'),
+            label: __('onboarding.step.shipping', 'Shipping'),
             icon: Truck,
-            desc: 'Koszty i metody dostaw',
+            desc: __('onboarding.step.shipping_desc', 'Costs and shipping methods'),
         },
         {
             id: 'taxes',
-            label: __('onboarding.step.taxes', 'Podatki i VAT'),
+            label: __('onboarding.step.taxes', 'Taxes & VAT'),
             icon: Percent,
-            desc: 'Stawki i kraje',
+            desc: __('onboarding.step.taxes_desc', 'Rates and countries'),
         },
         {
             id: 'homepage',
-            label: __('onboarding.step.homepage', 'Strona główna'),
+            label: __('onboarding.step.homepage', 'Homepage'),
             icon: Layout,
-            desc: 'Hero banner i teksty',
+            desc: __('onboarding.step.homepage_desc', 'Hero banner and content'),
         },
         {
             id: 'menu',
-            label: __('onboarding.step.menu', 'Menu nawigacyjne'),
+            label: __('onboarding.step.menu', 'Navigation Menu'),
             icon: MenuIcon,
-            desc: 'Linki w nagłówku',
+            desc: __('onboarding.step.menu_desc', 'Header links'),
         },
         {
             id: 'seo',
-            label: __('onboarding.step.seo', 'SEO podstawy'),
+            label: __('onboarding.step.seo', 'SEO Basics'),
             icon: Sparkles,
-            desc: 'Tytuł, opis, indeksowanie',
+            desc: __('onboarding.step.seo_desc', 'Title, description, indexing'),
         },
         {
             id: 'legal',
-            label: __('onboarding.step.legal', 'Polityki prawne'),
+            label: __('onboarding.step.legal', 'Legal Policies'),
             icon: Shield,
-            desc: 'Regulamin i prywatność',
+            desc: __('onboarding.step.legal_desc', 'Terms and privacy policies'),
         },
     ];
 
@@ -221,14 +221,14 @@ export default function Onboarding({
             if (uploadedFile && uploadedFile.url) {
                 forms.brand.setData(field, uploadedFile.url);
                 toast.success(
-                    __('onboarding.upload_success', 'Plik przesłany pomyślnie'),
+                    __('onboarding.upload_success', 'File uploaded successfully'),
                 );
             }
         } catch {
             toast.error(
                 __(
                     'onboarding.upload_error',
-                    'Wystąpił błąd podczas przesłania pliku.',
+                    'An error occurred while uploading the file.',
                 ),
             );
         } finally {
@@ -243,7 +243,7 @@ export default function Onboarding({
             preserveScroll: true,
             onSuccess: () => {
                 toast.success(
-                    __('onboarding.step_saved', 'Krok zapisany pomyślnie'),
+                    __('onboarding.step_saved', 'Step saved successfully'),
                 );
                 // Advance to next step locally if one exists
                 const nextIndex = currentStepIndex + 1;
@@ -253,7 +253,7 @@ export default function Onboarding({
                     toast.success(
                         __(
                             'onboarding.all_done_msg',
-                            'Wszystkie kroki ukończone! Kliknij przycisk poniżej, aby zakończyć.',
+                            'All steps completed! Click the button below to finish.',
                         ),
                     );
                 }
@@ -262,7 +262,7 @@ export default function Onboarding({
                 toast.error(
                     __(
                         'onboarding.save_error',
-                        'Wystąpił błąd podczas zapisu kroku.',
+                        'An error occurred while saving the step.',
                     ),
                 );
             },
@@ -278,7 +278,7 @@ export default function Onboarding({
                     toast.success(
                         __(
                             'onboarding.completed_success',
-                            'Setup wizard został pomyślnie ukończony!',
+                            'Setup wizard completed successfully!',
                         ),
                     );
                 },
@@ -344,7 +344,7 @@ export default function Onboarding({
                                 <p className="text-sm text-muted-foreground">
                                     {__(
                                         'onboarding.header.subtitle',
-                                        'Skonfiguruj podstawowe ustawienia swojego nowego sklepu w kilku krokach.',
+                                        'Configure the basic settings of your new store in a few simple steps.',
                                     )}
                                 </p>
                             </div>
@@ -356,12 +356,12 @@ export default function Onboarding({
                                     {progressPercent}%{' '}
                                     {__(
                                         'onboarding.progress.completed',
-                                        'ukończone',
+                                        'completed',
                                     )}
                                 </span>
                                 <span className="text-muted-foreground">
                                     {completedCount}/{steps.length}{' '}
-                                    {__('onboarding.progress.steps', 'kroków')}
+                                    {__('onboarding.progress.steps', 'steps')}
                                 </span>
                             </div>
                             <div className="h-2 w-full rounded-full bg-secondary">
@@ -430,7 +430,7 @@ export default function Onboarding({
                                 <CheckCircle2 className="mr-2 h-4 w-4" />
                                 {__(
                                     'onboarding.action.finish',
-                                    'Ukończ konfigurację',
+                                    'Complete Configuration',
                                 )}
                             </Button>
                         </div>
@@ -602,17 +602,17 @@ export default function Onboarding({
                                                     {uploadingLogo
                                                         ? __(
                                                               'onboarding.uploading',
-                                                              'Przesyłanie...',
+                                                              'Uploading...',
                                                           )
                                                         : __(
                                                               'onboarding.choose_file',
-                                                              'Wybierz plik',
+                                                              'Choose file',
                                                           )}
                                                 </Button>
                                                 <p className="text-[10px] text-muted-foreground">
                                                     {__(
                                                         'onboarding.logo_hint',
-                                                        'Sugerowany format SVG lub PNG, tło przezroczyste.',
+                                                        'Suggested format SVG or PNG, transparent background.',
                                                     )}
                                                 </p>
                                             </div>
@@ -623,7 +623,7 @@ export default function Onboarding({
                                         <Label>
                                             {__(
                                                 'onboarding.brand.site_favicon',
-                                                'Favicon (ikonka karty)',
+                                                'Favicon (tab icon)',
                                             )}
                                         </Label>
                                         <div className="flex items-center gap-4 rounded-xl border border-dashed p-4">
@@ -671,17 +671,17 @@ export default function Onboarding({
                                                     {uploadingFavicon
                                                         ? __(
                                                               'onboarding.uploading',
-                                                              'Przesyłanie...',
+                                                              'Uploading...',
                                                           )
                                                         : __(
                                                               'onboarding.choose_file',
-                                                              'Wybierz plik',
+                                                              'Choose file',
                                                           )}
                                                 </Button>
                                                 <p className="text-[10px] text-muted-foreground">
                                                     {__(
                                                         'onboarding.favicon_hint',
-                                                        'Sugerowany format PNG, 32x32 lub ICO.',
+                                                        'Suggested format PNG, 32x32 or ICO.',
                                                     )}
                                                 </p>
                                             </div>
@@ -697,7 +697,7 @@ export default function Onboarding({
                                     >
                                         {__(
                                             'onboarding.action.save_next',
-                                            'Zapisz i przejdź dalej',
+                                            'Save and continue',
                                         )}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
@@ -718,13 +718,13 @@ export default function Onboarding({
                                     <h2 className="text-lg font-bold">
                                         {__(
                                             'onboarding.domain.title',
-                                            'Domena i ustawienia widoczności',
+                                            'Domain & Visibility Settings',
                                         )}
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
                                         {__(
                                             'onboarding.domain.desc',
-                                            'Skonfiguruj adres url sklepu oraz to, czy jest on dostępny dla klientów.',
+                                            'Configure your store URL and its visibility to customers.',
                                         )}
                                     </p>
                                 </div>
@@ -734,7 +734,7 @@ export default function Onboarding({
                                         <Label htmlFor="site_url">
                                             {__(
                                                 'onboarding.domain.site_url',
-                                                'Publiczny adres URL sklepu',
+                                                'Public Store URL',
                                             )}
                                         </Label>
                                         <Input
@@ -747,12 +747,12 @@ export default function Onboarding({
                                                 )
                                             }
                                             required
-                                            placeholder="https://twojsklep.pl"
+                                            placeholder={__('onboarding.domain.placeholder', 'https://yourstore.com')}
                                         />
                                         <p className="text-xs text-muted-foreground">
                                             {__(
                                                 'onboarding.domain.url_hint',
-                                                'Główny adres URL pod którym klienci będą widzieć sklep (bez znaku / na końcu).',
+                                                'The main URL where customers will see the store (without a trailing slash).',
                                             )}
                                         </p>
                                     </div>
@@ -762,13 +762,13 @@ export default function Onboarding({
                                             <Label htmlFor="maintenance_mode">
                                                 {__(
                                                     'onboarding.domain.maintenance_mode',
-                                                    'Tryb konserwacji',
+                                                    'Maintenance Mode',
                                                 )}
                                             </Label>
                                             <p className="text-xs text-muted-foreground">
                                                 {__(
                                                     'onboarding.domain.maintenance_hint',
-                                                    'Wyłącz sklep dla klientów, jeśli wciąż wprowadzasz zmiany.',
+                                                    'Disable the store for customers if you are still making changes.',
                                                 )}
                                             </p>
                                         </div>
@@ -796,7 +796,7 @@ export default function Onboarding({
                                     >
                                         {__(
                                             'onboarding.action.save_next',
-                                            'Zapisz i przejdź dalej',
+                                            'Save and continue',
                                         )}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
@@ -817,13 +817,13 @@ export default function Onboarding({
                                     <h2 className="text-lg font-bold">
                                         {__(
                                             'onboarding.payments.title',
-                                            'Bramki płatności',
+                                            'Payment Gateways',
                                         )}
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
                                         {__(
                                             'onboarding.payments.desc',
-                                            'Skonfiguruj integracje z operatorami płatności Stripe, PayU, Przelewy24 lub przelewem tradycyjnym.',
+                                            'Configure integrations with payment gateways Stripe, PayU, Przelewy24 or bank transfer.',
                                         )}
                                     </p>
                                 </div>
@@ -835,7 +835,7 @@ export default function Onboarding({
                                             <Coins className="h-4 w-4 text-amber-500" />
                                             {__(
                                                 'onboarding.payments.bank_transfer',
-                                                'Przelew tradycyjny',
+                                                'Bank Transfer',
                                             )}
                                         </h3>
                                         <div className="grid gap-3 sm:grid-cols-2">
@@ -846,7 +846,7 @@ export default function Onboarding({
                                                 >
                                                     {__(
                                                         'onboarding.payments.account_name',
-                                                        'Nazwa odbiorcy',
+                                                        'Recipient Name',
                                                     )}
                                                 </Label>
                                                 <Input
@@ -870,7 +870,7 @@ export default function Onboarding({
                                                 >
                                                     {__(
                                                         'onboarding.payments.bank_name',
-                                                        'Nazwa banku',
+                                                        'Bank Name',
                                                     )}
                                                 </Label>
                                                 <Input
@@ -892,7 +892,10 @@ export default function Onboarding({
                                                     htmlFor="bank_transfer_iban"
                                                     className="text-xs"
                                                 >
-                                                    IBAN / Numer konta
+                                                    {__(
+                                                        'onboarding.payments.iban',
+                                                        'IBAN / Account Number',
+                                                    )}
                                                 </Label>
                                                 <Input
                                                     id="bank_transfer_iban"
@@ -913,7 +916,10 @@ export default function Onboarding({
                                                     htmlFor="bank_transfer_swift"
                                                     className="text-xs"
                                                 >
-                                                    SWIFT / BIC
+                                                    {__(
+                                                        'onboarding.payments.swift',
+                                                        'SWIFT / BIC',
+                                                    )}
                                                 </Label>
                                                 <Input
                                                     id="bank_transfer_swift"
@@ -936,7 +942,10 @@ export default function Onboarding({
                                     <div className="space-y-3 rounded-xl border bg-muted/10 p-4">
                                         <h3 className="flex items-center gap-2 text-sm font-semibold">
                                             <CreditCard className="h-4 w-4 text-indigo-500" />
-                                            Stripe Płatności
+                                            {__(
+                                                'onboarding.payments.stripe_title',
+                                                'Stripe Payments',
+                                            )}
                                         </h3>
                                         <div className="grid gap-3 sm:grid-cols-2">
                                             <div className="space-y-1">
@@ -1156,7 +1165,7 @@ export default function Onboarding({
                                     >
                                         {__(
                                             'onboarding.action.save_next',
-                                            'Zapisz i przejdź dalej',
+                                            'Save and continue',
                                         )}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
@@ -1177,13 +1186,13 @@ export default function Onboarding({
                                     <h2 className="text-lg font-bold">
                                         {__(
                                             'onboarding.shipping.title',
-                                            'Metody i koszty dostaw',
+                                            'Shipping Methods & Costs',
                                         )}
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
                                         {__(
                                             'onboarding.shipping.desc',
-                                            'Skonfiguruj globalny darmowy próg dostawy oraz włącz lub wyłącz poszczególne metody dostaw.',
+                                            'Configure the global free shipping threshold and enable or disable individual shipping methods.',
                                         )}
                                     </p>
                                 </div>
@@ -1193,7 +1202,7 @@ export default function Onboarding({
                                         <Label htmlFor="shipping_cost">
                                             {__(
                                                 'onboarding.shipping.default_cost',
-                                                'Domyślny koszt wysyłki (PLN)',
+                                                'Default shipping cost (PLN)',
                                             )}
                                         </Label>
                                         <Input
@@ -1216,7 +1225,7 @@ export default function Onboarding({
                                         <Label htmlFor="free_shipping_threshold">
                                             {__(
                                                 'onboarding.shipping.threshold',
-                                                'Darmowa dostawa od (PLN)',
+                                                'Free shipping from (PLN)',
                                             )}
                                         </Label>
                                         <Input
@@ -1241,7 +1250,7 @@ export default function Onboarding({
                                     <Label className="font-semibold">
                                         {__(
                                             'onboarding.shipping.methods_list',
-                                            'Dostępne metody dostaw w bazie',
+                                            'Available shipping methods in the database',
                                         )}
                                     </Label>
                                     {forms.shipping.data.methods.length ===
@@ -1249,7 +1258,7 @@ export default function Onboarding({
                                         <p className="text-sm text-muted-foreground">
                                             {__(
                                                 'onboarding.shipping.none',
-                                                'Brak metod dostaw w bazie. Możesz je dodać w panelu E-commerce -> Dostawy.',
+                                                'No shipping methods found in the database. You can add them in the E-commerce -> Shipping panel.',
                                             )}
                                         </p>
                                     ) : (
@@ -1348,7 +1357,7 @@ export default function Onboarding({
                                     >
                                         {__(
                                             'onboarding.action.save_next',
-                                            'Zapisz i przejdź dalej',
+                                            'Save and continue',
                                         )}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
@@ -1369,13 +1378,13 @@ export default function Onboarding({
                                     <h2 className="text-lg font-bold">
                                         {__(
                                             'onboarding.taxes.title',
-                                            'Podatki i VAT',
+                                            'Taxes & VAT',
                                         )}
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
                                         {__(
                                             'onboarding.taxes.desc',
-                                            'Skonfiguruj domyślny podatek VAT w sklepie oraz strefy podatkowe dla krajów.',
+                                            'Configure the default VAT rate in the store and tax zones for countries.',
                                         )}
                                     </p>
                                 </div>
@@ -1384,7 +1393,7 @@ export default function Onboarding({
                                     <Label htmlFor="tax_rate">
                                         {__(
                                             'onboarding.taxes.default_rate',
-                                            'Domyślna stawka VAT (%)',
+                                            'Default VAT rate (%)',
                                         )}
                                     </Label>
                                     <Input
@@ -1405,7 +1414,7 @@ export default function Onboarding({
                                         <Label className="font-semibold">
                                             {__(
                                                 'onboarding.taxes.rates_list',
-                                                'Lista stref podatkowych',
+                                                'Tax zones list',
                                             )}
                                         </Label>
                                         <Button
@@ -1417,7 +1426,7 @@ export default function Onboarding({
                                             +{' '}
                                             {__(
                                                 'onboarding.taxes.add_rate',
-                                                'Dodaj stawkę',
+                                                'Add rate',
                                             )}
                                         </Button>
                                     </div>
@@ -1568,7 +1577,7 @@ export default function Onboarding({
                                     >
                                         {__(
                                             'onboarding.action.save_next',
-                                            'Zapisz i przejdź dalej',
+                                            'Save and continue',
                                         )}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
@@ -1589,13 +1598,13 @@ export default function Onboarding({
                                     <h2 className="text-lg font-bold">
                                         {__(
                                             'onboarding.homepage.title',
-                                            'Konfiguracja strony głównej',
+                                            'Homepage Configuration',
                                         )}
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
                                         {__(
                                             'onboarding.homepage.desc',
-                                            'Dostosuj banner powitalny (hero banner) na swojej stronie głównej.',
+                                            'Customise the welcome banner (hero banner) on your homepage.',
                                         )}
                                     </p>
                                 </div>
@@ -1605,7 +1614,7 @@ export default function Onboarding({
                                         <Label htmlFor="hero_title">
                                             {__(
                                                 'onboarding.homepage.hero_title',
-                                                'Główny nagłówek banneru',
+                                                'Main banner headline',
                                             )}
                                         </Label>
                                         <Input
@@ -1624,7 +1633,7 @@ export default function Onboarding({
                                         <Label htmlFor="hero_subtitle">
                                             {__(
                                                 'onboarding.homepage.hero_subtitle',
-                                                'Podtytuł banneru',
+                                                'Banner subtitle',
                                             )}
                                         </Label>
                                         <Textarea
@@ -1644,7 +1653,7 @@ export default function Onboarding({
                                             <Label htmlFor="hero_cta_text">
                                                 {__(
                                                     'onboarding.homepage.cta_text',
-                                                    'Tekst przycisku (CTA)',
+                                                    'CTA button text',
                                                 )}
                                             </Label>
                                             <Input
@@ -1664,7 +1673,7 @@ export default function Onboarding({
                                             <Label htmlFor="hero_cta_url">
                                                 {__(
                                                     'onboarding.homepage.cta_url',
-                                                    'Link przycisku (CTA)',
+                                                    'CTA button link',
                                                 )}
                                             </Label>
                                             <Input
@@ -1691,7 +1700,7 @@ export default function Onboarding({
                                     >
                                         {__(
                                             'onboarding.action.save_next',
-                                            'Zapisz i przejdź dalej',
+                                            'Save and continue',
                                         )}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
@@ -1712,13 +1721,13 @@ export default function Onboarding({
                                     <h2 className="text-lg font-bold">
                                         {__(
                                             'onboarding.menu.title',
-                                            'Nawigacja w nagłówku',
+                                            'Header Navigation',
                                         )}
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
                                         {__(
                                             'onboarding.menu.desc',
-                                            'Stwórz główne linki nawigacyjne widoczne u góry strony dla swoich klientów.',
+                                            'Create the main navigation links visible at the top of the page for your customers.',
                                         )}
                                     </p>
                                 </div>
@@ -1728,7 +1737,7 @@ export default function Onboarding({
                                         <Label className="font-semibold">
                                             {__(
                                                 'onboarding.menu.links',
-                                                'Linki w menu',
+                                                'Menu links',
                                             )}
                                         </Label>
                                         <Button
@@ -1740,7 +1749,7 @@ export default function Onboarding({
                                             +{' '}
                                             {__(
                                                 'onboarding.menu.add_link',
-                                                'Dodaj link',
+                                                'Add link',
                                             )}
                                         </Button>
                                     </div>
@@ -1749,7 +1758,7 @@ export default function Onboarding({
                                         <p className="text-sm text-muted-foreground">
                                             {__(
                                                 'onboarding.menu.none',
-                                                'Brak dodanych linków w menu. Dodaj pierwszy link.',
+                                                'No links added to the menu. Add your first link.',
                                             )}
                                         </p>
                                     ) : (
@@ -1762,7 +1771,7 @@ export default function Onboarding({
                                                     >
                                                         <div className="space-y-1">
                                                             <Label className="text-xs">
-                                                                Etykieta (PL)
+                                                                {__('onboarding.menu.label_pl', 'Label (PL)')}
                                                             </Label>
                                                             <Input
                                                                 value={
@@ -1800,7 +1809,7 @@ export default function Onboarding({
                                                         </div>
                                                         <div className="space-y-1">
                                                             <Label className="text-xs">
-                                                                Etykieta (EN)
+                                                                {__('onboarding.menu.label_en', 'Label (EN)')}
                                                             </Label>
                                                             <Input
                                                                 value={
@@ -1838,7 +1847,7 @@ export default function Onboarding({
                                                         </div>
                                                         <div className="space-y-1">
                                                             <Label className="text-xs">
-                                                                URL / Ścieżka
+                                                                {__('onboarding.menu.url_path', 'URL / Path')}
                                                             </Label>
                                                             <Input
                                                                 value={
@@ -1870,7 +1879,7 @@ export default function Onboarding({
                                                         <div className="flex items-center justify-between gap-2 pb-1 sm:justify-end">
                                                             <div className="flex-1 space-y-1">
                                                                 <Label className="block text-[10px]">
-                                                                    Cel (Target)
+                                                                    {__('onboarding.menu.target', 'Target')}
                                                                 </Label>
                                                                 <select
                                                                     value={
@@ -1899,12 +1908,10 @@ export default function Onboarding({
                                                                     className="w-full rounded-md border p-1 text-xs"
                                                                 >
                                                                     <option value="_self">
-                                                                        Bieżąca
-                                                                        karta
+                                                                        {__('onboarding.menu.target_self', 'Current tab')}
                                                                     </option>
                                                                     <option value="_blank">
-                                                                        Nowa
-                                                                        karta
+                                                                        {__('onboarding.menu.target_blank', 'New tab')}
                                                                     </option>
                                                                 </select>
                                                             </div>
@@ -1937,7 +1944,7 @@ export default function Onboarding({
                                     >
                                         {__(
                                             'onboarding.action.save_next',
-                                            'Zapisz i przejdź dalej',
+                                            'Save and continue',
                                         )}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
@@ -1958,13 +1965,13 @@ export default function Onboarding({
                                     <h2 className="text-lg font-bold">
                                         {__(
                                             'onboarding.seo.title',
-                                            'Ustawienia SEO',
+                                            'SEO Settings',
                                         )}
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
                                         {__(
                                             'onboarding.seo.desc',
-                                            'Skonfiguruj domyślne tagi meta w celach optymalizacji wyszukiwarki Google.',
+                                            'Configure default meta tags for Google search engine optimisation.',
                                         )}
                                     </p>
                                 </div>
@@ -1974,7 +1981,7 @@ export default function Onboarding({
                                         <Label htmlFor="meta_title">
                                             {__(
                                                 'onboarding.seo.meta_title',
-                                                'Domyślny tytuł strony (Meta Title)',
+                                                'Default page title (Meta Title)',
                                             )}
                                         </Label>
                                         <Input
@@ -1991,7 +1998,7 @@ export default function Onboarding({
                                         <p className="text-xs text-muted-foreground">
                                             {__(
                                                 'onboarding.seo.title_hint',
-                                                'Domyślna nazwa sklepu w wynikach wyszukiwania (około 50-60 znaków).',
+                                                'The default store name in search results (approximately 50–60 characters).',
                                             )}
                                         </p>
                                     </div>
@@ -1999,7 +2006,7 @@ export default function Onboarding({
                                         <Label htmlFor="meta_description">
                                             {__(
                                                 'onboarding.seo.meta_desc',
-                                                'Domyślny opis strony (Meta Description)',
+                                                'Default page description (Meta Description)',
                                             )}
                                         </Label>
                                         <Textarea
@@ -2018,7 +2025,7 @@ export default function Onboarding({
                                         <p className="text-xs text-muted-foreground">
                                             {__(
                                                 'onboarding.seo.desc_hint',
-                                                'Krótkie streszczenie zawartości sklepu wyświetlane w wynikach wyszukiwania (maksymalnie 160 znaków).',
+                                                'A short summary of store content shown in search results (maximum 160 characters).',
                                             )}
                                         </p>
                                     </div>
@@ -2028,13 +2035,13 @@ export default function Onboarding({
                                             <Label htmlFor="disable_indexing">
                                                 {__(
                                                     'onboarding.seo.disable_indexing',
-                                                    'Zablokuj indeksowanie przez roboty',
+                                                    'Block indexing by robots',
                                                 )}
                                             </Label>
                                             <p className="text-xs text-muted-foreground">
                                                 {__(
                                                     'onboarding.seo.noindex_hint',
-                                                    'Dodaje tag noindex, zapobiegając indeksacji w wyszukiwarce Google podczas prac wdrożeniowych.',
+                                                    'Adds a noindex tag, preventing Google search engine indexing during development.',
                                                 )}
                                             </p>
                                         </div>
@@ -2061,7 +2068,7 @@ export default function Onboarding({
                                     >
                                         {__(
                                             'onboarding.action.save_next',
-                                            'Zapisz i przejdź dalej',
+                                            'Save and continue',
                                         )}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
@@ -2082,13 +2089,13 @@ export default function Onboarding({
                                     <h2 className="text-lg font-bold">
                                         {__(
                                             'onboarding.legal.title',
-                                            'Polityki prawne i dokumenty',
+                                            'Legal Policies & Documents',
                                         )}
                                     </h2>
                                     <p className="text-sm text-muted-foreground">
                                         {__(
                                             'onboarding.legal.desc',
-                                            'Wprowadź treść Polityki Prywatności oraz Regulaminu Sklepu, które są niezbędne do prowadzenia sprzedaży.',
+                                            'Enter the content of the Privacy Policy and Store Terms of Service, which are required for conducting sales.',
                                         )}
                                     </p>
                                 </div>
@@ -2098,7 +2105,7 @@ export default function Onboarding({
                                         <Label htmlFor="privacy_policy_content">
                                             {__(
                                                 'onboarding.legal.privacy_policy',
-                                                'Polityka prywatności (HTML)',
+                                                'Privacy policy (HTML)',
                                             )}
                                         </Label>
                                         <Textarea
@@ -2122,7 +2129,7 @@ export default function Onboarding({
                                         <Label htmlFor="terms_of_service_content">
                                             {__(
                                                 'onboarding.legal.terms',
-                                                'Regulamin sklepu (HTML)',
+                                                'Terms of service (HTML)',
                                             )}
                                         </Label>
                                         <Textarea
@@ -2147,7 +2154,7 @@ export default function Onboarding({
                                     <p className="text-xs text-muted-foreground">
                                         {__(
                                             'onboarding.legal.complete_hint',
-                                            'Po zapisaniu obu polityk, możesz kliknąć przycisk "Zakończ konfigurację" w panelu bocznym.',
+                                            'After saving both policies, you can click the "Complete Configuration" button in the sidebar.',
                                         )}
                                     </p>
                                     <div className="flex gap-2">
@@ -2158,7 +2165,7 @@ export default function Onboarding({
                                         >
                                             {__(
                                                 'onboarding.action.save_only',
-                                                'Zapisz polityki',
+                                                'Save policies',
                                             )}
                                         </Button>
                                         <Button
@@ -2168,7 +2175,7 @@ export default function Onboarding({
                                         >
                                             {__(
                                                 'onboarding.action.finish',
-                                                'Zakończ setup',
+                                                'Complete Setup',
                                             )}
                                         </Button>
                                     </div>

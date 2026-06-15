@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeftIcon } from 'lucide-react';
 import * as AppNotificationController from '@/actions/App/Http/Controllers/Admin/AppNotificationController';
@@ -6,6 +7,13 @@ import { PageHeader, PageHeaderActions } from '@/components/page-header';
 import StickyFormActions from '@/components/sticky-form-actions';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -21,6 +29,9 @@ export default function CreateNotification({
     types,
     channels,
 }: CreateProps) {
+    const [selectedCustomer, setSelectedCustomer] = useState('');
+    const [selectedType, setSelectedType] = useState('');
+    const [selectedChannel, setSelectedChannel] = useState('');
     const formId = 'notification-create-form';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -54,80 +65,80 @@ export default function CreateNotification({
                         <>
                             <div className="grid gap-2">
                                 <Label htmlFor="customer_id">Customer *</Label>
-                                <select
-                                    id="customer_id"
-                                    name="customer_id"
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                    required
-                                    defaultValue=""
+                                <Select
+                                    value={selectedCustomer}
+                                    onValueChange={setSelectedCustomer}
                                 >
-                                    <option value="" disabled>
-                                        Select customer
-                                    </option>
-                                    {customers.map((customer) => (
-                                        <option
-                                            key={customer.id}
-                                            value={customer.id}
-                                        >
-                                            {[
-                                                customer.first_name,
-                                                customer.last_name,
-                                            ]
-                                                .filter(Boolean)
-                                                .join(' ') ||
-                                                customer.email}{' '}
-                                            ({customer.email})
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger id="customer_id">
+                                        <SelectValue placeholder="Select customer" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {customers.map((customer) => (
+                                            <SelectItem
+                                                key={customer.id}
+                                                value={customer.id.toString()}
+                                            >
+                                                {[
+                                                    customer.first_name,
+                                                    customer.last_name,
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(' ') ||
+                                                    customer.email}{' '}
+                                                ({customer.email})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="customer_id" value={selectedCustomer} />
                                 <InputError message={errors.customer_id} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="type">Type *</Label>
-                                <select
-                                    id="type"
-                                    name="type"
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                    required
-                                    defaultValue=""
+                                <Select
+                                    value={selectedType}
+                                    onValueChange={setSelectedType}
                                 >
-                                    <option value="" disabled>
-                                        Select type
-                                    </option>
-                                    {types.map((type) => (
-                                        <option
-                                            key={type.value}
-                                            value={type.value}
-                                        >
-                                            {type.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger id="type">
+                                        <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {types.map((type) => (
+                                            <SelectItem
+                                                key={type.value}
+                                                value={type.value}
+                                            >
+                                                {type.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="type" value={selectedType} />
                                 <InputError message={errors.type} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="channel">Channel *</Label>
-                                <select
-                                    id="channel"
-                                    name="channel"
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                    required
-                                    defaultValue=""
+                                <Select
+                                    value={selectedChannel}
+                                    onValueChange={setSelectedChannel}
                                 >
-                                    <option value="" disabled>
-                                        Select channel
-                                    </option>
-                                    {channels.map((channel) => (
-                                        <option
-                                            key={channel.value}
-                                            value={channel.value}
-                                        >
-                                            {channel.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger id="channel">
+                                        <SelectValue placeholder="Select channel" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {channels.map((channel) => (
+                                            <SelectItem
+                                                key={channel.value}
+                                                value={channel.value}
+                                            >
+                                                {channel.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" name="channel" value={selectedChannel} />
                                 <InputError message={errors.channel} />
                             </div>
 
