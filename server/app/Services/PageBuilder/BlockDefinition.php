@@ -49,6 +49,29 @@ final class BlockDefinition
     }
 
     /**
+     * @return list<string>|null
+     */
+    public static function getAllowedChildren(string $type): ?array
+    {
+        $definition = self::definition($type);
+        $allowedChildren = $definition['allowed_children'] ?? null;
+
+        if ($allowedChildren === null) {
+            return null;
+        }
+
+        if (! is_array($allowedChildren)) {
+            throw new InvalidArgumentException(sprintf(
+                'Block type [%s] field [allowed_children] must be an array or null.',
+                $type,
+            ));
+        }
+
+        /** @var list<string> */
+        return array_values(array_map(strval(...), $allowedChildren));
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private static function definition(string $type): array
