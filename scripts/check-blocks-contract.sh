@@ -48,4 +48,17 @@ if grep -qE '\bswitch[[:space:]]*\(' "${CLIENT}/components/page-builder/block-re
   exit 1
 fi
 
+echo ">>> [blocks] server/none blocks must not fetch or import @/api in renderers"
+violations=0
+while IFS= read -r block_file; do
+  if grep -qE 'fetch\(|@/api/' "${block_file}"; then
+    echo "ERROR: ${block_file} must not use fetch() or @/api/* (data_strategy server|none)." >&2
+    violations=$((violations + 1))
+  fi
+done < <(find "${CLIENT}/components/page-builder/blocks" -maxdepth 1 -name '*.tsx' -print)
+
+if [[ "${violations}" -gt 0 ]]; then
+  exit 1
+fi
+
 echo ">>> Blocks contract checks passed."

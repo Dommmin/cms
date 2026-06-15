@@ -31,7 +31,7 @@ function FeaturedProductsSkeleton({
 
 export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
     const cfg = block.configuration as FeaturedProductsConfig;
-    const columns = cfg.columns ?? 4;
+    const columns = cfg.items_per_row ?? 4;
 
     const productRelations = getRelationsByKey(block.relations, 'products');
     const products = productRelations
@@ -47,11 +47,15 @@ export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
             return (ra?.position ?? 0) - (rb?.position ?? 0);
         });
 
-    const colClass = {
-        2: 'grid-cols-1 sm:grid-cols-2',
-        3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-        4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
-    }[columns];
+    const colClass =
+        {
+            1: 'grid-cols-1',
+            2: 'grid-cols-1 sm:grid-cols-2',
+            3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+            4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+            5: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5',
+            6: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6',
+        }[columns] ?? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
 
     const skeletonCount = Math.min(cfg.max_items ?? 8, columns);
 

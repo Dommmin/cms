@@ -1,71 +1,47 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-
 import { StoreMap } from '@/components/store-map';
+import { getRelationsByKey } from '@/lib/format';
 import type { Store } from '@/types/api';
 import type { MapBlockConfig, MapBlockProps } from './map-block.types';
+
+function resolveMapStores(
+    cfg: MapBlockConfig,
+    relations: MapBlockProps['block']['relations'],
+): Store[] {
+    const storeRelations = getRelationsByKey(relations, 'location');
+    const resolvedStores = storeRelations
+        .map((r) => r.data as Store | null)
+        .filter((s): s is Store => s !== null);
+
+    if (resolvedStores.length > 0) {
+        return resolvedStores;
+    }
+
+    if (cfg.lat !== undefined && cfg.lng !== undefined) {
+        return [
+            {
+                id: 0,
+                name: cfg.title ?? 'Location',
+                slug: '',
+                address: '',
+                city: '',
+                country: '',
+                phone: null,
+                email: null,
+                opening_hours: null,
+                lat: cfg.lat,
+                lng: cfg.lng,
+            },
+        ];
+    }
+
+    return [];
+}
 
 export function MapBlock({ block }: MapBlockProps) {
     const cfg = block.configuration as MapBlockConfig;
     const height = cfg.height ?? 400;
     const zoom = cfg.zoom ?? 14;
-
-    const [stores, setStores] = useState<Store[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        async function load() {
-            if (cfg.store_id) {
-                try {
-                    const res = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL ?? '/api/v1'}/stores/${cfg.store_id}`,
-                    );
-                    if (res.ok) {
-                        const json = await res.json();
-                        setStores([json.data]);
-                    }
-                } catch {
-                    // fall through to coordinate fallback
-                }
-            }
-
-            if (cfg.lat !== undefined && cfg.lng !== undefined) {
-                setStores((prev) =>
-                    prev.length > 0
-                        ? prev
-                        : [
-                              {
-                                  id: 0,
-                                  name: cfg.title ?? 'Location',
-                                  slug: '',
-                                  address: '',
-                                  city: '',
-                                  country: '',
-                                  phone: null,
-                                  email: null,
-                                  opening_hours: null,
-                                  lat: cfg.lat!,
-                                  lng: cfg.lng!,
-                              },
-                          ],
-                );
-            }
-
-            setLoading(false);
-        }
-
-        load();
-    }, [cfg.lat, cfg.lng, cfg.store_id, cfg.title]);
-
-    if (loading) {
-        return (
-            <div
-                className="bg-muted animate-pulse rounded-lg"
-                style={{ height }}
-            />
-        );
-    }
+    const stores = resolveMapStores(cfg, block.relations);
 
     if (stores.length === 0) {
         return (

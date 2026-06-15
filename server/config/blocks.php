@@ -13,6 +13,7 @@ use App\Models\Form;
 use App\Models\Menu;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\Store;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 return [
@@ -82,6 +83,10 @@ return [
         'blog_category' => [
             'model' => BlogCategory::class,
             'label' => 'Blog Category',
+        ],
+        'store' => [
+            'model' => Store::class,
+            'label' => 'Store',
         ],
     ],
 
@@ -437,7 +442,7 @@ return [
             'icon' => 'message-square',
             'category' => 'social-proof',
             'enum' => PageBlockTypeEnum::Testimonials,
-            'data_strategy' => BlockDataStrategy::Server,
+            'data_strategy' => BlockDataStrategy::None,
             'context_dependencies' => [],
             'allowed_children' => null,
             'allowed_relations' => [
@@ -769,10 +774,12 @@ return [
             'icon' => 'map-pin',
             'category' => 'content',
             'enum' => PageBlockTypeEnum::Map,
-            'data_strategy' => BlockDataStrategy::Client,
+            'data_strategy' => BlockDataStrategy::Server,
             'context_dependencies' => [],
             'allowed_children' => null,
-            'allowed_relations' => [],
+            'allowed_relations' => [
+                'location' => ['types' => ['store'], 'multiple' => false],
+            ],
             'schema' => [
                 'type' => 'object',
                 'properties' => [

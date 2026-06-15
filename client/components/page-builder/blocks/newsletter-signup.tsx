@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { subscribe } from '@/api/newsletter';
+import { subscribeToNewsletter } from '@/components/page-builder/mutations/newsletter';
 import { TurnstileWidget } from '@/components/turnstile-widget';
 import type {
     NewsletterSignupConfig,
@@ -23,7 +23,7 @@ export function NewsletterSignupBlock({ block }: NewsletterSignupProps) {
         if (!email) return;
         setLoading(true);
         try {
-            await subscribe({
+            await subscribeToNewsletter({
                 email,
                 name: cfg.ask_name ? name : undefined,
                 cf_turnstile_response: turnstileToken || undefined,

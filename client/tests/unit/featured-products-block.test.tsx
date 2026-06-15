@@ -75,7 +75,10 @@ describe('FeaturedProductsBlock', () => {
             <FeaturedProductsBlock
                 block={makeBlock(
                     { filter_mode: 'featured', title: 'Featured' },
-                    [makeProduct(1, 'Server Product A'), makeProduct(2, 'Server Product B')],
+                    [
+                        makeProduct(1, 'Server Product A'),
+                        makeProduct(2, 'Server Product B'),
+                    ],
                 )}
             />,
         );
@@ -90,10 +93,9 @@ describe('FeaturedProductsBlock', () => {
 
         renderToStaticMarkup(
             <FeaturedProductsBlock
-                block={makeBlock(
-                    { filter_mode: 'featured', max_items: 8 },
-                    [makeProduct(1, 'Already Resolved')],
-                )}
+                block={makeBlock({ filter_mode: 'featured', max_items: 8 }, [
+                    makeProduct(1, 'Already Resolved'),
+                ])}
             />,
         );
 
@@ -103,7 +105,10 @@ describe('FeaturedProductsBlock', () => {
     it('renders skeleton placeholders when no products are available', () => {
         const html = renderToStaticMarkup(
             <FeaturedProductsBlock
-                block={makeBlock({ filter_mode: 'featured', columns: 4 }, [])}
+                block={makeBlock(
+                    { filter_mode: 'featured', items_per_row: 4 },
+                    [],
+                )}
             />,
         );
 

@@ -37,12 +37,7 @@ export type BlockType =
     | 'two_columns'
     | 'video_embed';
 
-export type BlockDataStrategy =
-    | 'cached'
-    | 'client'
-    | 'hybrid'
-    | 'none'
-    | 'server';
+export type BlockDataStrategy = 'cached' | 'hybrid' | 'none' | 'server';
 
 export type BlockDefinitionExport = {
     accordion: {
@@ -341,7 +336,7 @@ export const BLOCK_CONTRACTS: Record<BlockType, BlockContractRuntime> = {
     },
     map: {
         type: 'map',
-        data_strategy: 'client',
+        data_strategy: 'server',
         context_dependencies: [],
         allowed_children: null,
     },
@@ -401,7 +396,7 @@ export const BLOCK_CONTRACTS: Record<BlockType, BlockContractRuntime> = {
     },
     testimonials: {
         type: 'testimonials',
-        data_strategy: 'server',
+        data_strategy: 'none',
         context_dependencies: [],
         allowed_children: null,
     },

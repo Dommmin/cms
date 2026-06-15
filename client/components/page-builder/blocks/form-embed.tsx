@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { submitForm } from '@/api/forms';
+import { submitEmbeddedForm } from '@/components/page-builder/mutations/forms';
 import { TurnstileWidget } from '@/components/turnstile-widget';
 import type { FormField } from '@/types/api';
 import type { FormEmbedConfig, FormEmbedProps } from './form-embed.types';
@@ -115,7 +115,7 @@ export function FormEmbedBlock({ block }: FormEmbedProps) {
             payload.cf_turnstile_response = turnstileToken;
         }
         try {
-            await submitForm(form!.id, payload);
+            await submitEmbeddedForm(form!.id, payload);
             setDone(true);
             toast.success(form!.success_message ?? 'Your message was sent!');
         } catch {

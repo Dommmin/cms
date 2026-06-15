@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Api\V1\PageResource;
 use App\Models\Page;
 use App\Models\PagePreviewToken;
+use App\Services\PageBuilder\PageRenderContext;
+use App\Services\PageBuilder\PageRenderContextResolver;
 use App\Services\PagePreviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,13 +29,15 @@ class PageController extends ApiController
             'sections.blocks.relations',
         ]);
 
+        $this->bindPageRenderContext($page, []);
+
         return $this->ok(new PageResource($page));
     }
 
     public function show(Request $request, string $slug): JsonResponse
     {
         $locale = app()->getLocale();
-        $segments = array_filter(explode('/', $slug), fn (string $s): bool => $s !== '');
+        $segments = array_values(array_filter(explode('/', $slug), fn (string $s): bool => $s !== ''));
 
         if ($request->filled('preview_token')) {
             $previewToken = resolve(PagePreviewService::class)->findValidToken(
@@ -48,11 +52,13 @@ class PageController extends ApiController
                     'sections.blocks.relations',
                 ]);
 
+                $this->bindPageRenderContext($page, $segments);
+
                 return $this->ok(new PageResource($page));
             }
         }
 
-        $page = Page::findByLocalizedPath(array_values($segments), $locale);
+        $page = Page::findByLocalizedPath($segments, $locale);
 
         abort_unless($page instanceof Page, 404);
 
@@ -63,6 +69,22 @@ class PageController extends ApiController
             'sections.blocks.relations',
         ]);
 
+        $this->bindPageRenderContext($page, $segments);
+
         return $this->ok(new PageResource($page));
+    }
+
+    /**
+     * @param  list<string>  $segments
+     */
+    private function bindPageRenderContext(Page $page, array $segments): void
+    {
+        $context = resolve(PageRenderContextResolver::class)->resolve(
+            $page,
+            $segments,
+            app()->getLocale(),
+        );
+
+        app()->instance(PageRenderContext::class, $context);
     }
 }

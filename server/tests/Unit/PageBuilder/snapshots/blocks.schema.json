@@ -806,7 +806,7 @@
                 }
             }
         },
-        "data_strategy": "client",
+        "data_strategy": "server",
         "context_dependencies": [],
         "allowed_children": null
     },
@@ -1330,7 +1330,7 @@
                 }
             }
         },
-        "data_strategy": "server",
+        "data_strategy": "none",
         "context_dependencies": [],
         "allowed_children": null
     },
