@@ -11,6 +11,8 @@ final class BlockSchemaExportService
 {
     public const string OUTPUT_RELATIVE_PATH = 'blocks.schema.json';
 
+    public const string SNAPSHOT_RELATIVE_PATH = 'tests/Unit/PageBuilder/snapshots/blocks.schema.json';
+
     /**
      * @return array<string, array{
      *     type: string,
@@ -58,6 +60,20 @@ final class BlockSchemaExportService
     public function outputPath(): string
     {
         return storage_path('app/'.self::OUTPUT_RELATIVE_PATH);
+    }
+
+    public function snapshotPath(): string
+    {
+        return base_path(self::SNAPSHOT_RELATIVE_PATH);
+    }
+
+    public function matchesSnapshot(): bool
+    {
+        if (! File::exists($this->snapshotPath())) {
+            return false;
+        }
+
+        return $this->toJson() === File::get($this->snapshotPath());
     }
 
     /**

@@ -9,7 +9,9 @@
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
         "test:ui": "vitest run --config vitest.config.ts",
-        "types": "tsc --noEmit"
+        "types": "tsc --noEmit",
+        "generate:blocks-types": "node scripts/generate-blocks-types.mjs",
+        "generate:blocks-types:check": "node scripts/generate-blocks-types.mjs --check"
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",

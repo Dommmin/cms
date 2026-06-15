@@ -10,7 +10,9 @@
         "format": "prettier --write .",
         "format:check": "prettier --check .",
         "test:ui": "vitest run --config vitest.config.ts",
-        "types": "tsc --noEmit"
+        "types": "tsc --noEmit",
+        "generate:blocks-types": "node scripts/generate-blocks-types.mjs",
+        "generate:blocks-types:check": "node scripts/generate-blocks-types.mjs --check"
     },
     "dependencies": {
         "@hookform/resolvers": "^5.2.2",
