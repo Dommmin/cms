@@ -1,10 +1,7 @@
-'use client';
-
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 import { ProductCard } from '@/components/product-card';
-import { apiGetPage } from '@/lib/api';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getRelationsByKey } from '@/lib/format';
 import type { Product } from '@/types/api';
 import type {
@@ -12,13 +9,32 @@ import type {
     FeaturedProductsProps,
 } from './featured-products.types';
 
+function FeaturedProductsSkeleton({
+    count,
+    colClass,
+}: {
+    count: number;
+    colClass: string;
+}) {
+    return (
+        <div className={`grid gap-6 ${colClass}`}>
+            {Array.from({ length: count }).map((_, index) => (
+                <div key={index} className="flex flex-col gap-3">
+                    <Skeleton className="aspect-square w-full rounded-xl" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
     const cfg = block.configuration as FeaturedProductsConfig;
     const columns = cfg.columns ?? 4;
-    const isFeaturedMode = cfg.filter_mode === 'featured';
 
     const productRelations = getRelationsByKey(block.relations, 'products');
-    const manualProducts = productRelations
+    const products = productRelations
         .map((r) => r.data as Product | null)
         .filter((p): p is Product => p !== null)
         .sort((a, b) => {
@@ -31,23 +47,13 @@ export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
             return (ra?.position ?? 0) - (rb?.position ?? 0);
         });
 
-    const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-
-    useEffect(() => {
-        if (!isFeaturedMode) return;
-        const limit = cfg.max_items ?? 8;
-        apiGetPage<Product>(`/products?filter[is_featured]=1&per_page=${limit}`)
-            .then((res) => setFeaturedProducts(res.data ?? []))
-            .catch(() => setFeaturedProducts([]));
-    }, [isFeaturedMode, cfg.max_items]);
-
-    const products = isFeaturedMode ? featuredProducts : manualProducts;
-
     const colClass = {
         2: 'grid-cols-1 sm:grid-cols-2',
         3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
         4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
     }[columns];
+
+    const skeletonCount = Math.min(cfg.max_items ?? 8, columns);
 
     return (
         <div className="flex flex-col gap-8">
@@ -83,9 +89,10 @@ export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
                     ))}
                 </div>
             ) : (
-                <p className="text-muted-foreground text-center">
-                    No products to display.
-                </p>
+                <FeaturedProductsSkeleton
+                    count={skeletonCount}
+                    colClass={colClass}
+                />
             )}
         </div>
     );
