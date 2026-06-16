@@ -5,7 +5,11 @@ export { Container } from './Container';
 export type { ContainerProps } from './Container.types';
 
 export { CTASection } from './CTASection';
-export type { CTASectionProps } from './CTASection.types';
+export type {
+    CTASectionAlign,
+    CTASectionProps,
+    CTASectionStyle,
+} from './CTASection.types';
 
 export { EmptyState } from './EmptyState';
 export type { EmptyStateProps } from './EmptyState.types';
