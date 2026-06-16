@@ -99,8 +99,11 @@ WARSTWA 2 — PRYMITYWY (shadcn new-york, jeden snapshot, prywatny registry)
   → Blog (osobne repo) pozostaje nietknięty jako referencja
 
 WARSTWA 3 — WZORCE KOMPOZYCYJNE (rozdzielone per-runtime)
-  STOREFRONT (Next):  Container, Section, PageHeader, CTASection, EmptyState, AnimateOnView
-                      — portowane z jakości Bloga, czytające tokeny z DB theme
+  STOREFRONT (Next):  `client/components/composition/` — **zintegrowane** (2026-06):
+                      `styles.ts` (jedyne mapy variant/padding/container/grid),
+                      `Container`, `Section`, `Grid`, `PageHeader`, `CTASection`,
+                      `EmptyState`, `AnimateOnView`; konsumenci: `section-renderer`,
+                      bloki page buildera (CTA, kolumny), blog (`blog-*-client`, `blog-module`)
   ADMIN (Inertia):    zostaje jak jest (AppShell, PageHeader, StickyFormActions…)
 
 WARSTWA 4 — KOMPONENTY DOMENOWE (nie współdzielone)
