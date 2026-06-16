@@ -20,6 +20,7 @@ import Wrapper from '@/components/wrapper';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { EditProps } from './edit.types';
+import { ThemeLivePreview } from './theme-live-preview';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Themes', href: ThemeController.index.url() },
@@ -452,6 +453,8 @@ export default function Edit({ theme }: EditProps) {
                                     />
                                 </div>
                             </DesignSection>
+
+                            <ThemeLivePreview theme={theme} />
 
                             <div className="flex items-center gap-2">
                                 <input

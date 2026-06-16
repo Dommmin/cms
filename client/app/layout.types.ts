@@ -40,6 +40,25 @@ export type ActiveTheme = {
         content_width?: string;
         narrow_width?: string;
     } | null;
+    font_sources?: {
+        heading?: {
+            family: string;
+            source: 'google' | 'system' | 'custom';
+            weights?: string[];
+            url?: string;
+        };
+        body?: {
+            family: string;
+            source: 'google' | 'system' | 'custom';
+            weights?: string[];
+            url?: string;
+        };
+    } | null;
+    branding?: {
+        logo_url?: string | null;
+        logo_dark_url?: string | null;
+        favicon_url?: string | null;
+    } | null;
 };
 
 export type SlotSettings = {

@@ -225,7 +225,7 @@ class ProfileController extends ApiController
         $grouped->put('cookie', $cookieSettings);
 
         $activeTheme = Theme::query()->where('is_active', true)->first([
-            'slug', 'tokens', 'dark_tokens', 'typography', 'spacing', 'buttons', 'containers',
+            'slug', 'tokens', 'dark_tokens', 'typography', 'font_sources', 'spacing', 'buttons', 'containers', 'branding',
         ]);
 
         $activeSlots = GlobalSlot::query()
@@ -413,9 +413,11 @@ class ProfileController extends ApiController
                 'tokens' => $activeTheme->tokens,
                 'dark_tokens' => $activeTheme->dark_tokens,
                 'typography' => $activeTheme->typography,
+                'font_sources' => $activeTheme->font_sources,
                 'spacing' => $activeTheme->spacing,
                 'buttons' => $activeTheme->buttons,
                 'containers' => $activeTheme->containers,
+                'branding' => $activeTheme->branding,
             ] : null,
             'slots' => $slots,
         ]);

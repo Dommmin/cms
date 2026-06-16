@@ -75,6 +75,7 @@ class ThemeSeeder extends Seeder
                     'h3_size' => '1.5rem',
                     'h4_size' => '1.25rem',
                 ],
+                'font_sources' => [
                     'heading' => [
                         'family' => 'Space Grotesk',
                         'source' => 'google',
@@ -626,10 +627,13 @@ class ThemeSeeder extends Seeder
                     'description' => $preset['description'],
                     'tokens' => $preset['tokens'],
                     'dark_tokens' => $preset['dark_tokens'] ?? null,
+                    'draft_tokens' => $preset['draft_tokens'] ?? null,
                     'typography' => $preset['typography'],
+                    'font_sources' => $preset['font_sources'] ?? null,
                     'spacing' => $preset['spacing'],
                     'buttons' => $preset['buttons'],
                     'containers' => $preset['containers'],
+                    'branding' => $preset['branding'] ?? null,
                     'settings' => $preset['settings'],
                     'is_active' => $isActive,
                 ]

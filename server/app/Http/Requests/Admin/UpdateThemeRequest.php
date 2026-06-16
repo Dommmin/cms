@@ -32,6 +32,17 @@ class UpdateThemeRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'tokens' => ['nullable', 'array'],
             'tokens.*' => ['string', 'max:100'],
+            'dark_tokens' => ['nullable', 'array'],
+            'dark_tokens.*' => ['string', 'max:100'],
+            'draft_tokens' => ['nullable', 'array'],
+            'draft_tokens.*' => ['string', 'max:100'],
+            'font_sources' => ['nullable', 'array'],
+            'font_sources.heading' => ['nullable', 'array'],
+            'font_sources.body' => ['nullable', 'array'],
+            'branding' => ['nullable', 'array'],
+            'branding.logo_url' => ['nullable', 'string', 'max:2048'],
+            'branding.logo_dark_url' => ['nullable', 'string', 'max:2048'],
+            'branding.favicon_url' => ['nullable', 'string', 'max:2048'],
             'typography' => ['nullable', 'array'],
             'typography.heading_font' => ['nullable', 'string', 'max:100'],
             'typography.body_font' => ['nullable', 'string', 'max:100'],
@@ -73,6 +84,10 @@ class UpdateThemeRequest extends FormRequest
         ]);
 
         $this->mergeNullableJsonField('typography');
+        $this->mergeNullableJsonField('font_sources');
+        $this->mergeNullableJsonField('branding');
+        $this->mergeNullableJsonField('draft_tokens');
+        $this->mergeNullableJsonField('dark_tokens');
         $this->mergeNullableJsonField('spacing');
         $this->mergeNullableJsonField('buttons');
         $this->mergeNullableJsonField('containers');

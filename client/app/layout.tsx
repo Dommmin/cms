@@ -22,6 +22,7 @@ import { Maintenance } from '@/components/maintenance';
 import { BlockAnimationObserver } from '@/components/page-builder/block-animation-observer';
 import { PwaServiceWorker } from '@/components/pwa-service-worker';
 import { SlotZone } from '@/components/slots/slot-zone';
+import { ThemeFontLoader } from '@/components/theme-font-loader';
 import { ThemeStyles } from '@/components/theme-styles';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildOrganization, buildWebSite } from '@/lib/schema';
@@ -150,6 +151,13 @@ export default async function RootLayout({
         >
             <head>
                 <ThemeStyles theme={publicSettings?.theme ?? null} />
+                <ThemeFontLoader theme={publicSettings?.theme ?? null} />
+                {publicSettings?.theme?.branding?.favicon_url ? (
+                    <link
+                        rel="icon"
+                        href={publicSettings.theme.branding.favicon_url}
+                    />
+                ) : null}
                 {process.env.NEXT_PUBLIC_API_URL && (
                     <link
                         rel="preconnect"
@@ -216,6 +224,10 @@ export default async function RootLayout({
                                         <Header
                                             modules={modules}
                                             siteName={siteName}
+                                            logoUrl={
+                                                publicSettings?.theme?.branding
+                                                    ?.logo_url ?? null
+                                            }
                                         />
                                         <main
                                             id="main-content"
