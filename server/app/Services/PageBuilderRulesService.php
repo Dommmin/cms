@@ -10,7 +10,7 @@ use RuntimeException;
 class PageBuilderRulesService
 {
     /**
-     * Enforce business rules from config (cms.sections.*.business_rules).
+     * Enforce business rules from config (blocks.block_types.*.business_rules).
      */
     public function enforce(Page $page): void
     {
@@ -21,13 +21,23 @@ class PageBuilderRulesService
 
         $blockTypes = [];
         foreach (($snapshot['sections'] ?? []) as $sectionIndex => $section) {
+            if (! is_array($section)) {
+                continue;
+            }
+
             foreach (($section['blocks'] ?? []) as $block) {
-                if (isset($block['type'])) {
-                    $blockTypes[] = [
-                        'type' => $block['type'],
-                        'section_index' => $sectionIndex,
-                    ];
+                if (! is_array($block)) {
+                    continue;
                 }
+
+                if (! isset($block['type'])) {
+                    continue;
+                }
+
+                $blockTypes[] = [
+                    'type' => $block['type'],
+                    'section_index' => $sectionIndex,
+                ];
             }
         }
 
@@ -37,16 +47,21 @@ class PageBuilderRulesService
             $counts[$type] = ($counts[$type] ?? 0) + 1;
         }
 
-        $sectionsConfig = config('cms.sections', []);
+        $blocksConfig = config('blocks.block_types', []);
         foreach ($counts as $blockType => $count) {
-            $businessRules = $sectionsConfig[$blockType]['business_rules'] ?? null;
+            $blockConfig = $blocksConfig[$blockType] ?? null;
+            if (! is_array($blockConfig)) {
+                continue;
+            }
+
+            $businessRules = $blockConfig['business_rules'] ?? null;
             if (! is_array($businessRules)) {
                 continue;
             }
 
             $maxPerPage = $businessRules['max_per_page'] ?? null;
             if ($maxPerPage !== null && $count > $maxPerPage) {
-                $label = $sectionsConfig[$blockType]['label'] ?? $blockType;
+                $label = $blockConfig['name'] ?? $blockType;
                 throw new RuntimeException(
                     __('page_builder.errors.max_per_page', ['count' => $maxPerPage, 'label' => $label])
                 );
@@ -56,7 +71,7 @@ class PageBuilderRulesService
             if (is_array($allowedPositions) && in_array('top', $allowedPositions, true)) {
                 foreach ($blockTypes as $item) {
                     if ($item['type'] === $blockType && $item['section_index'] !== 0) {
-                        $label = $sectionsConfig[$blockType]['label'] ?? $blockType;
+                        $label = $blockConfig['name'] ?? $blockType;
                         throw new RuntimeException(
                             __('page_builder.errors.top_position_only', ['label' => $label])
                         );

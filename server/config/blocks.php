@@ -98,6 +98,10 @@ return [
             'category' => 'layout',
             'enum' => PageBlockTypeEnum::HeroBanner,
             'data_strategy' => BlockDataStrategy::None,
+            'business_rules' => [
+                'max_per_page' => 1,
+                'allowed_positions' => ['top'],
+            ],
             'context_dependencies' => [],
             'allowed_children' => null,
             'allowed_relations' => [

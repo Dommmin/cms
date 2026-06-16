@@ -50,7 +50,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @mixin Model
  */
 #[Fillable([
-    'page_id', 'section_id', 'type', 'configuration', 'position', 'is_active', 'reusable_block_id',
+    'page_id', 'section_id', 'type', 'configuration', 'schema_version', 'position', 'is_active', 'reusable_block_id',
 ])]
 #[Table(name: 'page_blocks')]
 class PageBlock extends Model

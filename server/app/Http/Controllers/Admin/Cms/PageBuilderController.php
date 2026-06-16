@@ -16,6 +16,7 @@ use App\Models\Page;
 use App\Models\PageBlock;
 use App\Models\PageSection;
 use App\Services\PageBuilder\PageBuilderSnapshotValidator;
+use App\Services\PageBuilderRulesService;
 use App\Services\PageBuilderSyncService;
 use App\Services\PagePreviewService;
 use App\Services\PageVersionService;
@@ -36,6 +37,7 @@ class PageBuilderController extends Controller
         private readonly PagePreviewService $pagePreviewService,
         private readonly PageBuilderSnapshotValidator $snapshotValidator,
         private readonly PageVersionService $pageVersionService,
+        private readonly PageBuilderRulesService $rulesService,
     ) {}
 
     public function show(Request $request, int $page)
@@ -368,6 +370,8 @@ class PageBuilderController extends Controller
                 ];
             }
 
+            $page->forceFill(['builder_snapshot' => $snapshot])->save();
+            $this->rulesService->enforce($page);
             $this->syncService->sync($page, $snapshot);
 
             $page->forceFill(['version' => (int) $page->version + 1])->save();

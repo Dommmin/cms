@@ -90,6 +90,7 @@ class PageBuilderSyncService
             'section_id' => $section->id,
             'type' => $block['type'] ?? '',
             'configuration' => $block['configuration'] ?? null,
+            'schema_version' => (int) ($block['schema_version'] ?? 1),
             'position' => $block['position'] ?? $blockIndex,
             'is_active' => $block['is_active'] ?? true,
             'reusable_block_id' => $block['reusable_block_id'] ?? null,

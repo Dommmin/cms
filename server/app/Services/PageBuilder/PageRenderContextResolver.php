@@ -36,7 +36,7 @@ final class PageRenderContextResolver
 
         $categorySlug = $segments[$pageSegmentCount];
 
-        if (! is_string($categorySlug) || $categorySlug === '') {
+        if ($categorySlug === '') {
             return null;
         }
 

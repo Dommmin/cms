@@ -201,7 +201,7 @@ it('filters featured products by page render context category', function (): voi
         currentCategoryId: $electronics->id,
     ));
 
-    $payload = (new PageResource($page))->toArray(request());
+    $payload = new PageResource($page)->toArray(request());
     $relations = $payload['sections'][0]['blocks'][0]['relations'];
 
     expect($relations)->toHaveCount(1)
