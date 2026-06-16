@@ -7,9 +7,11 @@ export function PageHeader({
     description,
     eyebrow,
     align = 'left',
+    actions,
     className,
 }: PageHeaderProps) {
     const centered = align === 'center';
+    const alignedRight = align === 'right';
 
     return (
         <header
@@ -17,6 +19,7 @@ export function PageHeader({
                 'mb-[var(--block-gap,2rem)] space-y-3',
                 centered &&
                     'mx-auto max-w-[var(--container-content-width,48rem)] text-center',
+                alignedRight && 'text-right',
                 className,
             )}
         >
@@ -35,6 +38,17 @@ export function PageHeader({
                 <p className="text-muted-foreground text-lg leading-relaxed">
                     {description}
                 </p>
+            ) : null}
+            {actions ? (
+                <div
+                    className={cn(
+                        'flex flex-wrap gap-3 pt-2',
+                        centered && 'justify-center',
+                        alignedRight && 'justify-end',
+                    )}
+                >
+                    {actions}
+                </div>
             ) : null}
         </header>
     );

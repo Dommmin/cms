@@ -1,5 +1,6 @@
 import { getBlogCategories, getBlogPosts } from '@/api/cms';
 import { BlogListClient } from '@/components/blog-list-client';
+import { PageHeader } from '@/components/composition';
 import type { Page } from '@/types/api';
 
 export async function BlogModule({
@@ -37,16 +38,11 @@ export async function BlogModule({
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-            <header className="mb-12 text-center">
-                <h1 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl">
-                    {page.title}
-                </h1>
-                {page.excerpt && (
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
-                        {page.excerpt}
-                    </p>
-                )}
-            </header>
+            <PageHeader
+                title={page.title}
+                description={page.excerpt ?? undefined}
+                align="center"
+            />
             <BlogListClient
                 posts={posts}
                 categories={categories}
