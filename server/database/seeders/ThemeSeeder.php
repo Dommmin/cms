@@ -13,6 +13,101 @@ class ThemeSeeder extends Seeder
     {
         $presets = [
             [
+                'name' => 'Default',
+                'slug' => 'default',
+                'description' => 'Editorial storefront — indigo accent, Inter + Space Grotesk, flat radius.',
+                'tokens' => [
+                    'background' => '#ffffff',
+                    'foreground' => '#0f172a',
+                    'card' => '#ffffff',
+                    'card-foreground' => '#0f172a',
+                    'popover' => '#ffffff',
+                    'popover-foreground' => '#0f172a',
+                    'primary' => '#4f46e5',
+                    'primary-foreground' => '#ffffff',
+                    'secondary' => '#f1f5f9',
+                    'secondary-foreground' => '#1e293b',
+                    'muted' => '#f8fafc',
+                    'muted-foreground' => '#64748b',
+                    'accent' => '#eef2ff',
+                    'accent-foreground' => '#312e81',
+                    'destructive' => '#dc2626',
+                    'destructive-foreground' => '#ffffff',
+                    'border' => '#e2e8f0',
+                    'input' => '#e2e8f0',
+                    'ring' => '#4f46e5',
+                    'chart-1' => '#4f46e5',
+                    'chart-2' => '#06b6d4',
+                    'chart-3' => '#10b981',
+                    'chart-4' => '#f59e0b',
+                    'chart-5' => '#ec4899',
+                    'radius' => '0.375rem',
+                ],
+                'dark_tokens' => [
+                    'background' => '#0f172a',
+                    'foreground' => '#f8fafc',
+                    'card' => '#1e293b',
+                    'card-foreground' => '#f8fafc',
+                    'popover' => '#1e293b',
+                    'popover-foreground' => '#f8fafc',
+                    'primary' => '#818cf8',
+                    'primary-foreground' => '#0f172a',
+                    'secondary' => '#1e293b',
+                    'secondary-foreground' => '#f8fafc',
+                    'muted' => '#1e293b',
+                    'muted-foreground' => '#94a3b8',
+                    'accent' => '#312e81',
+                    'accent-foreground' => '#e0e7ff',
+                    'destructive' => '#f87171',
+                    'destructive-foreground' => '#0f172a',
+                    'border' => '#334155',
+                    'input' => '#334155',
+                    'ring' => '#818cf8',
+                    'radius' => '0.375rem',
+                ],
+                'typography' => [
+                    'heading_font' => '"Space Grotesk", Inter, system-ui, sans-serif',
+                    'body_font' => 'Inter, system-ui, sans-serif',
+                    'base_size' => '16px',
+                    'scale' => '1.25',
+                    'h1_size' => '2.5rem',
+                    'h2_size' => '2rem',
+                    'h3_size' => '1.5rem',
+                    'h4_size' => '1.25rem',
+                ],
+                    'heading' => [
+                        'family' => 'Space Grotesk',
+                        'source' => 'google',
+                        'weights' => ['400', '500', '600', '700'],
+                    ],
+                    'body' => [
+                        'family' => 'Inter',
+                        'source' => 'google',
+                        'weights' => ['400', '500', '600'],
+                    ],
+                ],
+                'spacing' => [
+                    'section_padding' => '5rem',
+                    'block_gap' => '2rem',
+                    'container_padding' => '1.5rem',
+                ],
+                'buttons' => [
+                    'primary_border_radius' => '0.375rem',
+                    'primary_padding_x' => '1.5rem',
+                    'primary_padding_y' => '0.625rem',
+                    'secondary_border_radius' => '0.375rem',
+                    'secondary_padding_x' => '1.5rem',
+                    'secondary_padding_y' => '0.625rem',
+                ],
+                'containers' => [
+                    'max_width' => '80rem',
+                    'content_width' => '48rem',
+                    'narrow_width' => '40rem',
+                ],
+                'settings' => ['preset' => true, 'default_storefront' => true],
+                'is_active' => true,
+            ],
+            [
                 'name' => 'Slate Pro',
                 'slug' => 'slate-pro',
                 'description' => 'Professional indigo & dark slate — clean SaaS look.',
@@ -515,19 +610,28 @@ class ThemeSeeder extends Seeder
             ->whereIn('slug', $newSlugs)
             ->update(['is_active' => false]);
 
+        $hasActiveTheme = Theme::query()->where('is_active', true)->exists();
+
         foreach ($presets as $preset) {
+            $isActive = $preset['is_active'] ?? false;
+            if (! $hasActiveTheme && ($preset['settings']['default_storefront'] ?? false)) {
+                $isActive = true;
+                $hasActiveTheme = true;
+            }
+
             Theme::query()->updateOrCreate(
                 ['slug' => $preset['slug']],
                 [
                     'name' => $preset['name'],
                     'description' => $preset['description'],
                     'tokens' => $preset['tokens'],
+                    'dark_tokens' => $preset['dark_tokens'] ?? null,
                     'typography' => $preset['typography'],
                     'spacing' => $preset['spacing'],
                     'buttons' => $preset['buttons'],
                     'containers' => $preset['containers'],
                     'settings' => $preset['settings'],
-                    'is_active' => $preset['is_active'],
+                    'is_active' => $isActive,
                 ]
             );
         }
