@@ -91,6 +91,10 @@ class PageResource extends JsonResource
             )->resolve($request);
         }
 
+        if ($page->relationLoaded('theme') && $page->theme) {
+            $data['theme'] = new ThemeResource($page->theme)->resolve($request);
+        }
+
         $filter = Hook::filter(new PageRenderFilter($data, $page));
 
         return $filter->pageData;
@@ -415,7 +419,7 @@ class PageResource extends JsonResource
         }
 
         $context = app()->bound(PageRenderContext::class)
-            ? app(PageRenderContext::class)
+            ? resolve(PageRenderContext::class)
             : new PageRenderContext();
 
         $pathService = resolve(StorefrontPathService::class);

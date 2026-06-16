@@ -1,5 +1,7 @@
 // ── Pagination ────────────────────────────────────────────────────────────────
 
+import type { ActiveTheme } from '@/app/layout.types';
+
 export interface PaginatedResponse<T> {
     data: T[];
     links: {
@@ -839,6 +841,7 @@ export interface Page {
     metafields?: Metafield[];
     sections: PageSection[];
     children?: Page[];
+    theme?: ActiveTheme | null;
 }
 
 // ── Stores ────────────────────────────────────────────────────────────────────

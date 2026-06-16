@@ -24,6 +24,7 @@ class PageController extends ApiController
 
         $page->load([
             'metafields',
+            'theme',
             'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks.relations',
@@ -47,6 +48,7 @@ class PageController extends ApiController
                 $page = Page::query()->findOrFail($previewToken->page_id);
                 $page->load([
                     'metafields',
+                    'theme',
                     'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
                     'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
                     'sections.blocks.relations',
@@ -64,6 +66,7 @@ class PageController extends ApiController
 
         $page->load([
             'metafields',
+            'theme',
             'sections' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks' => fn ($q) => $q->where('is_active', true)->orderBy('position'),
             'sections.blocks.relations',

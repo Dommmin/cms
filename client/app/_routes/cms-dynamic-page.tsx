@@ -7,6 +7,7 @@ import { getPage } from '@/api/cms';
 import { getPublicSettings } from '@/api/settings';
 import { JsonLd } from '@/components/json-ld';
 import { PageRenderer } from '@/components/page-builder/page-renderer';
+import { ThemeStyles } from '@/components/theme-styles';
 import { localePath, type I18nConfig, type Locale } from '@/lib/i18n';
 import { getI18nConfig } from '@/lib/i18n-server';
 import { buildFaqPage, buildWebPage } from '@/lib/schema';
@@ -292,6 +293,7 @@ function PageContent({
     return (
         <>
             <JsonLd data={schemaData} />
+            {page.theme ? <ThemeStyles theme={page.theme} /> : null}
             <PageRenderer
                 page={page}
                 searchParams={searchParams}
