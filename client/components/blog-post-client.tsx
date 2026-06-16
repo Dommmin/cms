@@ -5,6 +5,7 @@ import { BlogViewTracker } from '@/app/blog/_blog-view-tracker';
 import { BlogComments } from '@/components/blog-comments';
 import { BlogVotes } from '@/components/blog-votes';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { Container } from '@/components/composition';
 import { JsonLd } from '@/components/json-ld';
 import { enrichArticleHtml } from '@/lib/blog-content';
 import { localePath } from '@/lib/i18n';
@@ -35,7 +36,7 @@ export function BlogPostClient({
     );
 
     return (
-        <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+        <Container as="article" narrow className="py-12">
             <JsonLd data={buildBlogPosting(post, locale)} />
             <JsonLd
                 data={buildBreadcrumbList([
@@ -229,6 +230,6 @@ export function BlogPostClient({
                 />
             </div>
             <BlogComments slug={post.slug} locale={locale} />
-        </article>
+        </Container>
     );
 }

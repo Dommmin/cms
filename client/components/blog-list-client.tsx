@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Container, EmptyState } from '@/components/composition';
 import { useLocalePath } from '@/hooks/use-locale';
 import { resolveBlogPostPath } from '@/lib/public-paths';
 import type { BlogListClientProps } from './blog-list-client.types';
@@ -37,7 +38,7 @@ export function BlogListClient({
     };
 
     return (
-        <div className="store-wide-shell mx-auto w-full px-4 py-12 sm:px-6 lg:px-8">
+        <Container wide className="py-12">
             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
                 {categories.length > 0 && (
                     <div className="flex flex-wrap gap-2">
@@ -91,9 +92,7 @@ export function BlogListClient({
             </div>
 
             {posts.data.length === 0 ? (
-                <div className="text-muted-foreground py-24 text-center">
-                    No posts found.
-                </div>
+                <EmptyState title="No posts found." className="my-12" />
             ) : (
                 <>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -179,6 +178,6 @@ export function BlogListClient({
                     )}
                 </>
             )}
-        </div>
+        </Container>
     );
 }
