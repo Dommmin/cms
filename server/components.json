@@ -17,9 +17,6 @@
         "lib": "@/lib",
         "hooks": "@/hooks"
     },
-    "registries": {
-        "@shadcn-studio": "https://shadcnstudio.com/r/{name}.json",
-        "@ss-themes": "https://shadcnstudio.com/r/themes/{name}.json"
-    },
+    "registries": {}
     "iconLibrary": "lucide"
 }
