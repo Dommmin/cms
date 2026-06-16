@@ -31,7 +31,7 @@ export function PromotionalBannerBlock({ block }: PromotionalBannerProps) {
                         sizes="100vw"
                         className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/40" />
+                    <div className="absolute inset-0 bg-[var(--section-dark-bg,var(--foreground))]/40" />
                 </>
             )}
 
@@ -47,14 +47,14 @@ export function PromotionalBannerBlock({ block }: PromotionalBannerProps) {
                 )}
                 {cfg.title && (
                     <h2
-                        className={`text-3xl font-bold ${bgUrl ? 'text-white' : ''} md:text-4xl`}
+                        className={`text-3xl font-bold md:text-4xl ${bgUrl ? 'text-[var(--section-dark-text,var(--primary-foreground))]' : ''}`}
                     >
                         {cfg.title}
                     </h2>
                 )}
                 {cfg.subtitle && (
                     <p
-                        className={`text-lg ${bgUrl ? 'text-white/90' : 'text-muted-foreground'}`}
+                        className={`text-lg ${bgUrl ? 'text-[var(--section-dark-text,var(--primary-foreground))]/90' : 'text-muted-foreground'}`}
                     >
                         {cfg.subtitle}
                     </p>

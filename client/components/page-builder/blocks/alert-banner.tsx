@@ -7,27 +7,27 @@ import type { BlockRendererProps } from '../block-renderer.types';
 
 const variantConfig = {
     info: {
-        bg: 'bg-blue-50 dark:bg-blue-950/30',
-        border: 'border-blue-200 dark:border-blue-800',
-        text: 'text-blue-800 dark:text-blue-200',
+        bg: 'bg-accent',
+        border: 'border-border',
+        text: 'text-accent-foreground',
         icon: Info,
     },
     warning: {
-        bg: 'bg-amber-50 dark:bg-amber-950/30',
-        border: 'border-amber-200 dark:border-amber-800',
-        text: 'text-amber-800 dark:text-amber-200',
+        bg: 'bg-secondary',
+        border: 'border-border',
+        text: 'text-secondary-foreground',
         icon: AlertTriangle,
     },
     success: {
-        bg: 'bg-green-50 dark:bg-green-950/30',
-        border: 'border-green-200 dark:border-green-800',
-        text: 'text-green-800 dark:text-green-200',
+        bg: 'bg-muted',
+        border: 'border-border',
+        text: 'text-foreground',
         icon: CheckCircle,
     },
     error: {
-        bg: 'bg-red-50 dark:bg-red-950/30',
-        border: 'border-red-200 dark:border-red-800',
-        text: 'text-red-800 dark:text-red-200',
+        bg: 'bg-destructive/10',
+        border: 'border-destructive/30',
+        text: 'text-destructive',
         icon: AlertCircle,
     },
 };

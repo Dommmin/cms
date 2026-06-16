@@ -39,7 +39,7 @@ export function HeroBannerBlock({ block }: HeroBannerProps) {
                         priority
                     />
                     <div
-                        className="absolute inset-0 bg-black"
+                        className="absolute inset-0 bg-[var(--section-dark-bg,var(--foreground))]"
                         style={{ opacity: overlayOpacity }}
                     />
                 </>

@@ -58,12 +58,12 @@ export function CategoriesGridBlock({ block }: CategoriesGridProps) {
                                 sizes="(max-width: 640px) 50vw, 25vw"
                             />
                         )}
-                        <div className="relative z-10 w-full bg-gradient-to-t from-black/70 to-transparent p-4">
-                            <p className="font-semibold text-white">
+                        <div className="relative z-10 w-full bg-gradient-to-t from-[var(--section-dark-bg,var(--foreground))]/80 to-transparent p-4">
+                            <p className="font-semibold text-[var(--section-dark-text,var(--background))]">
                                 {cat.name}
                             </p>
                             {cfg.show_description && cat.description && (
-                                <p className="text-xs text-white/80">
+                                <p className="text-xs text-[var(--section-dark-text,var(--background))]/80">
                                     {cat.description}
                                 </p>
                             )}

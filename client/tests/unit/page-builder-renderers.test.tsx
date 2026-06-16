@@ -459,6 +459,28 @@ describe('theme styles', () => {
         expect(html).toContain('--section-dark-text: #ffffff;');
     });
 
+    it('renders dark theme CSS variables for .dark selector', () => {
+        const theme: ActiveTheme = {
+            slug: 'editorial',
+            tokens: {
+                background: '#ffffff',
+                foreground: '#111111',
+            },
+            dark_tokens: {
+                background: '#0f172a',
+                foreground: '#f8fafc',
+                primary: '#818cf8',
+            },
+        };
+
+        const html = renderToStaticMarkup(<ThemeStyles theme={theme} />);
+
+        expect(html).toContain(':root {');
+        expect(html).toContain('.dark {');
+        expect(html).toContain('--background: #0f172a;');
+        expect(html).toContain('--primary: #818cf8;');
+    });
+
     it('skips unsupported or oversized CSS token keys', () => {
         const theme: ActiveTheme = {
             slug: 'restricted',

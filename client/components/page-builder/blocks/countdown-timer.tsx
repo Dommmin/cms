@@ -53,7 +53,7 @@ export function CountdownTimerBlock({ block }: CountdownTimerProps) {
     const isDark = cfg.style === 'dark' || cfg.style === 'brand';
     const containerClass = {
         light: 'bg-background text-foreground',
-        dark: 'bg-gray-950 text-white rounded-2xl px-8 py-12',
+        dark: 'rounded-2xl bg-[var(--section-dark-bg,var(--foreground))] px-8 py-12 text-[var(--section-dark-text,var(--background))]',
         brand: 'bg-primary text-primary-foreground rounded-2xl px-8 py-12',
     }[cfg.style ?? 'dark'];
 
@@ -87,7 +87,9 @@ export function CountdownTimerBlock({ block }: CountdownTimerProps) {
                         <div key={l} className="flex flex-col items-center">
                             <span
                                 className={`min-w-[3.5rem] rounded-xl px-3 py-2 text-4xl font-extrabold tabular-nums sm:text-5xl ${
-                                    isDark ? 'bg-white/10' : 'bg-muted'
+                                    isDark
+                                        ? 'bg-[var(--section-dark-text,var(--background))]/10'
+                                        : 'bg-muted'
                                 }`}
                             >
                                 {pad(v)}
@@ -109,7 +111,7 @@ export function CountdownTimerBlock({ block }: CountdownTimerProps) {
                     href={cfg.cta_url}
                     className={`rounded-lg px-8 py-3 font-semibold transition-opacity hover:opacity-90 ${
                         isDark
-                            ? 'bg-white text-gray-950'
+                            ? 'bg-[var(--section-dark-text,var(--background))] text-[var(--section-dark-bg,var(--foreground))]'
                             : 'bg-primary text-primary-foreground'
                     }`}
                 >
