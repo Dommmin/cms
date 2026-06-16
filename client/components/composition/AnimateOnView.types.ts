@@ -1,7 +1,15 @@
 import type { ReactNode } from 'react';
 
+export type AnimationPreset = {
+    initial: Record<string, number>;
+    animate: Record<string, number>;
+};
+
 export interface AnimateOnViewProps {
-    children: ReactNode;
+    /** Preset key (e.g. `fade-up`). Unknown keys render a plain section. */
+    animation: string;
     className?: string;
-    animation?: 'fade-in' | 'fade-up' | 'fade-left' | 'fade-right' | 'zoom-in';
+    'data-section-type'?: string;
+    'data-section-id'?: number;
+    children: ReactNode;
 }

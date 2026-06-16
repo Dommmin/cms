@@ -1,11 +1,5 @@
-export type AnimationPreset = {
-    initial: Record<string, number>;
-    animate: Record<string, number>;
-};
-export interface AnimatedSectionProps {
-    animation: string;
-    className?: string;
-    'data-section-type'?: string;
-    'data-section-id'?: number;
-    children: React.ReactNode;
-}
+// Back-compat type re-export — canonical types live with the composition primitive.
+export type {
+    AnimateOnViewProps as AnimatedSectionProps,
+    AnimationPreset,
+} from '@/components/composition/AnimateOnView.types';

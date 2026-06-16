@@ -1,17 +1,62 @@
 'use client';
 
-import { AnimatedSection } from '@/components/page-builder/animated-section';
+import { motion, useReducedMotion } from 'framer-motion';
 
-import type { AnimateOnViewProps } from './AnimateOnView.types';
+import type {
+    AnimateOnViewProps,
+    AnimationPreset,
+} from './AnimateOnView.types';
+
+const PRESETS: Record<string, AnimationPreset> = {
+    'fade-in': {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+    },
+    'fade-up': {
+        initial: { opacity: 0, y: 50 },
+        animate: { opacity: 1, y: 0 },
+    },
+    'fade-left': {
+        initial: { opacity: 0, x: -60 },
+        animate: { opacity: 1, x: 0 },
+    },
+    'fade-right': {
+        initial: { opacity: 0, x: 60 },
+        animate: { opacity: 1, x: 0 },
+    },
+    'zoom-in': {
+        initial: { opacity: 0, scale: 0.92 },
+        animate: { opacity: 1, scale: 1 },
+    },
+};
 
 export function AnimateOnView({
-    children,
+    animation,
     className,
-    animation = 'fade-up',
+    children,
+    ...rest
 }: AnimateOnViewProps) {
+    const reducedMotion = useReducedMotion();
+    const preset = !reducedMotion ? PRESETS[animation] : null;
+
+    if (!preset) {
+        return (
+            <section className={className} {...rest}>
+                {children}
+            </section>
+        );
+    }
+
     return (
-        <AnimatedSection animation={animation} className={className}>
+        <motion.section
+            className={className}
+            initial={preset.initial}
+            whileInView={preset.animate}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.65, ease: 'easeOut' }}
+            {...rest}
+        >
             {children}
-        </AnimatedSection>
+        </motion.section>
     );
 }
