@@ -21,10 +21,11 @@ class HandleAppearance
     {
         $activeTheme = Theme::query()
             ->where('is_active', true)
-            ->first(['slug', 'tokens', 'typography', 'spacing', 'buttons', 'containers']);
+            ->first(['slug', 'tokens', 'dark_tokens', 'typography', 'spacing', 'buttons', 'containers']);
 
         View::share('appearance', $request->cookie('appearance') ?? 'system');
         View::share('activeThemeCssVariables', $this->buildCssVariables($activeTheme));
+        View::share('activeThemeDarkCssVariables', $this->buildDarkCssVariables($activeTheme));
         View::share('activeThemeSlug', $activeTheme?->slug);
 
         return $next($request);
@@ -119,6 +120,42 @@ class HandleAppearance
             ->implode(' ');
     }
 
+    private function buildDarkCssVariables(?Theme $theme): string
+    {
+        if (! $theme instanceof Theme) {
+            return '';
+        }
+
+        $colorVars = $this->sanitizeTokenVariables(
+            (array) ($theme->dark_tokens ?? []),
+            $this->allowedColorKeys(),
+        );
+
+        if ($colorVars === []) {
+            return '';
+        }
+
+        $variables = [];
+        foreach ($colorVars as $key => $value) {
+            $variables[$key] = $value;
+        }
+
+        $darkFg = $variables['foreground'] ?? null;
+        $darkBg = $variables['background'] ?? null;
+        if (is_string($darkFg) && $darkFg !== '') {
+            $variables['section-dark-bg'] = $darkFg;
+        }
+
+        if (is_string($darkBg) && $darkBg !== '') {
+            $variables['section-dark-text'] = $darkBg;
+        }
+
+        return collect($variables)
+            ->map(fn (string $value, string $key): string => sprintf('--%s: %s;', $key, $value))
+            ->values()
+            ->implode(' ');
+    }
+
     /**
      * @param  array<string, mixed>  $tokens
      * @param  list<string>  $allowedKeys
@@ -177,6 +214,9 @@ class HandleAppearance
             'sidebar-accent-foreground',
             'sidebar-border',
             'sidebar-ring',
+            'accent-vivid',
+            'accent-vivid-foreground',
+            'card-elevated',
         ];
     }
 }

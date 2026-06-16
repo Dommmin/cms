@@ -49,7 +49,7 @@ class HandleInertiaRequests extends Middleware
         $flashError = $this->translateFlashMessage($request->session()->get('error'));
         $activeTheme = Theme::query()
             ->where('is_active', true)
-            ->first(['id', 'slug', 'tokens', 'typography', 'spacing', 'buttons', 'containers']);
+            ->first(['id', 'slug', 'tokens', 'dark_tokens', 'typography', 'spacing', 'buttons', 'containers']);
 
         return [
             ...parent::share($request),
@@ -69,6 +69,7 @@ class HandleInertiaRequests extends Middleware
                 'id' => $activeTheme->id,
                 'slug' => $activeTheme->slug,
                 'tokens' => $activeTheme->tokens,
+                'dark_tokens' => $activeTheme->dark_tokens,
                 'typography' => $activeTheme->typography,
                 'spacing' => $activeTheme->spacing,
                 'buttons' => $activeTheme->buttons,

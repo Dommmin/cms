@@ -11,6 +11,7 @@ export type Modules = {
 export type ActiveTheme = {
     slug: string;
     tokens?: Record<string, string> | null;
+    dark_tokens?: Record<string, string> | null;
     typography?: {
         heading_font?: string;
         body_font?: string;

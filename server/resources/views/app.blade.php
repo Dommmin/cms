@@ -37,6 +37,10 @@
             :root {
                 {!! $activeThemeCssVariables ?? '' !!}
             }
+
+            .dark {
+                {!! $activeThemeDarkCssVariables ?? '' !!}
+            }
         </style>
 
         <title data-inertia>{{ config('app.name', 'Laravel') }}</title>

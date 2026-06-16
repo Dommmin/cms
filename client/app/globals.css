@@ -69,6 +69,21 @@
     --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/*
+ * TOKEN CONTRACT — merchant-overridable variables (defaults in :root / .dark below).
+ * Color: --background, --foreground, --primary, --secondary, --muted, --accent,
+ *   --destructive, --border, --input, --ring, --radius, --chart-*, --sidebar-*
+ * Typography: --font-heading, --font-body, --text-base-size, --text-scale, --h*-size
+ * Spacing: --section-padding-y, --block-gap, --container-padding
+ * Containers: --container-max-width, --container-content-width, --container-narrow-width
+ * Buttons: --btn-radius, --btn-padding-*, --btn-secondary-*
+ * Store layout: --store-shell-width (alias → --container-max-width),
+ *   --store-wide-shell-width, --store-content-width, --store-section-y, --store-grid-gap,
+ *   --store-card-radius (alias → --radius), --store-control-radius, --store-focus-ring,
+ *   --store-shadow-*, --store-accent-*
+ * Section variants: --section-dark-bg, --section-dark-text
+ */
+
 :root {
     --radius: 0.5rem;
 
@@ -128,12 +143,10 @@
     --accent-vivid-foreground: oklch(0.99 0.002 260);
 
     /* Storefront design tokens */
-    --store-shell-width: 80rem;
     --store-wide-shell-width: 96rem;
     --store-content-width: 72rem;
     --store-section-y: clamp(2.5rem, 6vw, 5rem);
     --store-grid-gap: clamp(1rem, 2vw, 1.5rem);
-    --store-card-radius: 0.5rem;
     --store-control-radius: 0.375rem;
     --store-product-image-ratio: 1 / 1;
     --store-focus-ring: 0 0 0 3px oklch(0.14 0.005 260 / 15%);
@@ -166,6 +179,10 @@
     --btn-secondary-padding-y: 0.625rem;
     --section-dark-bg: var(--foreground);
     --section-dark-text: var(--background);
+
+    /* Consolidated aliases (R2) — single source of truth */
+    --store-shell-width: var(--container-max-width);
+    --store-card-radius: var(--radius);
 }
 
 .dark {

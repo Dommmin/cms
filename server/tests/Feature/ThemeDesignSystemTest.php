@@ -170,6 +170,33 @@ describe('Theme Design System Tokens', function (): void {
 
         expect($cssVars)->toBe('');
     });
+
+    it('generates dark mode CSS variables from dark_tokens', function (): void {
+        $theme = Theme::factory()->create([
+            'tokens' => [
+                'background' => '#ffffff',
+                'foreground' => '#111111',
+            ],
+            'dark_tokens' => [
+                'background' => '#0f172a',
+                'foreground' => '#f8fafc',
+                'primary' => '#818cf8',
+            ],
+            'is_active' => true,
+        ]);
+
+        $middleware = new HandleAppearance();
+        $reflection = new ReflectionClass($middleware);
+        $darkMethod = $reflection->getMethod('buildDarkCssVariables');
+
+        $cssVars = $darkMethod->invoke($middleware, $theme);
+
+        expect($cssVars)->toContain('--background: #0f172a');
+        expect($cssVars)->toContain('--foreground: #f8fafc');
+        expect($cssVars)->toContain('--primary: #818cf8');
+        expect($cssVars)->toContain('--section-dark-bg: #f8fafc');
+        expect($cssVars)->toContain('--section-dark-text: #0f172a');
+    });
 });
 
 describe('Theme Design System Field Persistence', function (): void {

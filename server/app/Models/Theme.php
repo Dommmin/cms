@@ -21,6 +21,7 @@ use Spatie\Activitylog\Support\LogOptions;
  * Theme model representing UI/themes configuration stored in the database.
  *
  * @property array<string, mixed>|null $tokens
+ * @property array<string, mixed>|null $dark_tokens
  * @property array<string, mixed>|null $typography
  * @property array<string, mixed>|null $spacing
  * @property array<string, mixed>|null $buttons
@@ -65,6 +66,7 @@ use Spatie\Activitylog\Support\LogOptions;
     'slug',
     'description',
     'tokens',
+    'dark_tokens',
     'typography',
     'spacing',
     'buttons',
@@ -97,6 +99,7 @@ class Theme extends Model
     {
         return [
             'tokens' => 'array',
+            'dark_tokens' => 'array',
             'typography' => 'array',
             'spacing' => 'array',
             'buttons' => 'array',
