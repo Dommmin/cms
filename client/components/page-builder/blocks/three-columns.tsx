@@ -1,11 +1,18 @@
 import { sanitizeHtml } from '@/lib/sanitize';
 import Image from 'next/image';
 
+import { Grid } from '@/components/composition';
 import { getRelationByKey } from '@/lib/format';
 import type {
     ThreeColumnsConfig,
     ThreeColumnsProps,
 } from './three-columns.types';
+
+const ALIGN_MAP = {
+    top: 'start',
+    middle: 'center',
+    bottom: 'end',
+} as const;
 
 export function ThreeColumnsBlock({ block }: ThreeColumnsProps) {
     const cfg = block.configuration as ThreeColumnsConfig;
@@ -28,14 +35,10 @@ export function ThreeColumnsBlock({ block }: ThreeColumnsProps) {
         },
     ];
 
-    const alignClass = {
-        top: 'items-start',
-        middle: 'items-center',
-        bottom: 'items-end',
-    }[cfg.vertical_alignment ?? 'top'];
+    const align = ALIGN_MAP[cfg.vertical_alignment ?? 'top'];
 
     return (
-        <div className={`grid grid-cols-1 gap-8 md:grid-cols-3 ${alignClass}`}>
+        <Grid cols={3} align={align}>
             {columns.map((col, i) => {
                 const imgUrl = col.imgRel?.metadata?.url as string | undefined;
                 const imgAlt = col.imgRel?.metadata?.alt as string | undefined;
@@ -68,6 +71,6 @@ export function ThreeColumnsBlock({ block }: ThreeColumnsProps) {
                     </div>
                 );
             })}
-        </div>
+        </Grid>
     );
 }

@@ -1,8 +1,15 @@
 import { sanitizeHtml } from '@/lib/sanitize';
 import Image from 'next/image';
 
+import { Grid } from '@/components/composition';
 import { getRelationByKey } from '@/lib/format';
 import type { TwoColumnsConfig, TwoColumnsProps } from './two-columns.types';
+
+const ALIGN_MAP = {
+    top: 'start',
+    center: 'center',
+    bottom: 'end',
+} as const;
 
 export function TwoColumnsBlock({ block }: TwoColumnsProps) {
     const cfg = block.configuration as TwoColumnsConfig;
@@ -14,11 +21,13 @@ export function TwoColumnsBlock({ block }: TwoColumnsProps) {
     const rightImageRelation = getRelationByKey(block.relations, 'right_image');
 
     const gapClass = { sm: 'gap-6', md: 'gap-12', lg: 'gap-20' }[gap];
+    const verticalAlign = cfg.vertical_align ?? 'center';
     const alignClass = {
         top: 'items-start',
         center: 'items-center',
         bottom: 'items-end',
-    }[cfg.vertical_align ?? 'center'];
+    }[verticalAlign];
+    const alignKey = ALIGN_MAP[verticalAlign];
 
     const leftClass =
         ratio === '60-40'
@@ -99,6 +108,15 @@ export function TwoColumnsBlock({ block }: TwoColumnsProps) {
             </div>
         );
     };
+
+    if (ratio === '50-50') {
+        return (
+            <Grid cols={2} gap={gapClass} align={alignKey}>
+                <div>{renderLeft()}</div>
+                <div>{renderRight()}</div>
+            </Grid>
+        );
+    }
 
     return (
         <div className={`grid ${gridCols} ${gapClass} ${alignClass}`}>
