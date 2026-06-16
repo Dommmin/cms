@@ -47,6 +47,9 @@ class DatabaseSeeder extends Seeder
             ShippingMethodSeeder::class,
             CurrencySeeder::class,
             EmailTemplateSeeder::class,
+            PageBuilderShowcaseSeeder::class,
+            ThemeShowcaseSeeder::class,
+            DesignSystemShowcaseSeeder::class,
         ]);
 
         // ── Newsletter (seeded only when module is active) ───────────────────

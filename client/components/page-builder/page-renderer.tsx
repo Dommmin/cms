@@ -1,5 +1,8 @@
 import { cookies } from 'next/headers';
 
+import { DesignSystemShowcasePage } from '@/components/design-system-showcase/DesignSystemShowcasePage';
+import { DESIGN_SYSTEM_SHOWCASE_SLUG } from '@/components/design-system-showcase/showcase-groups';
+
 import { ModuleRenderer } from './module-renderer';
 import type { PageRendererProps } from './page-renderer.types';
 import { SectionRenderer } from './section-renderer';
@@ -31,6 +34,10 @@ export async function PageRenderer({
                 locale={locale}
             />
         );
+    }
+
+    if (page.slug === DESIGN_SYSTEM_SHOWCASE_SLUG) {
+        return <DesignSystemShowcasePage sections={page.sections} />;
     }
 
     const cookieStore = await cookies();
