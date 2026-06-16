@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
 
+import type { SectionPadding, SectionVariantKey } from './styles';
+
 export interface SectionProps {
     children: ReactNode;
     className?: string;
-    variant?: 'light' | 'dark' | 'muted' | 'brand';
-    padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+    variant?: SectionVariantKey;
+    padding?: SectionPadding;
     id?: string;
 }
