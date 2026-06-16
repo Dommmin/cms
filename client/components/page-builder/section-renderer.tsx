@@ -2,6 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import type { SectionPadding } from '@/components/composition/styles';
+import {
+    containerClasses,
+    sectionPaddingClasses,
+    sectionVariantClasses,
+} from '@/components/composition/styles';
+
 import { AnimatedSection } from './animated-section';
 import { BlockRenderer } from './block-renderer';
 import { BlockErrorBoundary } from './error-boundary';
@@ -19,33 +26,6 @@ function sanitizeCss(css: string): string {
         .replace(/url\s*\(\s*['"]?\s*data\s*:/gi, 'url(');
 }
 
-const variantStyles: Record<string, string> = {
-    light: 'bg-[var(--background)] text-[var(--foreground)]',
-    dark: 'bg-[var(--section-dark-bg,var(--foreground))] text-[var(--section-dark-text,var(--background))]',
-    muted: 'bg-[var(--muted)] text-[var(--foreground)]',
-    brand: 'bg-[var(--primary)] text-[var(--primary-foreground)]',
-    hero: 'bg-[var(--section-dark-bg,var(--foreground))] text-[var(--section-dark-text,var(--background))]',
-};
-
-const layoutContainerStyles: Record<string, string> = {
-    contained:
-        'mx-auto max-w-[var(--container-max-width,80rem)] px-4 sm:px-6 lg:px-8',
-    'full-width': 'w-full',
-    flush: 'w-full',
-    'two-col':
-        'mx-auto max-w-[var(--container-max-width,80rem)] px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8',
-    'three-col':
-        'mx-auto max-w-[var(--container-max-width,80rem)] px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8',
-};
-
-const sectionPaddingStyles: Record<string, string> = {
-    none: 'py-0',
-    sm: 'py-6',
-    md: 'py-12',
-    lg: 'py-[var(--section-padding-y,5rem)]',
-    xl: 'py-28',
-};
-
 function SectionContent({
     section,
     isPreview,
@@ -59,12 +39,13 @@ function SectionContent({
     const padding = settings?.padding ?? 'lg';
     const animation = settings?.animation ?? 'none';
 
-    const sectionBg = variantStyles[variant] ?? '';
+    const sectionBg = sectionVariantClasses[variant];
     const sectionPadding =
-        layout === 'flush' ? '' : (sectionPaddingStyles[padding] ?? 'py-12');
+        layout === 'flush'
+            ? ''
+            : (sectionPaddingClasses[padding as SectionPadding] ?? 'py-12');
 
-    const containerClass =
-        layoutContainerStyles[layout] ?? layoutContainerStyles.contained;
+    const containerClass = containerClasses[layout];
 
     const activeBlocks = section.blocks.filter((b) => b.is_active);
 
@@ -217,9 +198,11 @@ export function SectionLazyWrapper(props: SectionRendererProps) {
     const variant = section.variant ?? 'light';
     const layout = section.layout ?? 'contained';
     const padding = settings?.padding ?? 'lg';
-    const sectionBg = variantStyles[variant] ?? '';
+    const sectionBg = sectionVariantClasses[variant];
     const sectionPad =
-        layout === 'flush' ? '' : (sectionPaddingStyles[padding] ?? 'py-12');
+        layout === 'flush'
+            ? ''
+            : (sectionPaddingClasses[padding as SectionPadding] ?? 'py-12');
     const minHeight = settings?.min_height ?? '200px';
 
     if (!isVisible) {
