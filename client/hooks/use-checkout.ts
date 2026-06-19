@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRef } from 'react';
 
 import {
     CheckoutPayload,
@@ -30,9 +31,19 @@ export function usePaymentMethods() {
 export function useCheckout() {
     const queryClient = useQueryClient();
 
+    // One idempotency key per checkout attempt. It survives double-clicks and
+    // network retries (so the server deduplicates them) and is only cleared
+    // after a successful order, when the next attempt should start fresh.
+    const idempotencyKeyRef = useRef<string | null>(null);
+
     return useMutation({
-        mutationFn: (payload: CheckoutPayload) => submitCheckout(payload),
+        mutationFn: (payload: CheckoutPayload) => {
+            idempotencyKeyRef.current ??= crypto.randomUUID();
+
+            return submitCheckout(payload, idempotencyKeyRef.current);
+        },
         onSuccess: () => {
+            idempotencyKeyRef.current = null;
             queryClient.invalidateQueries({ queryKey: cartKeys.cart });
         },
     });

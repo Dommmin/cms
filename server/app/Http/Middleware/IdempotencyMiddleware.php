@@ -7,6 +7,7 @@ namespace App\Http\Middleware;
 use App\Http\Middleware\Idempotency\IdempotencyRecord;
 use Closure;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -39,9 +40,17 @@ final class IdempotencyMiddleware
     /** Fallback wait before a concurrent caller gives up. */
     private const int DEFAULT_LOCK_WAIT_SECONDS = 5;
 
+    /** Reject keys longer than this (matches Stripe's limit) to bound cache/hashing cost. */
+    private const int DEFAULT_MAX_KEY_LENGTH = 255;
+
+    /** Do not cache response bodies longer than this (~1 MiB of characters) to bound cache memory. */
+    private const int DEFAULT_MAX_BODY_LENGTH = 1_048_576;
+
     /**
      * Response headers that must never be captured/restored: they are
-     * connection- or body-specific and must be recomputed per response.
+     * connection-, body-, or session-specific and must not be replayed from a
+     * cached entry. `set-cookie` in particular would leak a stale session,
+     * CSRF, or cart cookie onto a later request.
      *
      * @var list<string>
      */
@@ -51,6 +60,7 @@ final class IdempotencyMiddleware
         'connection',
         'content-length',
         'transfer-encoding',
+        'set-cookie',
         'x-idempotent-replayed',
     ];
 
@@ -64,6 +74,10 @@ final class IdempotencyMiddleware
 
         if (! is_string($idempotencyKey) || mb_trim($idempotencyKey) === '') {
             return $next($request);
+        }
+
+        if (mb_strlen($idempotencyKey) > (int) config('idempotency.max_key_length', self::DEFAULT_MAX_KEY_LENGTH)) {
+            return $this->malformedKey();
         }
 
         $cacheKey = $this->cacheKey($request, $idempotencyKey);
@@ -88,8 +102,7 @@ final class IdempotencyMiddleware
 
                     $response = $next($request);
 
-                    // Never cache server errors — they should remain retryable.
-                    if ($response->getStatusCode() < 500) {
+                    if ($this->isStorable($response)) {
                         $this->store($cacheKey, $fingerprint, $response);
                     }
 
@@ -124,6 +137,27 @@ final class IdempotencyMiddleware
     }
 
     /**
+     * Whether a response may be safely cached for replay.
+     *
+     * Server errors (5xx) stay retryable; streamed/binary responses have no
+     * retrievable body; oversized bodies are skipped to bound cache memory.
+     */
+    private function isStorable(SymfonyResponse $response): bool
+    {
+        if ($response->getStatusCode() >= 500) {
+            return false;
+        }
+
+        $content = $response->getContent();
+
+        if (! is_string($content)) {
+            return false;
+        }
+
+        return mb_strlen($content) <= (int) config('idempotency.max_body_length', self::DEFAULT_MAX_BODY_LENGTH);
+    }
+
+    /**
      * Persist the response so later retries can replay it byte-for-byte.
      */
     private function store(string $cacheKey, string $fingerprint, SymfonyResponse $response): void
@@ -141,10 +175,20 @@ final class IdempotencyMiddleware
 
     /**
      * Rebuild a response from a stored record, restoring all original headers.
+     *
+     * A JSON body is replayed as a {@see JsonResponse} so downstream middleware
+     * that only passes through JSON responses (e.g. ForceJsonResponse) does not
+     * re-wrap or corrupt the replayed payload. The stored body is already
+     * encoded, so it is set verbatim rather than re-encoded.
      */
     private function replay(IdempotencyRecord $record): SymfonyResponse
     {
-        $response = new Response($record->body, $record->status);
+        $contentType = $record->headers['content-type'][0] ?? null;
+        $isJson = is_string($contentType) && str_contains($contentType, 'application/json');
+
+        $response = $isJson
+            ? new JsonResponse($record->body, $record->status, json: true)
+            : new Response($record->body, $record->status);
 
         foreach ($record->headers as $name => $values) {
             $response->headers->set($name, $values, replace: true);
@@ -242,25 +286,27 @@ final class IdempotencyMiddleware
         return 'ip:'.hash('sha256', (string) $request->ip());
     }
 
-    private function fingerprintMismatch(): Response
+    private function fingerprintMismatch(): JsonResponse
     {
-        return new Response(
-            json_encode([
-                'message' => 'The Idempotency-Key has already been used with a different request payload.',
-            ], JSON_THROW_ON_ERROR),
+        return new JsonResponse(
+            ['message' => 'The Idempotency-Key has already been used with a different request payload.'],
             422,
-            ['Content-Type' => 'application/json'],
         );
     }
 
-    private function conflict(): Response
+    private function conflict(): JsonResponse
     {
-        return new Response(
-            json_encode([
-                'message' => 'A request with this Idempotency-Key is already being processed. Please retry shortly.',
-            ], JSON_THROW_ON_ERROR),
+        return new JsonResponse(
+            ['message' => 'A request with this Idempotency-Key is already being processed. Please retry shortly.'],
             409,
-            ['Content-Type' => 'application/json'],
+        );
+    }
+
+    private function malformedKey(): JsonResponse
+    {
+        return new JsonResponse(
+            ['message' => 'The Idempotency-Key header is too long.'],
+            400,
         );
     }
 }

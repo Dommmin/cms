@@ -108,10 +108,13 @@ export async function getShippingMethods(): Promise<ShippingMethod[]> {
 
 export async function submitCheckout(
     payload: CheckoutPayload,
+    idempotencyKey: string,
 ): Promise<CheckoutResponse> {
     const { data } = await api.post<CheckoutResponse>('/checkout', payload, {
         headers: {
-            'Idempotency-Key': `checkout-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            // The key must stay stable across retries of the same attempt, so the
+            // caller owns it (see useCheckout). Never generate it per request.
+            'Idempotency-Key': idempotencyKey,
         },
     });
     return data;

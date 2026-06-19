@@ -129,3 +129,74 @@ it('returns 409 while an identical request is still in flight', function (): voi
 
     expect(Cache::get('test:runs'))->toBe(0);
 });
+
+it('rejects an Idempotency-Key that exceeds the maximum length', function (): void {
+    $this->postJson('/_test/idempotency', ['amount' => 100], ['Idempotency-Key' => str_repeat('a', 256)])
+        ->assertStatus(400)
+        ->assertJsonStructure(['message']);
+
+    expect(Cache::get('test:runs'))->toBe(0);
+});
+
+it('does not replay Set-Cookie headers from the cached response', function (): void {
+    Route::middleware('idempotent')->post(
+        '/_test/idempotency-cookie',
+        fn (): mixed => response()
+            ->json(['run' => Cache::increment('test:runs')], 201)
+            ->cookie('demo_session', 'secret-value'),
+    );
+
+    $headers = ['Idempotency-Key' => 'key-cookie'];
+
+    $this->postJson('/_test/idempotency-cookie', [], $headers)->assertCreated();
+
+    $this->postJson('/_test/idempotency-cookie', [], $headers)
+        ->assertCreated()
+        ->assertHeader('X-Idempotent-Replayed', 'true')
+        ->assertHeaderMissing('Set-Cookie');
+
+    expect(Cache::get('test:runs'))->toBe(1);
+});
+
+it('replays a JSON body verbatim behind ForceJsonResponse instead of re-wrapping it', function (): void {
+    // Mirror the real API stack: ForceJsonResponse wraps the route, idempotent
+    // runs inside it. A plain replayed Response would be re-wrapped into an
+    // error envelope; a JsonResponse must pass through untouched.
+    Route::middleware(['force.json', 'idempotent'])->post(
+        '/_test/idempotency-json',
+        fn (): mixed => response()->json(['run' => Cache::increment('test:runs'), 'order' => 'ORD-1'], 201),
+    );
+
+    $headers = ['Idempotency-Key' => 'key-json-passthrough'];
+
+    $first = $this->postJson('/_test/idempotency-json', ['amount' => 100], $headers);
+    $second = $this->postJson('/_test/idempotency-json', ['amount' => 100], $headers);
+
+    $first->assertCreated();
+    $second->assertCreated()
+        ->assertHeader('X-Idempotent-Replayed', 'true')
+        ->assertExactJson($first->json())          // not the {success:false,...} envelope
+        ->assertJsonPath('order', 'ORD-1');
+
+    expect(Cache::get('test:runs'))->toBe(1);
+});
+
+it('does not cache responses larger than the configured limit', function (): void {
+    config(['idempotency.max_body_length' => 10]);
+
+    Route::middleware('idempotent')->post(
+        '/_test/idempotency-big',
+        fn (): mixed => response()->json([
+            'run' => Cache::increment('test:runs'),
+            'pad' => str_repeat('x', 64),
+        ]),
+    );
+
+    $headers = ['Idempotency-Key' => 'key-big'];
+
+    $this->postJson('/_test/idempotency-big', [], $headers);
+    $this->postJson('/_test/idempotency-big', [], $headers);
+
+    // Body exceeded the limit → never cached → handler ran twice.
+    expect(Cache::get('test:runs'))->toBe(2);
+});

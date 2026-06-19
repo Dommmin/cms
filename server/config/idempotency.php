@@ -37,4 +37,26 @@ return [
     */
     'lock_wait_seconds' => (int) env('IDEMPOTENCY_LOCK_WAIT_SECONDS', 5),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Maximum Idempotency-Key Length
+    |--------------------------------------------------------------------------
+    |
+    | Requests carrying a longer key are rejected with HTTP 400. Bounds the
+    | cost of hashing and prevents abuse via oversized headers.
+    |
+    */
+    'max_key_length' => (int) env('IDEMPOTENCY_MAX_KEY_LENGTH', 255),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Maximum Cached Body Length (characters)
+    |--------------------------------------------------------------------------
+    |
+    | Responses with a longer body are returned normally but not cached for
+    | replay, keeping the cache store from growing unbounded.
+    |
+    */
+    'max_body_length' => (int) env('IDEMPOTENCY_MAX_BODY_LENGTH', 1_048_576),
+
 ];
