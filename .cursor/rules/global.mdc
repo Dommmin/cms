@@ -9,6 +9,16 @@ alwaysApply: true
 
 Compact non-negotiable core. **Routing (what to read / when to verify):** `.ai/routing.md`. Depth: `.ai/rules.md`, `.ai/guide.md` (feature sections only), `.ai/context.md`. Globs: `backend.mdc`, `frontend-client.mdc`.
 
+## AI Feature Workflow (mandatory)
+
+Always follow `.ai/policies/feature-flow.md`.
+
+Before final answer:
+1. simulate builder agent behavior using `.ai/prompts/builder.md`
+2. simulate reviewer agent using `.ai/prompts/reviewer.md`
+3. apply scoring policy from `.ai/policies/scoring.md`
+4. if score < 9, revise implementation (max 2 iterations, then escalate to human)
+
 ## Docker — commands only in containers
 
 ```bash

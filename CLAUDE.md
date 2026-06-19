@@ -10,6 +10,19 @@ Monorepo: **Laravel backend + admin SPA** (`server/`) · **Next.js public fronte
 
 ---
 
+## AI Workflow (mandatory)
+
+You must follow the repository AI workflow defined in `.ai/policies/feature-flow.md`.
+
+You MUST perform:
+- builder phase (`.ai/prompts/builder.md`)
+- reviewer phase (`.ai/prompts/reviewer.md`)
+- fix loop until the acceptance threshold in `.ai/policies/scoring.md` is met (score ≥ 9, max 2 iterations, then escalate to human)
+
+You are not allowed to output code that has not passed the reviewer check.
+
+---
+
 ## Commands (always via Docker)
 
 ```bash
