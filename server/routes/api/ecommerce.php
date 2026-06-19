@@ -117,8 +117,8 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::get('{reference}/invoice', [OrderController::class, 'invoice'])->name('invoice');
             Route::get('{reference}/proforma', [OrderController::class, 'proforma'])->name('proforma');
             Route::post('{reference}/cancel', [OrderController::class, 'cancel'])->middleware('idempotent')->name('cancel');
-            Route::post('{reference}/pay', [OrderController::class, 'pay'])->name('pay');
-            Route::post('{reference}/return', [OrderController::class, 'requestReturn'])->name('return');
+            Route::post('{reference}/pay', [OrderController::class, 'pay'])->middleware('idempotent')->name('pay');
+            Route::post('{reference}/return', [OrderController::class, 'requestReturn'])->middleware('idempotent')->name('return');
             Route::post('{reference}/reorder', [OrderController::class, 'reorder'])->name('reorder');
         });
 

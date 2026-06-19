@@ -7,7 +7,10 @@ namespace Database\Seeders;
 use App\Models\Page;
 use App\Models\PageBlock;
 use App\Models\PageSection;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Seeder;
+use InvalidArgumentException;
+use RuntimeException;
 
 class ThemeShowcaseSeeder extends Seeder
 {
@@ -80,7 +83,7 @@ class ThemeShowcaseSeeder extends Seeder
             'surfaces' => $this->surfacesDemo(),
             'spacing' => $this->spacingDemo(),
             'colors' => $this->colorsDemo(),
-            default => throw new \InvalidArgumentException("Unknown showcase group [{$group}]."),
+            default => throw new InvalidArgumentException(sprintf('Unknown showcase group [%s].', $group)),
         };
 
         $this->block($page, $section, 'custom_html', $demo, 1);
@@ -498,8 +501,9 @@ CSS;
 
     private function assertAllShowcaseGroupsPresent(Page $page): void
     {
-        $actual = $page->allSections()
-            ->get()
+        /** @var Collection<int, PageSection> $sections */
+        $sections = $page->allSections()->get();
+        $actual = $sections
             ->map(static fn (PageSection $section): ?string => is_array($section->settings)
                 ? ($section->settings['showcase_group'] ?? null)
                 : null)
@@ -512,13 +516,13 @@ CSS;
         $missing = array_values(array_diff(self::SHOWCASE_GROUPS, $actual));
 
         if ($missing !== []) {
-            throw new \RuntimeException('Theme Showcase is missing groups: '.implode(', ', $missing));
+            throw new RuntimeException('Theme Showcase is missing groups: '.implode(', ', $missing));
         }
     }
 
     private function printSummary(Page $page): void
     {
-        if (! $this->command) {
+        if ($this->command === null) {
             return;
         }
 
@@ -528,7 +532,7 @@ CSS;
         $this->command->table(
             ['Record', 'Details'],
             [
-                ['Page', "ID {$page->id} · slug /".self::PAGE_SLUG],
+                ['Page', sprintf('ID %d · slug /', $page->id).self::PAGE_SLUG],
                 ['Sections', (string) $page->allSections->count()],
                 ['Blocks', (string) $page->allBlocks->count()],
                 ['Groups', implode(', ', self::SHOWCASE_GROUPS)],

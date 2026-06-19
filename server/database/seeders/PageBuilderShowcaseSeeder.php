@@ -16,8 +16,10 @@ use App\Models\PageBlock;
 use App\Models\PageSection;
 use App\Models\Product;
 use Database\Seeders\Concerns\CachesImages;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Config;
+use RuntimeException;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class PageBuilderShowcaseSeeder extends Seeder
@@ -181,7 +183,7 @@ class PageBuilderShowcaseSeeder extends Seeder
             'grayscale' => true,
         ], $blockPos++);
         foreach (range(1, 5) as $index) {
-            $this->attachMedia($logoCloud, 'logos', "showcase-logo-{$index}", $index, "Partner logo {$index}");
+            $this->attachMedia($logoCloud, 'logos', 'showcase-logo-'.$index, $index, 'Partner logo '.$index);
         }
 
         $this->block($page, $section, 'countdown_timer', [
@@ -453,7 +455,7 @@ class PageBuilderShowcaseSeeder extends Seeder
             'show_captions' => true,
         ], $blockPos++);
         foreach (range(1, 6) as $index) {
-            $this->attachMedia($gallery, 'gallery', "showcase-gallery-{$index}", $index, "Gallery image {$index} from the showcase seeder");
+            $this->attachMedia($gallery, 'gallery', 'showcase-gallery-'.$index, $index, sprintf('Gallery image %s from the showcase seeder', $index));
         }
 
         $this->block($page, $section, 'video_embed', [
@@ -592,7 +594,7 @@ class PageBuilderShowcaseSeeder extends Seeder
      */
     private function resolveBlockMedia(string $seed, string $alt, int $width = 1200, int $height = 800): array
     {
-        $cacheKey = "{$seed}-{$width}x{$height}";
+        $cacheKey = sprintf('%s-%dx%d', $seed, $width, $height);
 
         if (! isset($this->mediaCache[$cacheKey])) {
             $originalSkipSeedConversions = (bool) config('media-library.skip_seed_conversions', false);
@@ -607,9 +609,7 @@ class PageBuilderShowcaseSeeder extends Seeder
             try {
                 $file = $this->seederImage($seed, $width, $height);
 
-                if (! file_exists($file)) {
-                    throw new \RuntimeException("Seed image file missing for [{$seed}].");
-                }
+                throw_unless(file_exists($file), RuntimeException::class, sprintf('Seed image file missing for [%s].', $seed));
 
                 $cmsMedia = CmsMedia::query()->create([]);
                 $media = $cmsMedia->addMedia($file)
@@ -691,8 +691,9 @@ class PageBuilderShowcaseSeeder extends Seeder
     private function assertAllBlockTypesPresent(Page $page): void
     {
         $expected = array_map(static fn (PageBlockTypeEnum $case): string => $case->value, PageBlockTypeEnum::cases());
-        $actual = $page->allBlocks()
-            ->get()
+        /** @var Collection<int, PageBlock> $blocks */
+        $blocks = $page->allBlocks()->get();
+        $actual = $blocks
             ->map(static fn (PageBlock $block): string => $block->type->value)
             ->unique()
             ->sort()
@@ -702,13 +703,13 @@ class PageBuilderShowcaseSeeder extends Seeder
         $missing = array_values(array_diff($expected, $actual));
 
         if ($missing !== []) {
-            throw new \RuntimeException('Page Builder Showcase is missing block types: '.implode(', ', $missing));
+            throw new RuntimeException('Page Builder Showcase is missing block types: '.implode(', ', $missing));
         }
     }
 
     private function printSummary(Page $page): void
     {
-        if (! $this->command) {
+        if ($this->command === null) {
             return;
         }
 
@@ -726,7 +727,7 @@ class PageBuilderShowcaseSeeder extends Seeder
         $this->command->table(
             ['Record', 'Details'],
             [
-                ['Page', "ID {$page->id} · slug /".self::PAGE_SLUG],
+                ['Page', sprintf('ID %d · slug /', $page->id).self::PAGE_SLUG],
                 ['Sections', (string) $sectionCount],
                 ['Blocks', (string) $blockCount],
                 ['Block relations', (string) $relationCount],

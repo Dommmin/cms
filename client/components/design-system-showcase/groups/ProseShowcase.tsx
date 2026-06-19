@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { ShowcaseGroupHeader } from '../ShowcaseGroupHeader';
 
 export function ProseShowcase() {
@@ -28,9 +30,9 @@ export function ProseShowcase() {
                 </blockquote>
                 <p>
                     Read more in the{' '}
-                    <a href="/design-system-showcase">
+                    <Link href="/design-system-showcase">
                         design system documentation
-                    </a>
+                    </Link>
                     .
                 </p>
             </article>

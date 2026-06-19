@@ -30,8 +30,8 @@ beforeEach(function (): void {
 
     foreach (range(1, 3) as $position) {
         Brand::query()->create([
-            'name' => "Showcase Brand {$position}",
-            'slug' => "showcase-brand-{$position}",
+            'name' => 'Showcase Brand '.$position,
+            'slug' => 'showcase-brand-'.$position,
             'is_active' => true,
             'position' => $position,
         ]);

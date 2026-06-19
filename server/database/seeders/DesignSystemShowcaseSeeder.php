@@ -6,7 +6,9 @@ namespace Database\Seeders;
 
 use App\Models\Page;
 use App\Models\PageSection;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Seeder;
+use RuntimeException;
 
 class DesignSystemShowcaseSeeder extends Seeder
 {
@@ -121,8 +123,9 @@ class DesignSystemShowcaseSeeder extends Seeder
 
     private function assertAllShowcaseGroupsPresent(Page $page): void
     {
-        $actual = $page->allSections()
-            ->get()
+        /** @var Collection<int, PageSection> $sections */
+        $sections = $page->allSections()->get();
+        $actual = $sections
             ->map(static fn (PageSection $section): ?string => is_array($section->settings)
                 ? ($section->settings['showcase_group'] ?? null)
                 : null)
@@ -135,13 +138,13 @@ class DesignSystemShowcaseSeeder extends Seeder
         $missing = array_values(array_diff(self::SHOWCASE_GROUPS, $actual));
 
         if ($missing !== []) {
-            throw new \RuntimeException('Design System Showcase is missing groups: '.implode(', ', $missing));
+            throw new RuntimeException('Design System Showcase is missing groups: '.implode(', ', $missing));
         }
     }
 
     private function printSummary(Page $page): void
     {
-        if (! $this->command) {
+        if ($this->command === null) {
             return;
         }
 
