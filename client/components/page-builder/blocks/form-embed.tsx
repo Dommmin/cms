@@ -1,25 +1,28 @@
 'use client';
 
+import { CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { BlockHeader } from '@/components/composition';
 import { submitEmbeddedForm } from '@/components/page-builder/mutations/forms';
 import { TurnstileWidget } from '@/components/turnstile-widget';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import type { FormField } from '@/types/api';
 import type { FormEmbedConfig, FormEmbedProps } from './form-embed.types';
 
 function FieldInput({ field }: { field: FormField }) {
-    const base =
-        'w-full rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring';
-
     if (field.type === 'textarea') {
         return (
-            <textarea
+            <Textarea
+                id={field.name}
                 name={field.name}
                 required={field.is_required}
                 placeholder={field.placeholder ?? undefined}
                 rows={4}
-                className={base}
             />
         );
     }
@@ -27,9 +30,10 @@ function FieldInput({ field }: { field: FormField }) {
     if (field.type === 'select' && field.options) {
         return (
             <select
+                id={field.name}
                 name={field.name}
                 required={field.is_required}
-                className={base}
+                className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-[3px] md:text-sm"
             >
                 <option value="">Select…</option>
                 {field.options.map((opt) => (
@@ -46,6 +50,7 @@ function FieldInput({ field }: { field: FormField }) {
             <label className="flex items-center gap-2 text-sm">
                 <input
                     type="checkbox"
+                    id={field.name}
                     name={field.name}
                     required={field.is_required}
                     className="border-input h-4 w-4 rounded"
@@ -77,12 +82,12 @@ function FieldInput({ field }: { field: FormField }) {
     }
 
     return (
-        <input
+        <Input
+            id={field.name}
             type={field.type}
             name={field.name}
             required={field.is_required}
             placeholder={field.placeholder ?? undefined}
-            className={base}
         />
     );
 }
@@ -128,7 +133,9 @@ export function FormEmbedBlock({ block }: FormEmbedProps) {
     if (done) {
         return (
             <div className="border-border bg-muted flex flex-col items-center gap-3 rounded-xl border p-8 text-center">
-                <div className="text-4xl">✅</div>
+                <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-full">
+                    <CheckCircle className="h-6 w-6" aria-hidden="true" />
+                </div>
                 <p className="font-semibold">
                     {form.success_message ?? 'Thank you!'}
                 </p>
@@ -142,32 +149,26 @@ export function FormEmbedBlock({ block }: FormEmbedProps) {
 
     return (
         <div className="flex flex-col gap-6">
-            {(cfg.title || cfg.subtitle) && (
-                <div>
-                    {cfg.title && (
-                        <h2 className="text-2xl font-bold">{cfg.title}</h2>
-                    )}
-                    {cfg.subtitle && (
-                        <p className="text-muted-foreground mt-1">
-                            {cfg.subtitle}
-                        </p>
-                    )}
-                </div>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                size="base"
+                compactDescription
+            />
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 {sortedFields.map((field) => (
                     <div key={field.id} className="flex flex-col gap-1.5">
-                        {field.type !== 'checkbox' && (
-                            <label className="text-sm font-medium">
+                        {field.type !== 'checkbox' ? (
+                            <Label htmlFor={field.name}>
                                 {field.label}
-                                {field.is_required && (
+                                {field.is_required ? (
                                     <span className="text-destructive ml-1">
                                         *
                                     </span>
-                                )}
-                            </label>
-                        )}
+                                ) : null}
+                            </Label>
+                        ) : null}
                         <FieldInput field={field} />
                     </div>
                 ))}
@@ -176,13 +177,9 @@ export function FormEmbedBlock({ block }: FormEmbedProps) {
                     onVerify={setTurnstileToken}
                     onExpire={() => setTurnstileToken('')}
                 />
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 self-start rounded-lg px-8 py-3 font-semibold transition-colors disabled:opacity-60"
-                >
+                <Button type="submit" disabled={loading} className="self-start">
                     {loading ? 'Sending…' : 'Submit'}
-                </button>
+                </Button>
             </form>
         </div>
     );

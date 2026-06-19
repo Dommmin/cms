@@ -1,4 +1,9 @@
+import { Star } from 'lucide-react';
 import Image from 'next/image';
+
+import { BlockHeader } from '@/components/composition';
+import { cn } from '@/lib/utils';
+
 import type {
     TestimonialsConfig,
     TestimonialsProps,
@@ -19,20 +24,11 @@ export function TestimonialsBlock({ block }: TestimonialsProps) {
 
     return (
         <div className="flex flex-col gap-8">
-            {(cfg.title || cfg.subtitle) && (
-                <div className="text-center">
-                    {cfg.title && (
-                        <h2 className="text-2xl font-bold md:text-3xl">
-                            {cfg.title}
-                        </h2>
-                    )}
-                    {cfg.subtitle && (
-                        <p className="text-muted-foreground mt-2">
-                            {cfg.subtitle}
-                        </p>
-                    )}
-                </div>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+            />
 
             <div className={`grid gap-6 ${colClass}`}>
                 {items.map((item, i) => (
@@ -43,16 +39,16 @@ export function TestimonialsBlock({ block }: TestimonialsProps) {
                         {item.rating && (
                             <div className="flex gap-1">
                                 {Array.from({ length: 5 }).map((_, si) => (
-                                    <span
+                                    <Star
                                         key={si}
-                                        className={
+                                        aria-hidden="true"
+                                        className={cn(
+                                            'h-4 w-4',
                                             si < item.rating!
-                                                ? 'text-yellow-400'
-                                                : 'text-muted'
-                                        }
-                                    >
-                                        ★
-                                    </span>
+                                                ? 'fill-[var(--store-accent-amber)] text-[var(--store-accent-amber)]'
+                                                : 'text-muted',
+                                        )}
+                                    />
                                 ))}
                             </div>
                         )}

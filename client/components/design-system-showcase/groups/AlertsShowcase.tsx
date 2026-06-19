@@ -1,5 +1,6 @@
-import { cn } from '@/lib/utils';
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { ShowcaseGroupHeader } from '../ShowcaseGroupHeader';
 
@@ -7,28 +8,28 @@ const alerts = [
     {
         id: 'info',
         label: 'info',
-        className: 'bg-accent text-accent-foreground border-border',
+        variant: 'info' as const,
         icon: Info,
         message: 'Informational message for neutral context.',
     },
     {
         id: 'success',
         label: 'success',
-        className: 'bg-muted text-foreground border-border',
+        variant: 'success' as const,
         icon: CheckCircle,
         message: 'Success — your changes were saved.',
     },
     {
         id: 'warning',
         label: 'warning',
-        className: 'bg-secondary text-secondary-foreground border-border',
+        variant: 'warning' as const,
         icon: AlertTriangle,
         message: 'Warning — review settings before publishing.',
     },
     {
         id: 'danger',
         label: 'danger',
-        className: 'bg-destructive/10 text-destructive border-destructive/30',
+        variant: 'destructive' as const,
         icon: AlertCircle,
         message: 'Danger — this action cannot be undone.',
     },
@@ -49,21 +50,13 @@ export function AlertsShowcase() {
                             <p className="text-muted-foreground font-mono text-xs uppercase">
                                 {alert.label}
                             </p>
-                            <div
-                                className={cn(
-                                    'flex items-center gap-3 rounded-lg border px-4 py-3',
-                                    alert.className,
-                                )}
-                                role="status"
-                            >
-                                <Icon
-                                    className="h-4 w-4 shrink-0"
-                                    aria-hidden="true"
-                                />
-                                <p className="text-sm font-medium">
-                                    {alert.message}
-                                </p>
-                            </div>
+                            <Alert variant={alert.variant}>
+                                <Icon aria-hidden="true" />
+                                <AlertTitle>{alert.message}</AlertTitle>
+                                <AlertDescription className="sr-only">
+                                    {alert.label} alert example
+                                </AlertDescription>
+                            </Alert>
                         </div>
                     );
                 })}

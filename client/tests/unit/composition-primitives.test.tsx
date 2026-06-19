@@ -2,12 +2,15 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import {
+    BlockHeader,
     Container,
     CTASection,
     EmptyState,
     Grid,
     PageHeader,
     Section,
+    Stack,
+    Surface,
 } from '@/components/composition';
 
 describe('composition primitives', () => {
@@ -45,6 +48,42 @@ describe('composition primitives', () => {
 
         expect(html).toContain('md:grid-cols-3');
         expect(html).toContain('gap-[var(--block-gap');
+    });
+
+    it('renders BlockHeader with section heading styles', () => {
+        const html = renderToStaticMarkup(
+            <BlockHeader
+                eyebrow="Featured"
+                title="Our products"
+                description="Hand-picked for you"
+                align="center"
+            />,
+        );
+
+        expect(html).toContain('Our products');
+        expect(html).toContain('text-[length:var(--h2-size');
+        expect(html).toContain('text-center');
+    });
+
+    it('renders Stack with gap scale classes', () => {
+        const html = renderToStaticMarkup(
+            <Stack gap="lg">
+                <div>one</div>
+                <div>two</div>
+            </Stack>,
+        );
+
+        expect(html).toContain('flex flex-col');
+        expect(html).toContain('gap-6');
+    });
+
+    it('renders Surface with variant classes', () => {
+        const html = renderToStaticMarkup(
+            <Surface variant="elevated">content</Surface>,
+        );
+
+        expect(html).toContain('elevated-surface');
+        expect(html).toContain('content');
     });
 
     it('renders PageHeader with heading tokens', () => {

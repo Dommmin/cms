@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
 
+import { BlockHeader } from '@/components/composition';
+
 import type {
     PricingTableConfig,
     PricingTableProps,
@@ -22,20 +24,11 @@ export function PricingTableBlock({ block }: PricingTableProps) {
 
     return (
         <div className="flex flex-col gap-10">
-            {(cfg.title || cfg.subtitle) && (
-                <div className="text-center">
-                    {cfg.title && (
-                        <h2 className="text-2xl font-bold md:text-3xl">
-                            {cfg.title}
-                        </h2>
-                    )}
-                    {cfg.subtitle && (
-                        <p className="text-muted-foreground mt-2">
-                            {cfg.subtitle}
-                        </p>
-                    )}
-                </div>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+            />
 
             {showToggle && (
                 <div className="flex items-center justify-center gap-4">
@@ -54,7 +47,7 @@ export function PricingTableBlock({ block }: PricingTableProps) {
                         className={`relative h-6 w-12 rounded-full transition-colors ${isYearly ? 'bg-primary' : 'bg-muted'}`}
                     >
                         <span
-                            className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isYearly ? 'translate-x-6' : ''}`}
+                            className={`bg-background absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow transition-transform ${isYearly ? 'translate-x-6' : ''}`}
                         />
                     </button>
                     <span
@@ -63,7 +56,7 @@ export function PricingTableBlock({ block }: PricingTableProps) {
                         }
                     >
                         Yearly{' '}
-                        <span className="ml-1 text-xs font-medium text-green-600">
+                        <span className="ml-1 text-xs font-medium text-[var(--store-accent-mint)]">
                             Save ~20%
                         </span>
                     </span>

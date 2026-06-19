@@ -1,3 +1,5 @@
+import { BlockHeader } from '@/components/composition';
+
 import type {
     StepsProcessConfig,
     StepsProcessProps,
@@ -12,20 +14,11 @@ export function StepsProcessBlock({ block }: StepsProcessProps) {
 
     return (
         <div className="flex flex-col gap-10">
-            {(cfg.title || cfg.subtitle) && (
-                <div className="text-center">
-                    {cfg.title && (
-                        <h2 className="text-2xl font-bold md:text-3xl">
-                            {cfg.title}
-                        </h2>
-                    )}
-                    {cfg.subtitle && (
-                        <p className="text-muted-foreground mt-2">
-                            {cfg.subtitle}
-                        </p>
-                    )}
-                </div>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+            />
 
             {layout === 'vertical' ? (
                 <div className="relative mx-auto max-w-2xl">

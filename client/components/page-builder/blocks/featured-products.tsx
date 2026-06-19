@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { BlockHeader } from '@/components/composition';
 import { ProductCard } from '@/components/product-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getRelationsByKey } from '@/lib/format';
@@ -61,30 +62,21 @@ export function FeaturedProductsBlock({ block }: FeaturedProductsProps) {
 
     return (
         <div className="flex flex-col gap-8">
-            {(cfg.title || cfg.subtitle) && (
-                <div className="flex items-end justify-between gap-4">
-                    <div>
-                        {cfg.title && (
-                            <h2 className="text-2xl font-bold md:text-3xl">
-                                {cfg.title}
-                            </h2>
-                        )}
-                        {cfg.subtitle && (
-                            <p className="text-muted-foreground mt-1">
-                                {cfg.subtitle}
-                            </p>
-                        )}
-                    </div>
-                    {cfg.view_all_url && (
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                compactDescription
+                trailing={
+                    cfg.view_all_url ? (
                         <Link
                             href={cfg.view_all_url}
-                            className="text-primary shrink-0 text-sm font-medium hover:underline"
+                            className="text-primary text-sm font-medium hover:underline"
                         >
                             {cfg.view_all_label ?? 'View all →'}
                         </Link>
-                    )}
-                </div>
-            )}
+                    ) : undefined
+                }
+            />
 
             {products.length > 0 ? (
                 <div className={`grid gap-6 ${colClass}`}>

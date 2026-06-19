@@ -1,3 +1,5 @@
+import { BlockHeader } from '@/components/composition';
+
 import type { TimelineConfig, TimelineProps } from './timeline.types';
 
 export function TimelineBlock({ block }: TimelineProps) {
@@ -8,20 +10,11 @@ export function TimelineBlock({ block }: TimelineProps) {
 
     return (
         <div className="flex flex-col gap-10">
-            {(cfg.title || cfg.subtitle) && (
-                <div className="text-center">
-                    {cfg.title && (
-                        <h2 className="text-2xl font-bold md:text-3xl">
-                            {cfg.title}
-                        </h2>
-                    )}
-                    {cfg.subtitle && (
-                        <p className="text-muted-foreground mt-2">
-                            {cfg.subtitle}
-                        </p>
-                    )}
-                </div>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+            />
 
             <div className="relative">
                 {/* Vertical line */}
@@ -35,7 +28,7 @@ export function TimelineBlock({ block }: TimelineProps) {
                         >
                             {/* Dot */}
                             <div className="bg-primary ring-background absolute top-1 left-2 flex h-5 w-5 items-center justify-center rounded-full ring-4 md:left-6">
-                                <span className="h-2 w-2 rounded-full bg-white" />
+                                <span className="bg-background h-2 w-2 rounded-full" />
                             </div>
 
                             <div className="flex-1">

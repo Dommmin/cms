@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { BlockHeader } from '@/components/composition';
 import { getRelationsByKey } from '@/lib/format';
 import { resolveCategoryPath } from '@/lib/public-paths';
 import type { Category } from '@/types/api';
@@ -27,20 +28,11 @@ export function CategoriesGridBlock({ block }: CategoriesGridProps) {
 
     return (
         <div className="flex flex-col gap-8">
-            {(cfg.title || cfg.subtitle) && (
-                <div className="text-center">
-                    {cfg.title && (
-                        <h2 className="text-2xl font-bold md:text-3xl">
-                            {cfg.title}
-                        </h2>
-                    )}
-                    {cfg.subtitle && (
-                        <p className="text-muted-foreground mt-2">
-                            {cfg.subtitle}
-                        </p>
-                    )}
-                </div>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+            />
 
             <div className={`grid gap-4 ${colClass}`}>
                 {categories.map((cat) => (

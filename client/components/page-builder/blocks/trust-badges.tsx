@@ -1,22 +1,5 @@
+import { BlockIcon } from './block-icon';
 import type { TrustBadgesConfig, TrustBadgesProps } from './trust-badges.types';
-
-const iconMap: Record<string, string> = {
-    truck: '🚚',
-    shield: '🛡',
-    return: '↩',
-    lock: '🔒',
-    star: '★',
-    check: '✓',
-    clock: '⏱',
-    gift: '🎁',
-    award: '🏆',
-    leaf: '🍃',
-    heart: '♥',
-    users: '👥',
-    phone: '📞',
-    mail: '✉',
-    globe: '🌍',
-};
 
 export function TrustBadgesBlock({ block }: TrustBadgesProps) {
     const cfg = block.configuration as TrustBadgesConfig;
@@ -33,9 +16,11 @@ export function TrustBadgesBlock({ block }: TrustBadgesProps) {
                         key={i}
                         className="text-muted-foreground flex items-center gap-2 text-sm"
                     >
-                        <span className="text-base">
-                            {iconMap[badge.icon ?? 'check'] ?? '✓'}
-                        </span>
+                        <BlockIcon
+                            name={badge.icon ?? 'check'}
+                            size="sm"
+                            className="text-muted-foreground"
+                        />
                         <span className="font-medium">{badge.label}</span>
                     </div>
                 ))}
@@ -59,9 +44,7 @@ export function TrustBadgesBlock({ block }: TrustBadgesProps) {
                         key={i}
                         className="bg-card flex flex-col items-center gap-2 rounded-xl border p-4 text-center shadow-sm"
                     >
-                        <span className="text-2xl">
-                            {iconMap[badge.icon ?? 'check'] ?? '✓'}
-                        </span>
+                        <BlockIcon name={badge.icon ?? 'check'} size="xl" />
                         {badge.label && (
                             <p className="text-sm font-semibold">
                                 {badge.label}
@@ -78,7 +61,6 @@ export function TrustBadgesBlock({ block }: TrustBadgesProps) {
         );
     }
 
-    // Default: row
     return (
         <div className="flex flex-wrap items-center justify-center gap-8">
             {badges.map((badge, i) => (
@@ -86,9 +68,7 @@ export function TrustBadgesBlock({ block }: TrustBadgesProps) {
                     key={i}
                     className="flex flex-col items-center gap-1 text-center"
                 >
-                    <span className="text-3xl">
-                        {iconMap[badge.icon ?? 'check'] ?? '✓'}
-                    </span>
+                    <BlockIcon name={badge.icon ?? 'check'} size="xl" />
                     {badge.label && (
                         <p className="text-sm font-semibold">{badge.label}</p>
                     )}

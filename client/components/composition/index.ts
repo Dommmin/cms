@@ -1,6 +1,13 @@
 export { AnimateOnView } from './AnimateOnView';
 export type { AnimateOnViewProps } from './AnimateOnView.types';
 
+export { BlockHeader } from './BlockHeader';
+export type {
+    BlockHeaderAlign,
+    BlockHeaderProps,
+    BlockHeaderSize,
+} from './BlockHeader.types';
+
 export { Container } from './Container';
 export type { ContainerProps } from './Container.types';
 
@@ -23,11 +30,19 @@ export type { PageHeaderProps } from './PageHeader.types';
 export { Section } from './Section';
 export type { SectionProps } from './Section.types';
 
+export { Stack } from './Stack';
+export type { StackProps } from './Stack.types';
+
+export { Surface } from './Surface';
+export type { SurfaceProps } from './Surface.types';
+
 export {
     containerClasses,
     gridClasses,
     sectionPaddingClasses,
     sectionVariantClasses,
+    stackGapClasses,
+    surfaceVariantClasses,
 } from './styles';
 export type {
     GridCols,
@@ -35,4 +50,6 @@ export type {
     SectionPadding,
     SectionVariant,
     SectionVariantKey,
+    StackGap,
+    SurfaceVariant,
 } from './styles';

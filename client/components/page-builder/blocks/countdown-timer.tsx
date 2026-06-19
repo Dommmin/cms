@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 
+import { BlockHeader } from '@/components/composition';
+import { cn } from '@/lib/utils';
+
 import type {
     CountdownTimerConfig,
     CountdownTimerProps,
@@ -61,16 +64,15 @@ export function CountdownTimerBlock({ block }: CountdownTimerProps) {
         <div
             className={`flex flex-col items-center gap-8 text-center ${containerClass}`}
         >
-            {cfg.title && (
-                <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>
-            )}
-            {cfg.subtitle && (
-                <p
-                    className={`text-lg ${isDark ? 'opacity-80' : 'text-muted-foreground'}`}
-                >
-                    {cfg.subtitle}
-                </p>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+                descriptionClassName={cn(
+                    'text-lg',
+                    isDark ? 'text-inherit opacity-80' : undefined,
+                )}
+            />
 
             {expired ? (
                 <p className="text-xl font-semibold">

@@ -1,12 +1,8 @@
+import { Stack } from '@/components/composition';
+
 import { ShowcaseGroupHeader } from '../ShowcaseGroupHeader';
 
-const gaps = [
-    { id: 'xs', className: 'gap-2' },
-    { id: 'sm', className: 'gap-3' },
-    { id: 'md', className: 'gap-4' },
-    { id: 'lg', className: 'gap-6' },
-    { id: 'xl', className: 'gap-8' },
-] as const;
+const gaps = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
 
 export function StackLayoutsShowcase() {
     return (
@@ -17,15 +13,11 @@ export function StackLayoutsShowcase() {
             />
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {gaps.map((gap) => (
-                    <div key={gap.id} className="space-y-2">
+                    <div key={gap} className="space-y-2">
                         <p className="text-muted-foreground font-mono text-xs uppercase">
-                            gap {gap.id}
+                            gap {gap}
                         </p>
-                        <div
-                            className={['flex flex-col', gap.className].join(
-                                ' ',
-                            )}
-                        >
+                        <Stack gap={gap}>
                             {['A', 'B', 'C'].map((item) => (
                                 <div
                                     key={item}
@@ -34,7 +26,7 @@ export function StackLayoutsShowcase() {
                                     {item}
                                 </div>
                             ))}
-                        </div>
+                        </Stack>
                     </div>
                 ))}
             </div>

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 
+import { BlockHeader } from '@/components/composition';
 import { getRelationsByKey } from '@/lib/format';
 import type {
     ImageGalleryConfig,
@@ -27,7 +28,7 @@ export function ImageGalleryBlock({ block }: ImageGalleryProps) {
 
     return (
         <div className="flex flex-col gap-6">
-            {cfg.title && <h2 className="text-2xl font-bold">{cfg.title}</h2>}
+            <BlockHeader title={cfg.title} size="base" />
             <div className={`grid gap-3 ${colClass}`}>
                 {imageRelations.map((rel, i) => {
                     const url = rel.metadata?.url as string | undefined;

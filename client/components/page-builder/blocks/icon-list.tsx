@@ -1,48 +1,9 @@
 import { cn } from '@/lib/utils';
-import type { IconListConfig, IconListProps } from './icon-list.types';
 
-// Simple icon map — renders emoji or text fallback (full Lucide dynamic import avoided for bundle size)
-function BlockIcon({ name, color }: { name?: string; color?: string }) {
-    const iconMap: Record<string, string> = {
-        check: '✓',
-        star: '★',
-        bolt: '⚡',
-        heart: '♥',
-        shield: '🛡',
-        lock: '🔒',
-        truck: '🚚',
-        clock: '⏱',
-        globe: '🌍',
-        phone: '📞',
-        mail: '✉',
-        users: '👥',
-        chart: '📊',
-        rocket: '🚀',
-        leaf: '🍃',
-        sun: '☀',
-        moon: '🌙',
-        zap: '⚡',
-        award: '🏆',
-        gift: '🎁',
-        tag: '🏷',
-        settings: '⚙',
-        code: '💻',
-        camera: '📷',
-        music: '🎵',
-        video: '🎬',
-        file: '📄',
-        folder: '📁',
-    };
-    const symbol = (name && iconMap[name]) ?? '●';
-    return (
-        <span
-            className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg"
-            style={color ? { color } : undefined}
-        >
-            {symbol}
-        </span>
-    );
-}
+import { BlockHeader } from '@/components/composition';
+
+import { BlockIcon } from './block-icon';
+import type { IconListConfig, IconListProps } from './icon-list.types';
 
 export function IconListBlock({ block }: IconListProps) {
     const cfg = block.configuration as IconListConfig;
@@ -62,20 +23,11 @@ export function IconListBlock({ block }: IconListProps) {
 
     return (
         <div className="flex flex-col gap-10">
-            {(cfg.title || cfg.subtitle) && (
-                <div className="text-center">
-                    {cfg.title && (
-                        <h2 className="text-2xl font-bold md:text-3xl">
-                            {cfg.title}
-                        </h2>
-                    )}
-                    {cfg.subtitle && (
-                        <p className="text-muted-foreground mt-2">
-                            {cfg.subtitle}
-                        </p>
-                    )}
-                </div>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+            />
 
             <div className={cn('grid gap-6', colClass)}>
                 {items.map((item, i) => (
@@ -88,15 +40,21 @@ export function IconListBlock({ block }: IconListProps) {
                             style === 'compact' && 'flex items-center gap-3',
                         )}
                     >
-                        <BlockIcon name={item.icon} color={cfg.icon_color} />
+                        <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                            <BlockIcon
+                                name={item.icon}
+                                color={cfg.icon_color}
+                                size="md"
+                            />
+                        </div>
                         <div>
                             {item.title && (
                                 <p
                                     className={cn(
-                                        'font-semibold',
+                                        'font-[family-name:var(--font-heading)] font-semibold',
                                         style === 'compact'
-                                            ? 'text-sm'
-                                            : 'text-base',
+                                            ? 'text-[length:var(--h4-size,1.25rem)]'
+                                            : 'text-[length:var(--text-base-size,1rem)]',
                                     )}
                                 >
                                     {item.title}

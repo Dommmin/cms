@@ -1,28 +1,14 @@
+import { Surface } from '@/components/composition';
+import type { SurfaceVariant } from '@/components/composition/styles';
+
 import { ShowcaseGroupHeader } from '../ShowcaseGroupHeader';
 
-const surfaces = [
-    {
-        id: 'default',
-        label: 'default',
-        className: 'bg-card text-card-foreground border border-border',
-    },
-    {
-        id: 'outlined',
-        label: 'outlined',
-        className: 'bg-background text-foreground border-2 border-border',
-    },
-    {
-        id: 'elevated',
-        label: 'elevated',
-        className:
-            'elevated-surface rounded-[var(--store-card-radius,var(--radius))]',
-    },
-    {
-        id: 'muted',
-        label: 'muted',
-        className: 'bg-muted text-foreground border border-border',
-    },
-] as const;
+const surfaces: { id: SurfaceVariant; label: string }[] = [
+    { id: 'default', label: 'default' },
+    { id: 'outlined', label: 'outlined' },
+    { id: 'elevated', label: 'elevated' },
+    { id: 'muted', label: 'muted' },
+];
 
 export function SurfacesShowcase() {
     return (
@@ -37,14 +23,12 @@ export function SurfacesShowcase() {
                         <p className="text-muted-foreground font-mono text-xs uppercase">
                             {surface.label}
                         </p>
-                        <div
-                            className={[
-                                'flex min-h-28 items-end rounded-lg p-4 text-sm font-medium',
-                                surface.className,
-                            ].join(' ')}
+                        <Surface
+                            variant={surface.id}
+                            className="flex min-h-28 items-end p-4 text-sm font-medium"
                         >
                             Surface · {surface.label}
-                        </div>
+                        </Surface>
                     </div>
                 ))}
             </div>

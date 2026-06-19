@@ -2,6 +2,9 @@
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 import { useState } from 'react';
+
+import { BlockHeader } from '@/components/composition';
+
 import type { BlockRendererProps } from '../block-renderer.types';
 
 interface Plan {
@@ -31,14 +34,14 @@ export function PricingCardsBlock({ block }: BlockRendererProps) {
 
     return (
         <div className="py-8 text-center">
-            {title && (
-                <h2 className="mb-2 text-3xl font-bold tracking-tight">
-                    {title}
-                </h2>
-            )}
-            {subtitle && (
-                <p className="text-muted-foreground mb-6">{subtitle}</p>
-            )}
+            <BlockHeader
+                title={title}
+                description={subtitle}
+                align="center"
+                size="lg"
+                titleClassName="mb-2"
+                descriptionClassName="mb-6"
+            />
             {show_toggle && (
                 <div className="bg-muted/60 mb-8 inline-flex items-center gap-1 rounded-full border p-1">
                     <button
@@ -64,7 +67,7 @@ export function PricingCardsBlock({ block }: BlockRendererProps) {
                         )}
                     >
                         Yearly{' '}
-                        <span className="text-xs font-semibold text-green-600">
+                        <span className="text-xs font-semibold text-[var(--store-accent-mint)]">
                             -20%
                         </span>
                     </button>

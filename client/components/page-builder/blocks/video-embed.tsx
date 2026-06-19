@@ -1,3 +1,5 @@
+import { BlockHeader } from '@/components/composition';
+
 import type { VideoEmbedConfig, VideoEmbedProps } from './video-embed.types';
 
 function getEmbedUrl(
@@ -60,7 +62,7 @@ export function VideoEmbedBlock({ block }: VideoEmbedProps) {
 
     return (
         <div className="flex flex-col gap-4">
-            {cfg.title && <h2 className="text-2xl font-bold">{cfg.title}</h2>}
+            <BlockHeader title={cfg.title} size="base" />
             <div className={`overflow-hidden rounded-2xl ${aspectClass}`}>
                 <iframe
                     src={embedUrl}

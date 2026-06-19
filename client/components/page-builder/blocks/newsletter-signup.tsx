@@ -1,10 +1,14 @@
 'use client';
 
+import { PartyPopper } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { BlockHeader } from '@/components/composition';
 import { subscribeToNewsletter } from '@/components/page-builder/mutations/newsletter';
 import { TurnstileWidget } from '@/components/turnstile-widget';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import type {
     NewsletterSignupConfig,
     NewsletterSignupProps,
@@ -40,8 +44,10 @@ export function NewsletterSignupBlock({ block }: NewsletterSignupProps) {
     if (done) {
         return (
             <div className="flex flex-col items-center gap-3 py-8 text-center">
-                <div className="text-4xl">🎉</div>
-                <p className="text-lg font-semibold">
+                <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-full">
+                    <PartyPopper className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <p className="text-[length:var(--h4-size,1.25rem)] font-semibold">
                     {cfg.success_message ?? "You're subscribed!"}
                 </p>
             </div>
@@ -50,42 +56,41 @@ export function NewsletterSignupBlock({ block }: NewsletterSignupProps) {
 
     return (
         <div className="flex flex-col items-center gap-6 text-center">
-            {cfg.title && (
-                <h2 className="text-2xl font-bold md:text-3xl">{cfg.title}</h2>
-            )}
-            {cfg.subtitle && (
-                <p className="text-muted-foreground max-w-xl">{cfg.subtitle}</p>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+                descriptionClassName="max-w-xl"
+            />
 
             <form
                 onSubmit={handleSubmit}
                 className="flex w-full max-w-md flex-col gap-3"
             >
-                {cfg.ask_name && (
-                    <input
+                {cfg.ask_name ? (
+                    <Input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Your name"
-                        className="border-input bg-background focus:ring-ring w-full rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2"
                     />
-                )}
+                ) : null}
                 <div className="flex flex-col gap-2 sm:flex-row">
-                    <input
+                    <Input
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder={cfg.placeholder ?? 'Enter your email'}
-                        className="border-input bg-background focus:ring-ring min-w-0 flex-1 rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2"
+                        className="min-w-0 flex-1"
                     />
-                    <button
+                    <Button
                         type="submit"
                         disabled={loading}
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 w-full shrink-0 rounded-lg px-6 py-3 text-sm font-semibold transition-colors disabled:opacity-60 sm:w-auto"
+                        className="w-full sm:w-auto"
                     >
                         {loading ? '...' : (cfg.button_text ?? 'Subscribe')}
-                    </button>
+                    </Button>
                 </div>
                 <TurnstileWidget
                     onVerify={setTurnstileToken}

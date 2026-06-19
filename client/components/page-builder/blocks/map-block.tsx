@@ -1,3 +1,4 @@
+import { BlockHeader } from '@/components/composition';
 import { StoreMap } from '@/components/store-map';
 import { getRelationsByKey } from '@/lib/format';
 import type { Store } from '@/types/api';
@@ -56,9 +57,7 @@ export function MapBlock({ block }: MapBlockProps) {
 
     return (
         <div>
-            {cfg.title && (
-                <h2 className="mb-4 text-2xl font-bold">{cfg.title}</h2>
-            )}
+            <BlockHeader title={cfg.title} size="base" className="mb-4" />
             <div className="border-border overflow-hidden rounded-xl border">
                 <StoreMap stores={stores} height={height} zoom={zoom} />
             </div>

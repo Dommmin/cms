@@ -1,7 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 
+import { BlockHeader } from '@/components/composition';
 import { getRelationByKey } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import type {
     PromotionalBannerConfig,
     PromotionalBannerProps,
@@ -17,10 +20,17 @@ export function PromotionalBannerBlock({ block }: PromotionalBannerProps) {
     const isCenter = layout === 'center';
     const isRight = layout === 'right';
 
+    const bannerStyle = cfg.background_color
+        ? ({ '--banner-bg': cfg.background_color } as CSSProperties)
+        : undefined;
+
     return (
         <div
-            className="relative flex min-h-64 overflow-hidden rounded-2xl"
-            style={{ backgroundColor: cfg.background_color ?? undefined }}
+            className={cn(
+                'relative flex min-h-64 overflow-hidden rounded-2xl',
+                cfg.background_color && 'bg-[var(--banner-bg)]',
+            )}
+            style={bannerStyle}
         >
             {bgUrl && (
                 <>
@@ -45,20 +55,23 @@ export function PromotionalBannerBlock({ block }: PromotionalBannerProps) {
                         {cfg.badge_text}
                     </span>
                 )}
-                {cfg.title && (
-                    <h2
-                        className={`text-3xl font-bold md:text-4xl ${bgUrl ? 'text-[var(--section-dark-text,var(--primary-foreground))]' : ''}`}
-                    >
-                        {cfg.title}
-                    </h2>
-                )}
-                {cfg.subtitle && (
-                    <p
-                        className={`text-lg ${bgUrl ? 'text-[var(--section-dark-text,var(--primary-foreground))]/90' : 'text-muted-foreground'}`}
-                    >
-                        {cfg.subtitle}
-                    </p>
-                )}
+                <BlockHeader
+                    title={cfg.title}
+                    description={cfg.subtitle}
+                    size="display"
+                    align={isCenter ? 'center' : isRight ? 'right' : 'left'}
+                    titleClassName={
+                        bgUrl
+                            ? 'text-[var(--section-dark-text,var(--primary-foreground))]'
+                            : undefined
+                    }
+                    descriptionClassName={cn(
+                        'text-lg',
+                        bgUrl
+                            ? 'text-[var(--section-dark-text,var(--primary-foreground))]/90'
+                            : undefined,
+                    )}
+                />
                 {cfg.cta_text && cfg.cta_url && (
                     <div>
                         <Link

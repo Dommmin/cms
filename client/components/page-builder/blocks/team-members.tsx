@@ -3,6 +3,8 @@ import Link from 'next/link';
 
 import { Linkedin, Twitter } from 'lucide-react';
 
+import { BlockHeader } from '@/components/composition';
+
 import type { TeamMembersConfig, TeamMembersProps } from './team-members.types';
 
 export function TeamMembersBlock({ block }: TeamMembersProps) {
@@ -22,20 +24,11 @@ export function TeamMembersBlock({ block }: TeamMembersProps) {
 
     return (
         <div className="flex flex-col gap-10">
-            {(cfg.title || cfg.subtitle) && (
-                <div className="text-center">
-                    {cfg.title && (
-                        <h2 className="text-2xl font-bold md:text-3xl">
-                            {cfg.title}
-                        </h2>
-                    )}
-                    {cfg.subtitle && (
-                        <p className="text-muted-foreground mt-2">
-                            {cfg.subtitle}
-                        </p>
-                    )}
-                </div>
-            )}
+            <BlockHeader
+                title={cfg.title}
+                description={cfg.subtitle}
+                align="center"
+            />
 
             <div className={`grid gap-8 ${colClass}`}>
                 {members.map((member, i) => (

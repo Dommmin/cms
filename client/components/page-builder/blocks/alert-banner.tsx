@@ -1,33 +1,28 @@
 'use client';
-import { cn } from '@/lib/utils';
 import Cookies from 'js-cookie';
 import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react';
 import { useState } from 'react';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
+
 import type { BlockRendererProps } from '../block-renderer.types';
 
 const variantConfig = {
     info: {
-        bg: 'bg-accent',
-        border: 'border-border',
-        text: 'text-accent-foreground',
+        variant: 'info' as const,
         icon: Info,
     },
     warning: {
-        bg: 'bg-secondary',
-        border: 'border-border',
-        text: 'text-secondary-foreground',
+        variant: 'warning' as const,
         icon: AlertTriangle,
     },
     success: {
-        bg: 'bg-muted',
-        border: 'border-border',
-        text: 'text-foreground',
+        variant: 'success' as const,
         icon: CheckCircle,
     },
     error: {
-        bg: 'bg-destructive/10',
-        border: 'border-destructive/30',
-        text: 'text-destructive',
+        variant: 'destructive' as const,
         icon: AlertCircle,
     },
 };
@@ -53,16 +48,12 @@ export function AlertBannerBlock({ block }: BlockRendererProps) {
     const Icon = variantCfg.icon;
 
     return (
-        <div
-            className={cn(
-                'my-2 flex items-center gap-3 rounded-lg border px-4 py-3',
-                variantCfg.bg,
-                variantCfg.border,
-                variantCfg.text,
-            )}
+        <Alert
+            variant={variantCfg.variant}
+            className={cn('my-2 items-center', dismissable && 'pr-10')}
         >
-            <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <p className="flex-1 text-sm font-medium">
+            <Icon aria-hidden="true" />
+            <AlertDescription className="text-foreground col-start-2 text-sm font-medium">
                 {message}
                 {link && (
                     <a
@@ -72,7 +63,7 @@ export function AlertBannerBlock({ block }: BlockRendererProps) {
                         {link_label ?? 'Learn more'}
                     </a>
                 )}
-            </p>
+            </AlertDescription>
             {dismissable && (
                 <button
                     type="button"
@@ -81,11 +72,11 @@ export function AlertBannerBlock({ block }: BlockRendererProps) {
                         setDismissed(true);
                         Cookies.set(cookieKey, '1', { expires: 7 });
                     }}
-                    className="shrink-0 hover:opacity-70"
+                    className="absolute top-3 right-3 shrink-0 hover:opacity-70"
                 >
                     <X className="h-4 w-4" />
                 </button>
             )}
-        </div>
+        </Alert>
     );
 }

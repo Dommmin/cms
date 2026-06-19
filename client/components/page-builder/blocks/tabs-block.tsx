@@ -1,63 +1,65 @@
 'use client';
 
 import { sanitizeHtml } from '@/lib/sanitize';
-import { useState } from 'react';
+
+import { BlockHeader } from '@/components/composition';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 import type { TabsBlockProps, TabsConfig } from './tabs-block.types';
 
 export function TabsBlock({ block }: TabsBlockProps) {
     const cfg = block.configuration as TabsConfig;
     const tabs = cfg.tabs ?? [];
-    const [activeTab, setActiveTab] = useState(0);
     const variant = cfg.variant ?? 'underline';
 
-    const tabClass = (isActive: boolean) => {
-        if (variant === 'pills') {
-            return isActive
-                ? 'rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground'
-                : 'rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors';
-        }
-        if (variant === 'boxed') {
-            return isActive
-                ? 'border-b-2 border-primary px-4 py-3 text-sm font-medium text-primary bg-muted/30'
-                : 'border-b-2 border-transparent px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors';
-        }
-        // underline
-        return isActive
-            ? 'border-b-2 border-primary px-1 py-3 text-sm font-medium text-primary'
-            : 'border-b-2 border-transparent px-1 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors';
-    };
-
-    const wrapperClass =
-        variant === 'pills'
-            ? 'flex gap-2 flex-wrap'
-            : 'flex gap-4 border-b border-border overflow-x-auto';
+    const listVariant = variant === 'pills' ? 'default' : 'line';
+    const listClassName = cn(
+        variant === 'pills' && 'h-auto flex-wrap gap-2 p-1',
+        (variant === 'boxed' || variant === 'underline') &&
+            'border-border h-auto w-full justify-start gap-0 rounded-none border-b bg-transparent p-0',
+        variant === 'underline' && 'gap-4',
+    );
+    const triggerClassName = cn(
+        variant === 'pills' &&
+            'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-auto flex-none px-4 py-2',
+        (variant === 'boxed' || variant === 'underline') &&
+            'data-[state=active]:bg-muted/30 h-auto flex-none rounded-none px-4 py-3',
+    );
 
     return (
         <div className="flex flex-col gap-6">
-            {cfg.title && <h2 className="text-2xl font-bold">{cfg.title}</h2>}
+            <BlockHeader title={cfg.title} size="base" />
 
-            <div className={wrapperClass}>
-                {tabs.map((tab, i) => (
-                    <button
-                        key={i}
-                        onClick={() => setActiveTab(i)}
-                        className={tabClass(activeTab === i)}
-                    >
-                        {tab.icon && <span className="mr-1">{tab.icon}</span>}
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
+            {tabs.length > 0 ? (
+                <Tabs defaultValue="tab-0">
+                    <TabsList variant={listVariant} className={listClassName}>
+                        {tabs.map((tab, i) => (
+                            <TabsTrigger
+                                key={i}
+                                value={`tab-${i}`}
+                                className={triggerClassName}
+                            >
+                                {tab.icon ? <span>{tab.icon}</span> : null}
+                                {tab.label}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
 
-            {tabs[activeTab]?.content && (
-                <div
-                    className="prose dark:prose-invert"
-                    dangerouslySetInnerHTML={{
-                        __html: sanitizeHtml(tabs[activeTab].content!),
-                    }}
-                />
-            )}
+                    {tabs.map((tab, i) => (
+                        <TabsContent key={i} value={`tab-${i}`}>
+                            {tab.content ? (
+                                <div
+                                    className="prose dark:prose-invert"
+                                    dangerouslySetInnerHTML={{
+                                        __html: sanitizeHtml(tab.content),
+                                    }}
+                                />
+                            ) : null}
+                        </TabsContent>
+                    ))}
+                </Tabs>
+            ) : null}
         </div>
     );
 }

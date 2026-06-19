@@ -54,3 +54,23 @@ export const gridClasses: Record<GridCols, string> = {
     3: 'grid grid-cols-1 md:grid-cols-3',
     4: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
 };
+
+export type StackGap = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+export const stackGapClasses: Record<StackGap, string> = {
+    xs: 'gap-2',
+    sm: 'gap-3',
+    md: 'gap-4',
+    lg: 'gap-6',
+    xl: 'gap-8',
+};
+
+export type SurfaceVariant = 'default' | 'outlined' | 'elevated' | 'muted';
+
+export const surfaceVariantClasses: Record<SurfaceVariant, string> = {
+    default: 'bg-card text-card-foreground border border-border',
+    outlined: 'bg-background text-foreground border-2 border-border',
+    elevated:
+        'elevated-surface rounded-[var(--store-card-radius,var(--radius))]',
+    muted: 'bg-muted text-foreground border border-border',
+};
