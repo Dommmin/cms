@@ -210,8 +210,8 @@ export default function CheckoutPage() {
         }
 
         // 2. Addresses
-        const billingErrors = validateAddress(billing);
-        const shippingErrors = !sameAddress ? validateAddress(shipping) : {};
+        const billingErrors = validateAddress(billing, t);
+        const shippingErrors = !sameAddress ? validateAddress(shipping, t) : {};
         if (
             Object.keys(billingErrors).length > 0 ||
             Object.keys(shippingErrors).length > 0
