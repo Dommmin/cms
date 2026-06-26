@@ -22,6 +22,8 @@ function makeProduct(id: number, name: string): Product {
         brand: null,
         category: {
             id: 1,
+            description: null,
+            parent_id: null,
             image_url: null,
             name: 'Category',
             public_url: '/categories/category',
@@ -43,7 +45,7 @@ function makeProduct(id: number, name: string): Product {
         slug: `product-${id}`,
         thumbnail: null,
         variants: [],
-    };
+    } as unknown as Product;
 }
 
 function makeBlock(
@@ -56,7 +58,7 @@ function makeBlock(
         is_active: true,
         position: 0,
         relations: products.map((product, index) => ({
-            data: product,
+            data: product as unknown as Record<string, unknown>,
             id: index + 1,
             metadata: null,
             position: index,

@@ -25,7 +25,7 @@ function makeBlock(brands: Brand[]): PageBlock {
         is_active: true,
         position: 0,
         relations: brands.map((brand, index) => ({
-            data: brand,
+            data: brand as unknown as Record<string, unknown>,
             id: index + 1,
             metadata: null,
             position: index,

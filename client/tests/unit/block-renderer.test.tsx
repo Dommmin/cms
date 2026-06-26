@@ -22,13 +22,11 @@ vi.mock('next/dynamic', () => ({
     },
 }));
 
-const missingBlock: PageBlock = {
+const missingBlock = {
     id: 1,
-    type: 'not_registered_block' as PageBlock['type'],
+    type: 'not_registered_block',
     configuration: {},
-    sort_order: 0,
-    is_visible: true,
-};
+} as unknown as PageBlock;
 
 const blockRendererPath = join(
     dirname(fileURLToPath(import.meta.url)),

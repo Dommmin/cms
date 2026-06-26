@@ -36,7 +36,7 @@ function makeBlock(
         is_active: true,
         position: 0,
         relations: stores.map((store, index) => ({
-            data: store,
+            data: store as unknown as Record<string, unknown>,
             id: index + 1,
             metadata: null,
             position: index,
